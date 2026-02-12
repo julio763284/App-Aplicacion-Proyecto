@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/HomePage.dart';
+import 'package:gestor/Loading.dart';
+import 'package:gestor/login.dart';
 
 void main() {
   runApp(InventaryMobile());
@@ -13,4 +15,3 @@ class InventaryMobile extends StatelessWidget {
     return MaterialApp(home: HomePage());
   }
 }
-
