@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-import 'package:gestor/modelo.dart';
+import 'package:gestor/Presentacion/Models/modelo.dart';
 
 class InformesView extends StatefulWidget {
   const InformesView({super.key});
@@ -148,7 +148,7 @@ class _InformesViewState extends State<InformesView> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
-          "Gestionar Informes",
+          "Gestionar Reportes",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -167,7 +167,7 @@ class _InformesViewState extends State<InformesView> {
       body: informesFiltrados.isEmpty
           ? const Center(
               child: Text(
-                "No hay informes",
+                "No hay Reportes",
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             )
