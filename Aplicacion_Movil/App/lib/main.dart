@@ -14,4 +14,3 @@ class InventaryMobile extends StatelessWidget {
     return MaterialApp(home: LoginPage());
   }
 }
-
