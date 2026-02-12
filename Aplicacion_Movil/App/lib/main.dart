@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/HomePage.dart';
+import 'package:gestor/informes.dart';
 import 'package:gestor/login.dart';
 
 void main() {
