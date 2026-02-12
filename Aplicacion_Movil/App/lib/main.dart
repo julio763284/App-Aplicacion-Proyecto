@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/HomePage.dart';
 import 'package:gestor/login.dart';
+import 'olvidar_contrasena.dart';
 
 void main() {
   runApp(InventaryMobile());
@@ -11,6 +12,8 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LoginPage());
+    return olvidar_contrasena();
   }
 }
+
+
