@@ -12,8 +12,8 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return olvidar_contrasena();
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home:OlvidarContrasenaPage());
   }
 }
-
-

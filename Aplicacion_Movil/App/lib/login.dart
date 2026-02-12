@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'olvidar_contrasena.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -167,18 +168,23 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 15),
 
                   // OLVIDÓ CONTRASEÑA
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "¿Olvidaste tu contraseña?",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 1, 122, 116),
-                        fontWeight: FontWeight.bold,
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OlvidarContrasenaPage(),
                       ),
+                    );
+                  },
+                  child: const Text(
+                    "¿Olvidaste tu contraseña?",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 1, 122, 116),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-
-                  const SizedBox(height: 10),
+                ),
 
                   // REGISTRO
                   Row(
