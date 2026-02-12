@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/HomePage.dart';
-import 'package:gestor/Loading.dart';
+import 'package:gestor/informes.dart';
 import 'package:gestor/login.dart';
 
 void main() {
@@ -12,6 +12,6 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: HomePage());
+    return MaterialApp(home: LoginPage());
   }
 }
