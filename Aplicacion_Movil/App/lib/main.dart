@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Failure.dart';
 import 'package:gestor/HomePage.dart';
 import 'package:gestor/login.dart';
 
@@ -11,6 +12,6 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LoginPage());
+    return MaterialApp(home: VistaError());
   }
 }
