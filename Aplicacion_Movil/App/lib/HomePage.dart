@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestor/informes.dart';
+import 'package:gestor/Presentacion/Pages/informes.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -61,7 +61,7 @@ class HomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                   child: Text(
-                    "Gestionar Productos",
+                    "Gestionar Reportes",
                     style: TextStyle(
                       fontSize: 20.0,
                       color: Color.fromARGB(255, 1, 122, 116),
