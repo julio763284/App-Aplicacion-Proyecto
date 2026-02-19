@@ -3,6 +3,7 @@ import 'package:gestor/HomePage.dart';
 import 'package:gestor/HomePage2.dart';
 import 'package:gestor/Presentacion/Pages/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Pages/informes.dart';
+import 'package:gestor/Presentacion/Pages/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/login.dart';
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
 
@@ -15,6 +16,6 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: (HomePage2()));
+    return MaterialApp(home: RegisterView());
   }
 }
