@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/HomePage.dart';
 import 'package:gestor/HomePage2.dart';
+import 'package:gestor/Presentacion/Pages/Controlar_Gastos.dart';
 import 'package:gestor/Presentacion/Pages/Proveedores.dart';
 import 'package:gestor/Presentacion/Pages/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Pages/AjustesView.dart';
@@ -21,7 +22,7 @@ class InventaryMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProveedoresView(),
+      home: Controlar_Gastos(),
     );
   }
 }
