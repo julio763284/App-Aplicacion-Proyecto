@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Pages/informes.dart';
+import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 
 class HomePage2 extends StatelessWidget {
   const HomePage2({super.key});
