@@ -3,14 +3,14 @@ import 'dart:math';
 
 import 'package:gestor/Presentacion/Models/modelo.dart';
 
-class InformesView extends StatefulWidget {
-  const InformesView({super.key});
+class GestionarReportes extends StatefulWidget {
+  const GestionarReportes({super.key});
 
   @override
-  State<InformesView> createState() => _InformesViewState();
+  State<GestionarReportes> createState() => _InformesViewState();
 }
 
-class _InformesViewState extends State<InformesView> {
+class _InformesViewState extends State<GestionarReportes> {
   List<Informe> informes = [];
   DateTime? fechaFiltro;
 

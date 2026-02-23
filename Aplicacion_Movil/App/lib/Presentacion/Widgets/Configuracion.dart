@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AjustesView extends StatelessWidget {
-  const AjustesView({super.key});
+class Configuracion extends StatelessWidget {
+  const Configuracion({super.key});
 
   @override
   Widget build(BuildContext context) {

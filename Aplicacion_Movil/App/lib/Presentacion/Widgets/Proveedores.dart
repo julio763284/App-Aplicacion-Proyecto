@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ProveedoresView extends StatelessWidget {
-  const ProveedoresView({super.key});
+class Proveedores extends StatelessWidget {
+  const Proveedores({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D9488),
+        backgroundColor:  const Color.fromARGB(255, 1, 122, 116),
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
@@ -35,14 +35,14 @@ class ProveedoresView extends StatelessWidget {
               width: 160,
               height: 160,
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.15),
+                color: Color.fromARGB(255, 1, 122, 116).withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
               child: const Center(
                 child: Icon(
-                  Icons.person_add_alt_1,
+                  Icons.local_shipping,
                   size: 80,
-                  color: Colors.amber,
+                  color:Color.fromARGB(255, 1, 122, 116),
                 ),
               ),
             ),
@@ -69,7 +69,7 @@ class ProveedoresView extends StatelessWidget {
       ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.amber,
+        backgroundColor: Color.fromARGB(255, 1, 122, 116),
         onPressed: () {
           // Tu lógica aquí
         },
