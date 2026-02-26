@@ -65,6 +65,7 @@ flutter:
     - assets/VisualizarStock.png
     - assets/reporte19.png
     - assets/gif/loading.gif
+    - assets/gif/Stock_Vacio.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
