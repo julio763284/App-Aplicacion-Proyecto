@@ -7,6 +7,8 @@ import 'package:gestor/Presentacion/Pages/notificationView.dart';
 import 'package:gestor/Presentacion/Pages/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/login.dart';
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
+import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
+import 'package:gestor/Presentacion/Widgets/olvidar_contrasena2.dart';
 
 void main() {
   runApp(InventaryMobile());
@@ -17,6 +19,7 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: LoadingView());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: OlvidarContrasenaPage(),);
   }
 }
+
