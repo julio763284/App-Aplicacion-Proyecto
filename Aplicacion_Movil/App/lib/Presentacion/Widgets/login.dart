@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
         width: double.infinity,
         height: double.infinity,
 
-        // Fondo con degradado
+
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
