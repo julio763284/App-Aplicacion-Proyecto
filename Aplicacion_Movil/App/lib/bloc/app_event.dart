@@ -12,3 +12,5 @@ class GoToConfiguracion extends AppEvent {}
 class GoToNotificaciones extends AppEvent {}
 class GoToClientes extends AppEvent {}
 class GoToError extends AppEvent {}
+class GoToOlvidarContrasena extends AppEvent {}
+class GoToOlvidarContrasena2 extends AppEvent {}
