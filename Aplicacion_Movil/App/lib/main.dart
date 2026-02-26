@@ -11,6 +11,7 @@ import 'package:gestor/Presentacion/Widgets/notificationView.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/login.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
+import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
 
 void main() {
   runApp(InventaryMobile());
@@ -23,7 +24,7 @@ class InventaryMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: VistaError(),
+      home: GestionarInventarioPage(),
     );
   }
 }
