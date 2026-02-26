@@ -10,7 +10,6 @@ import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 import 'package:gestor/Presentacion/Widgets/notificationView.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/login.dart';
-import 'package:gestor/Presentacion/Widgets/Loading.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 
 void main() {
