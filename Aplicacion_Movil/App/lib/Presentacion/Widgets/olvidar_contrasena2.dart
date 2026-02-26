@@ -1,20 +1,22 @@
+
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/olvidar_contrasena2.dart';
 
-
-
-class OlvidarContrasenaPage extends StatefulWidget {
-  const OlvidarContrasenaPage({super.key});
+class OlvidarContrasena2 extends StatefulWidget {
+  const OlvidarContrasena2({super.key});
 
   @override
-  State<OlvidarContrasenaPage> createState() =>
-      _OlvidarContrasenaPageState();
+  State<OlvidarContrasena2> createState() =>
+      _OlvidarContrasena2State();
 }
 
-class _OlvidarContrasenaPageState
-    extends State<OlvidarContrasenaPage> {
+class _OlvidarContrasena2State
+    extends State<OlvidarContrasena2> {
 
-  final TextEditingController phoneController =
+  final TextEditingController codeController =
+      TextEditingController();
+  final TextEditingController newPassController =
+      TextEditingController();
+  final TextEditingController confirmPassController =
       TextEditingController();
 
   @override
@@ -55,7 +57,7 @@ class _OlvidarContrasenaPageState
                 children: [
 
                   const Icon(
-                    Icons.lock_reset,
+                    Icons.lock,
                     size: 90,
                     color: Color.fromARGB(255, 1, 122, 116),
                   ),
@@ -63,7 +65,7 @@ class _OlvidarContrasenaPageState
                   const SizedBox(height: 20),
 
                   const Text(
-                    "Recuperar Contraseña",
+                    "Restablecer Contraseña",
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -74,11 +76,44 @@ class _OlvidarContrasenaPageState
                   const SizedBox(height: 30),
 
                   TextField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
+                    controller: codeController,
                     decoration: InputDecoration(
-                      labelText: "Número de teléfono",
-                      prefixIcon: const Icon(Icons.phone),
+                      labelText: "Código recibido",
+                      prefixIcon: const Icon(Icons.verified),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: newPassController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Nueva contraseña",
+                      prefixIcon: const Icon(Icons.lock),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  TextField(
+                    controller: confirmPassController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Confirmar contraseña",
+                      prefixIcon: const Icon(Icons.lock_outline),
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
@@ -102,78 +137,46 @@ class _OlvidarContrasenaPageState
                         ),
                       ),
                       onPressed: () {
-                        if (phoneController.text.isEmpty) {
+                        if (codeController.text.isEmpty ||
+                            newPassController.text.isEmpty ||
+                            confirmPassController.text.isEmpty) {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(
                             const SnackBar(
                               content:
-                                  Text("Ingresa tu número de teléfono"),
+                                  Text("Completa todos los campos"),
+                            ),
+                          );
+                        } else if (newPassController.text !=
+                            confirmPassController.text) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Las contraseñas no coinciden"),
                             ),
                           );
                         } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const OlvidarContrasena2(),
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Contraseña actualizada correctamente"),
                             ),
                           );
+
+                          Navigator.popUntil(context, (route) => route.isFirst);
                         }
                       },
                       child: const Text(
-                        "Enviar código",
+                        "Restablecer contraseña",
                         style: TextStyle(
                             fontSize: 18,
                             color: Colors.white),
                       ),
                     ),
                   ),
-
-                 const SizedBox(height: 15),
-
-// 🔹 BOTÓN REENVIAR CÓDIGO
-TextButton(
-  onPressed: () {
-    if (phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Ingresa tu número para reenviar el código"),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Código reenviado correctamente"),
-        ),
-      );
-
-      // Aquí luego puedes agregar la lógica real para reenviar código
-    }
-  },
-  child: const Text(
-    "Reenviar código",
-    style: TextStyle(
-      color: Color.fromARGB(255, 1, 122, 116),
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-),
-
-const SizedBox(height: 5),
-
-        TextButton(
-        onPressed: () {
-            Navigator.pop(context);
-        },
-        child: const Text(
-            "Volver al Login",
-            style: TextStyle(
-            color: Color.fromARGB(255, 1, 122, 116),
-            fontWeight: FontWeight.bold,
-            ),
-        ),
-        ),
-                        ],
+                ],
               ),
             ),
           ),
