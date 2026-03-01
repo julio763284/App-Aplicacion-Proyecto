@@ -13,6 +13,8 @@ import 'package:gestor/Presentacion/Widgets/login.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena2.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
+import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
+
   
 void main() {
   runApp(const InventaryMobile());
@@ -23,9 +25,9 @@ class InventaryMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:OlvidarContrasenaPage(), 
+      home: GestionarInventarioPage(), 
     );
   }
 }
