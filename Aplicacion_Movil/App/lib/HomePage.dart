@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
+import 'package:gestor/perfil.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,7 +9,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE6E6E6), // fondo gris claro
+      backgroundColor: const Color(0xFFE6E6E6),
 
       appBar: AppBar(
         backgroundColor: primaryColor,
@@ -25,13 +25,12 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // DRAWER
+      // 🔹 DRAWER
       drawer: Drawer(
         backgroundColor: primaryColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-
             const SizedBox(height: 40),
 
             Column(
@@ -45,15 +44,14 @@ class HomePage extends StatelessWidget {
                     Text(
                       "Mobile Inventory",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
-
                 SizedBox(height: 6),
-
                 Text(
                   "Tu inventario siempre bajo control",
                   textAlign: TextAlign.center,
@@ -66,43 +64,41 @@ class HomePage extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
-
-            const Divider(
-              color: Colors.white30,
-              thickness: 1,
-            ),
-
+            const Divider(color: Colors.white30, thickness: 1),
             const SizedBox(height: 15),
 
-            menuButton(Icons.inventory, "Gestionar Productos"),
-            menuButton(Icons.file_copy, "Gestionar Reportes"),
-            menuButton(Icons.warehouse, "Visualizar Stock"),
-            menuButton(Icons.person, "Gestionar Cliente"),
-            menuButton(Icons.local_shipping, "Gestionar Proveedores"),
-            menuButton(Icons.warning, "Revisar Alertas"),
-            menuButton(Icons.monetization_on, "Controlar Finanzas"),
-            menuButton(Icons.storefront, "Gestionar Inventario"),
-            menuButton(Icons.settings, "Configuracion"),
+            menuButton(context, Icons.inventory, "Gestionar Productos"),
+            menuButton(context, Icons.file_copy, "Gestionar Reportes"),
+            menuButton(context, Icons.warehouse, "Visualizar Stock"),
+            menuButton(context, Icons.person, "Gestionar Cliente"),
+            menuButton(context, Icons.local_shipping, "Gestionar Proveedores"),
+            menuButton(context, Icons.warning, "Revisar Alertas"),
+            menuButton(context, Icons.monetization_on, "Controlar Finanzas"),
+            menuButton(context, Icons.storefront, "Gestionar Inventario"),
+            menuButton(context, Icons.settings, "Configuracion"),
+
+            // 🔥 BOTÓN MI PERFIL CON NAVEGACIÓN
+            menuButton(
+              context,
+              Icons.person,
+              "Mi perfil",
+              page: const PerfilPage(nombre: '', email: '',),
+            ),
           ],
         ),
       ),
 
-      // DASHBOARD
+      // 🔹 DASHBOARD
       body: ListView(
         children: [
-
           const SizedBox(height: 100),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               dashboardCard("Gestionar Productos", Icons.inventory),
-
               dashboardCard("Gestionar Reportes", Icons.file_copy),
-
               dashboardCard("Visualizar Stock", Icons.inventory_rounded),
-
             ],
           ),
 
@@ -111,13 +107,9 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               dashboardCard("Gestionar Cliente", Icons.person),
-
               dashboardCard("Gestionar Proveedores", Icons.local_shipping),
-
               dashboardCard("Revisar Alertas", Icons.warning),
-
             ],
           ),
 
@@ -126,13 +118,9 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               dashboardCard("Controlar Finanzas", Icons.monetization_on),
-
               dashboardCard("Gestionar Inventario", Icons.storefront),
-
               dashboardCard("Configurar", Icons.settings),
-
             ],
           ),
         ],
@@ -140,12 +128,24 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // BOTONES DEL DRAWER
-  static Widget menuButton(IconData icon, String text) {
+  // 🔹 BOTONES DEL DRAWER
+  static Widget menuButton(
+    BuildContext context,
+    IconData icon,
+    String text, {
+    Widget? page,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () {
+          if (page != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => page),
+            );
+          }
+        },
         icon: Icon(icon, color: Colors.white),
         label: Text(
           text,
@@ -165,7 +165,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // TARJETAS DEL DASHBOARD (como tu diseño original pero mejoradas)
+  // 🔹 TARJETAS DEL DASHBOARD
   static Widget dashboardCard(String text, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -185,7 +185,6 @@ class HomePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-
           Text(
             text,
             textAlign: TextAlign.center,
@@ -195,15 +194,8 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-
           const SizedBox(height: 8),
-
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 32,
-          ),
-
+          Icon(icon, color: Colors.white, size: 32),
         ],
       ),
     );
