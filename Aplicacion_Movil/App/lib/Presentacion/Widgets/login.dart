@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Widgets/api.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -139,23 +140,37 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         elevation: 10,
                       ),
-                      onPressed: () {
-                        String user = userController.text;
-                        String pass = passController.text;
+                      onPressed: () async {
+  String user = userController.text;
+  String pass = passController.text;
 
-                        if (user.isEmpty || pass.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Completa todos los campos"),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Bienvenido $user"),
-                            ),
-                          );
-                        }
+  if (user.isEmpty || pass.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Completa todos los campos"),
+      ),
+    );
+  } else {
+    bool loginExitoso = await loginUsuario(user, pass);
+
+    if (loginExitoso) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Bienvenido $user 🔥"),
+        ),
+      );
+
+      // Aquí puedes navegar a otra pantalla
+      // Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage()));
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Usuario o contraseña incorrectos"),
+        ),
+      );
+    }
+  }
                       },
                       child: const Text(
                         "Ingresar",
