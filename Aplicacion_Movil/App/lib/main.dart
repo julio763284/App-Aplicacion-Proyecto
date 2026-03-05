@@ -7,6 +7,7 @@ import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
 import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
+import 'package:gestor/Presentacion/Widgets/api.dart';
 import 'package:gestor/Presentacion/Widgets/notificationView.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/login.dart';
@@ -27,7 +28,7 @@ class InventaryMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen()
+      home: HomePage()
 
     );
   }
