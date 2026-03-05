@@ -4,96 +4,208 @@ import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  static const Color primaryColor = Color(0xFF017A74);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE6E6E6), // fondo gris claro
+
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 1, 122, 116),
-        title: Text(
+        backgroundColor: primaryColor,
+        elevation: 0,
+        title: const Text(
           "INVENTARY MOBILE",
-          style: TextStyle(color: Colors.white, fontSize: 20.0),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
         ),
       ),
-      //Menu desplegable DRAWER//
+
+      // DRAWER
       drawer: Drawer(
-        backgroundColor:  const Color.fromARGB(131, 1, 122, 116),
+        backgroundColor: primaryColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            SizedBox(height: 20.0,),
-            Text("Mobile Inventary", textAlign: TextAlign.center ,style: TextStyle(color: Colors.white, fontSize: 25.0)),
-            SizedBox(height: 40.0,),
-            ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.inventory, color: Colors.white),
-             label: Text("Gestionar Productos", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor:  const Color.fromARGB(255, 1, 122, 116)),
-             ),
-            SizedBox(height: 40.0,),
-            ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.file_copy, color: Colors.white),
-             label: Text("Gestionar Reportes", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor:  const Color.fromARGB(255, 1, 122, 116)),
-             ),
-            SizedBox(height: 40.0,),
-             ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.warehouse, color: Colors.white),
-             label: Text("Visualizar Stock", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor:const Color.fromARGB(255, 1, 122, 116)),
-             ),
-            SizedBox(height: 40.0,),
-             ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.person, color: Colors.white),
-             label: Text("Gestionar Cliente", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 1, 122, 116)),
-             ),
-            SizedBox(height: 40.0,),
-              ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.local_shipping, color: Colors.white),
-             label: Text("Gestionar Proveedores", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 1, 122, 116)),
-             ),
-              SizedBox(height: 40.0,),
-              ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.warning, color: Colors.white),
-             label: Text("Revisar Alertas", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 1, 122, 116)),
-             ),
-              SizedBox(height: 40.0,),
-              ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.monetization_on, color: Colors.white),
-             label: Text("Controlar Finanzas", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 1, 122, 116)),
-             ),
-              SizedBox(height: 40.0,),
-              ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.storefront, color: Colors.white),
-             label: Text("Gestionar Inventario", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 1, 122, 116)),
-             ),
-              SizedBox(height: 40.0,),
-              ElevatedButton.icon(onPressed: (){},
-             icon: Icon(Icons.settings, color: Colors.white),
-             label: Text("Configuracion", style: TextStyle(color: Colors.white),),
-             style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 1, 122, 116)),
-             )
-          ],
-      )
-      ),
-      //Menu desplegable DRAWER//
-      body: ListView(
-          children: [
+
+            const SizedBox(height: 40),
+
             Column(
-                children: [
-                  SizedBox(height: 100.0,),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [Container(padding: EdgeInsets.all(10.0), child: Column(children: [Text("Gestionar Productos", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Gestionar Productos");}, icon: Icon(Icons.inventory, color: Colors.white, size: 30.0,)) ],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0))), Container(padding: EdgeInsets.all(10.0),child: Column(children: [Text("Gestionar Reportes", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Gestionar Reportes");}, icon: Icon(Icons.file_copy, color: Colors.white, size: 30.0)) ],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0))),Container(padding: EdgeInsets.all(10.0) ,child: Column(children: [Text("Visualizar Stock", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Visualizar Stock");}, icon: Icon(Icons.inventory_rounded, color: Colors.white, size: 30.0,)) ],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0)))]),
-                  SizedBox(height: 50.0,),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [Container(padding: EdgeInsets.all(10.0), child: Column(children: [Text("Gestionar Cliente", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Gestionar Cliente");}, icon: Icon(Icons.person, color: Colors.white))],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0))), Container(padding: EdgeInsets.all(10.0),child: Column(children: [Text("Gestionar Proveedores", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Gestionar Proveedores");}, icon: Icon(Icons.local_shipping, color: Colors.white)) ],), decoration : BoxDecoration(color : const Color.fromARGB(255, 1, 122, 116), borderRadius : BorderRadius.circular(15.0))),Container(padding: EdgeInsets.all(10.0),child: Column(children: [Text("Revisar Alertas", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Revisar Alertas");}, icon: Icon(Icons.warning, color: Colors.white))],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0)))]),
-                  SizedBox(height: 50.0,),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [Container(padding: EdgeInsets.all(10.0), child: Column(children: [Text("Controlar Finanzas", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Presiono Controlar Finanzas");}, icon: Icon(Icons.monetization_on, color: Colors.white)) ],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0))), Container(padding: EdgeInsets.all(10.0),child: Column(children: [Text("Gestionar Inventario", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Presiono Gestionar Inventario");}, icon: Icon(Icons.storefront, color: Colors.white)) ],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0))),Container(padding: EdgeInsets.all(10.0),child: Column(children: [Text("Configuracion", style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic)), IconButton(onPressed: (){print("Presiono Configuracion");}, icon: Icon(Icons.settings , color: Colors.white)) ],), decoration: BoxDecoration(color: const Color.fromARGB(255, 1, 122, 116), borderRadius: BorderRadius.circular(15.0)))]),
-                ],
-            )
+              children: const [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.move_to_inbox,
+                        color: Colors.white, size: 38),
+                    SizedBox(width: 12),
+                    Text(
+                      "Mobile Inventory",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 6),
+
+                Text(
+                  "Tu inventario siempre bajo control",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            const Divider(
+              color: Colors.white30,
+              thickness: 1,
+            ),
+
+            const SizedBox(height: 15),
+
+            menuButton(Icons.inventory, "Gestionar Productos"),
+            menuButton(Icons.file_copy, "Gestionar Reportes"),
+            menuButton(Icons.warehouse, "Visualizar Stock"),
+            menuButton(Icons.person, "Gestionar Cliente"),
+            menuButton(Icons.local_shipping, "Gestionar Proveedores"),
+            menuButton(Icons.warning, "Revisar Alertas"),
+            menuButton(Icons.monetization_on, "Controlar Finanzas"),
+            menuButton(Icons.storefront, "Gestionar Inventario"),
+            menuButton(Icons.settings, "Configuracion"),
           ],
         ),
+      ),
+
+      // DASHBOARD
+      body: ListView(
+        children: [
+
+          const SizedBox(height: 100),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+
+              dashboardCard("Gestionar Productos", Icons.inventory),
+
+              dashboardCard("Gestionar Reportes", Icons.file_copy),
+
+              dashboardCard("Visualizar Stock", Icons.inventory_rounded),
+
+            ],
+          ),
+
+          const SizedBox(height: 50),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+
+              dashboardCard("Gestionar Cliente", Icons.person),
+
+              dashboardCard("Gestionar Proveedores", Icons.local_shipping),
+
+              dashboardCard("Revisar Alertas", Icons.warning),
+
+            ],
+          ),
+
+          const SizedBox(height: 50),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+
+              dashboardCard("Controlar Finanzas", Icons.monetization_on),
+
+              dashboardCard("Gestionar Inventario", Icons.storefront),
+
+              dashboardCard("Configurar", Icons.settings),
+
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // BOTONES DEL DRAWER
+  static Widget menuButton(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        icon: Icon(icon, color: Colors.white),
+        label: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          elevation: 0,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+        ),
+      ),
+    );
+  }
+
+  // TARJETAS DEL DASHBOARD (como tu diseño original pero mejoradas)
+  static Widget dashboardCard(String text, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      width: 110,
+      height: 110,
+      decoration: BoxDecoration(
+        color: primaryColor,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          )
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 32,
+          ),
+
+        ],
+      ),
     );
   }
 }
