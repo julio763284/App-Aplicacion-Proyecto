@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:gestor/HomePage.dart'; 
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,6 +32,8 @@ class _SplashScreenState extends State<SplashScreen>
     
     _scaleAnimation = CurvedAnimation(parent: _entryController, curve: Curves.easeOutBack);
 
+    _scaleAnimation = CurvedAnimation(parent: _entryController, curve: Curves.easeOutBack);
+
     _floatingController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -46,6 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _entryController.forward();
     _floatingController.repeat(reverse: true);
+
   }
 
   @override
@@ -70,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
         ),
         child: Center(
           child: Column(
-            mainAxisSize: MainAxisSize.min, 
+            mainAxisSize: MainAxisSize.min,
             children: [
               SlideTransition(
                 position: _floatingAnimation,
@@ -83,7 +87,6 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
               const SizedBox(height: 30),
-              // Un indicador de carga opcional pero elegante
               FadeTransition(
                 opacity: _fadeAnimation,
               )
