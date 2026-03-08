@@ -45,8 +45,6 @@ class _LoginPageState extends State<LoginPage> {
 
         child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
           builder: (context, state) {
-            
-
             // LOADING
             if (state is Logincargando) {
               return const LoadingView();
@@ -59,10 +57,6 @@ class _LoginPageState extends State<LoginPage> {
               passController: passController,
             );
             }
-
-            
-            
-
           },
         ),
       ),

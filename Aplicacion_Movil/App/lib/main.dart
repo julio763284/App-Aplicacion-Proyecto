@@ -37,3 +37,4 @@ class InventaryMobile extends StatelessWidget {
     );
   }
 }
+
