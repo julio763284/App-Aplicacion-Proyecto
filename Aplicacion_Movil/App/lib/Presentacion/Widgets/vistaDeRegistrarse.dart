@@ -1,8 +1,64 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class RegisterView extends StatelessWidget {
+class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
+
+  @override
+  State<RegisterView> createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<RegisterView> {
+  final nombreController = TextEditingController();
+  final correoController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+
+  final String url = "http://10.2.136.10:3000/registro";
+
+  Future<void> registrarUsuario() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      _mostrarMensaje("Las contraseñas no coinciden ❌");
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "nombre": nombreController.text,
+          "correo": correoController.text,
+          "password": passwordController.text
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        _mostrarMensaje("Usuario registrado correctamente 🔥");
+        _limpiarCampos();
+      } else {
+        _mostrarMensaje("Error al registrar usuario ❌");
+      }
+    } catch (e) {
+      _mostrarMensaje("Error de conexión con el servidor");
+    }
+  }
+
+  void _limpiarCampos() {
+    nombreController.clear();
+    correoController.clear();
+    passwordController.clear();
+    confirmPasswordController.clear();
+  }
+
+  void _mostrarMensaje(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensaje)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +89,7 @@ class RegisterView extends StatelessWidget {
                     vertical: 30,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15), // efecto opaco
+                    color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(color: Colors.white.withOpacity(0.3)),
                     boxShadow: [
@@ -61,18 +117,21 @@ class RegisterView extends StatelessWidget {
                       _buildInput(
                         label: "Nombre completo",
                         icon: Icons.person_outline,
+                        controller: nombreController,
                       ),
                       const SizedBox(height: 18),
 
                       _buildInput(
                         label: "Correo electrónico",
                         icon: Icons.email_outlined,
+                        controller: correoController,
                       ),
                       const SizedBox(height: 18),
 
                       _buildInput(
                         label: "Contraseña",
                         icon: Icons.lock_outline,
+                        controller: passwordController,
                         isPassword: true,
                       ),
                       const SizedBox(height: 18),
@@ -80,6 +139,7 @@ class RegisterView extends StatelessWidget {
                       _buildInput(
                         label: "Confirmar contraseña",
                         icon: Icons.lock_reset_outlined,
+                        controller: confirmPasswordController,
                         isPassword: true,
                       ),
                       const SizedBox(height: 28),
@@ -96,7 +156,7 @@ class RegisterView extends StatelessWidget {
                             ),
                             elevation: 10,
                           ),
-                          onPressed: () {},
+                          onPressed: registrarUsuario,
                           child: const Text(
                             "Registrarse",
                             style: TextStyle(
@@ -132,9 +192,11 @@ class RegisterView extends StatelessWidget {
   static Widget _buildInput({
     required String label,
     required IconData icon,
+    required TextEditingController controller,
     bool isPassword = false,
   }) {
     return TextField(
+      controller: controller,
       obscureText: isPassword,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
