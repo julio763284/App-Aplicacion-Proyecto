@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/perfil.dart';
 
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -23,8 +24,63 @@ class HomePage extends StatelessWidget {
             letterSpacing: 1,
           ),
         ),
-      ),
 
+        //  MENU PERFIL
+       actions: [
+          PopupMenuButton<String>(
+            icon: const CircleAvatar(
+              radius: 18,
+              backgroundImage: AssetImage('assets/profile.png'),
+            ),
+            onSelected: (value) {
+              if (value == "perfil") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PerfilPage(
+                      nombre: "Jorge",
+                      email: "jorge@email.com",
+                    ),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: "perfil",
+                child: Row(
+                  children: [
+                    Icon(Icons.person),
+                    SizedBox(width: 10),
+                    Text("Mi perfil"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: "config",
+                child: Row(
+                  children: [
+                    Icon(Icons.settings),
+                    SizedBox(width: 10),
+                    Text("Configuración"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: "logout",
+                child: Row(
+                  children: [
+                    Icon(Icons.logout),
+                    SizedBox(width: 10),
+                    Text("Cerrar sesión"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 10),
+        ],
+      ),
       // 🔹 DRAWER
       drawer: Drawer(
         backgroundColor: primaryColor,
@@ -76,14 +132,6 @@ class HomePage extends StatelessWidget {
             menuButton(context, Icons.monetization_on, "Controlar Finanzas"),
             menuButton(context, Icons.storefront, "Gestionar Inventario"),
             menuButton(context, Icons.settings, "Configuracion"),
-
-            // 🔥 BOTÓN MI PERFIL CON NAVEGACIÓN
-            menuButton(
-              context,
-              Icons.person,
-              "Mi perfil",
-              page: const PerfilPage(nombre: '', email: '',),
-            ),
           ],
         ),
       ),
@@ -128,7 +176,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // 🔹 BOTONES DEL DRAWER
+  // 🔹 BOTONES DRAWER
   static Widget menuButton(
     BuildContext context,
     IconData icon,
@@ -165,7 +213,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // 🔹 TARJETAS DEL DASHBOARD
+  // 🔹 TARJETAS DASHBOARD
   static Widget dashboardCard(String text, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(14),
