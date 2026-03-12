@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/perfil.dart';
 
+import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
+import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
+import 'package:gestor/Presentacion/Widgets/Cliente.dart';
+import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
+import 'package:gestor/Presentacion/Widgets/notificationView.dart';
+import 'package:gestor/Presentacion/Widgets/Controlar_Gastos.dart';
+import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
+import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,6 +20,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE6E6E6),
 
+      // 🔹 APPBAR
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0,
@@ -25,8 +34,8 @@ class HomePage extends StatelessWidget {
           ),
         ),
 
-        //  MENU PERFIL
-       actions: [
+        // 🔹 MENÚ PERFIL
+        actions: [
           PopupMenuButton<String>(
             icon: const CircleAvatar(
               radius: 18,
@@ -81,6 +90,7 @@ class HomePage extends StatelessWidget {
           const SizedBox(width: 10),
         ],
       ),
+
       // 🔹 DRAWER
       drawer: Drawer(
         backgroundColor: primaryColor,
@@ -89,13 +99,12 @@ class HomePage extends StatelessWidget {
           children: [
             const SizedBox(height: 40),
 
-            Column(
-              children: const [
+            const Column(
+              children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.move_to_inbox,
-                        color: Colors.white, size: 38),
+                    Icon(Icons.move_to_inbox, color: Colors.white, size: 38),
                     SizedBox(width: 12),
                     Text(
                       "Mobile Inventory",
@@ -120,18 +129,26 @@ class HomePage extends StatelessWidget {
             ),
 
             const SizedBox(height: 20),
-            const Divider(color: Colors.white30, thickness: 1),
+            const Divider(color: Colors.white30),
             const SizedBox(height: 15),
 
             menuButton(context, Icons.inventory, "Gestionar Productos"),
-            menuButton(context, Icons.file_copy, "Gestionar Reportes"),
-            menuButton(context, Icons.warehouse, "Visualizar Stock"),
-            menuButton(context, Icons.person, "Gestionar Cliente"),
-            menuButton(context, Icons.local_shipping, "Gestionar Proveedores"),
-            menuButton(context, Icons.warning, "Revisar Alertas"),
-            menuButton(context, Icons.monetization_on, "Controlar Finanzas"),
-            menuButton(context, Icons.storefront, "Gestionar Inventario"),
-            menuButton(context, Icons.settings, "Configuracion"),
+            menuButton(context, Icons.file_copy, "Gestionar Reportes",
+                page: const GestionarReportes()),
+            menuButton(context, Icons.warehouse, "Visualizar Stock",
+                page: const VisualizarStock()),
+            menuButton(context, Icons.person, "Gestionar Cliente",
+                page: const Cliente()),
+            menuButton(context, Icons.local_shipping, "Gestionar Proveedores",
+                page: const Proveedores()),
+            menuButton(context, Icons.warning, "Revisar Alertas",
+                page: const NotificationView()),
+            menuButton(context, Icons.monetization_on, "Controlar Finanzas",
+                page: const Controlar_Gastos()),
+            menuButton(context, Icons.storefront, "Gestionar Inventario",
+                page: GestionarInventarioPage()),
+            menuButton(context, Icons.settings, "Configuracion",
+                page: const Configuracion()),
           ],
         ),
       ),
@@ -144,9 +161,12 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              dashboardCard("Gestionar Productos", Icons.inventory),
-              dashboardCard("Gestionar Reportes", Icons.file_copy),
-              dashboardCard("Visualizar Stock", Icons.inventory_rounded),
+              dashboardCard(context, "Gestionar Productos", Icons.inventory),
+              dashboardCard(context, "Gestionar Reportes", Icons.file_copy,
+                  page: const GestionarReportes()),
+              dashboardCard(context, "Visualizar Stock",
+                  Icons.inventory_rounded,
+                  page: const VisualizarStock()),
             ],
           ),
 
@@ -155,9 +175,13 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              dashboardCard("Gestionar Cliente", Icons.person),
-              dashboardCard("Gestionar Proveedores", Icons.local_shipping),
-              dashboardCard("Revisar Alertas", Icons.warning),
+              dashboardCard(context, "Gestionar Cliente", Icons.person,
+                  page: const Cliente()),
+              dashboardCard(context, "Gestionar Proveedores",
+                  Icons.local_shipping,
+                  page: const Proveedores()),
+              dashboardCard(context, "Revisar Alertas", Icons.warning,
+                  page: const NotificationView()),
             ],
           ),
 
@@ -166,9 +190,14 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              dashboardCard("Controlar Finanzas", Icons.monetization_on),
-              dashboardCard("Gestionar Inventario", Icons.storefront),
-              dashboardCard("Configurar", Icons.settings),
+              dashboardCard(context, "Controlar Finanzas",
+                  Icons.monetization_on,
+                  page: const Controlar_Gastos()),
+              dashboardCard(context, "Gestionar Inventario",
+                  Icons.storefront,
+                  page: GestionarInventarioPage()),
+              dashboardCard(context, "Configurar", Icons.settings,
+                  page: const Configuracion()),
             ],
           ),
         ],
@@ -197,54 +226,64 @@ class HomePage extends StatelessWidget {
         icon: Icon(icon, color: Colors.white),
         label: Text(
           text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryColor,
           elevation: 0,
           alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         ),
       ),
     );
   }
 
   // 🔹 TARJETAS DASHBOARD
-  static Widget dashboardCard(String text, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      width: 110,
-      height: 110,
-      decoration: BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+  static Widget dashboardCard(
+    BuildContext context,
+    String text,
+    IconData icon, {
+    Widget? page,
+  }) {
+    return InkWell(
+      onTap: () {
+        if (page != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => page),
+          );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        width: 110,
+        height: 110,
+        decoration: BoxDecoration(
+          color: primaryColor,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Icon(icon, color: Colors.white, size: 32),
-        ],
+            const SizedBox(height: 8),
+            Icon(icon, color: Colors.white, size: 32),
+          ],
+        ),
       ),
     );
   }
