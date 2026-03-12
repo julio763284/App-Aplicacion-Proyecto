@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/perfil.dart';
 
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -23,8 +24,64 @@ class HomePage extends StatelessWidget {
             letterSpacing: 1,
           ),
         ),
-      ),
 
+        //  MENU PERFIL
+       actions: [
+          PopupMenuButton<String>(
+            icon: const CircleAvatar(
+              radius: 18,
+              backgroundImage: AssetImage('assets/profile.png'),
+            ),
+            onSelected: (value) {
+              if (value == "perfil") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PerfilPage(
+                      nombre: "Jorge",
+                      email: "jorge@email.com",
+                    ),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: "perfil",
+                child: Row(
+                  children: [
+                    Icon(Icons.person),
+                    SizedBox(width: 10),
+                    Text("Mi perfil"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: "config",
+                child: Row(
+                  children: [
+                    Icon(Icons.settings),
+                    SizedBox(width: 10),
+                    Text("Configuración"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: "logout",
+                child: Row(
+                  children: [
+                    Icon(Icons.logout),
+                    SizedBox(width: 10),
+                    Text("Cerrar sesión"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 10),
+        ],
+      ),
+      // 🔹 DRAWER
       drawer: Drawer(
         backgroundColor: primaryColor,
         child: ListView(
@@ -66,127 +123,15 @@ class HomePage extends StatelessWidget {
             const Divider(color: Colors.white30, thickness: 1),
             const SizedBox(height: 15),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.inventory, color: Colors.white),
-                label: const Text("Gestionar Productos",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.file_copy, color: Colors.white),
-                label: const Text("Gestionar Reportes",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.warehouse, color: Colors.white),
-                label: const Text("Visualizar Stock",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.person, color: Colors.white),
-                label: const Text("Gestionar Cliente",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.local_shipping, color: Colors.white),
-                label: const Text("Gestionar Proveedor",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.warning, color: Colors.white),
-                label: const Text("Revisar Alertas",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.monetization_on, color: Colors.white),
-                label: const Text("Controlar Finanzas",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.storefront, color: Colors.white),
-                label: const Text("Gestionar Inventario",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.settings, color: Colors.white),
-                label: const Text("Configuracion",
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  alignment: Alignment.centerLeft,
-                ),
-              ),
-            )
+            menuButton(context, Icons.inventory, "Gestionar Productos"),
+            menuButton(context, Icons.file_copy, "Gestionar Reportes"),
+            menuButton(context, Icons.warehouse, "Visualizar Stock"),
+            menuButton(context, Icons.person, "Gestionar Cliente"),
+            menuButton(context, Icons.local_shipping, "Gestionar Proveedores"),
+            menuButton(context, Icons.warning, "Revisar Alertas"),
+            menuButton(context, Icons.monetization_on, "Controlar Finanzas"),
+            menuButton(context, Icons.storefront, "Gestionar Inventario"),
+            menuButton(context, Icons.settings, "Configuracion"),
           ],
         ),
       ),
@@ -234,7 +179,45 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget dashboardContainer(String text, IconData icon) {
+  // 🔹 BOTONES DRAWER
+  static Widget menuButton(
+    BuildContext context,
+    IconData icon,
+    String text, {
+    Widget? page,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          if (page != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => page),
+            );
+          }
+        },
+        icon: Icon(icon, color: Colors.white),
+        label: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          elevation: 0,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+        ),
+      ),
+    );
+  }
+
+  // 🔹 TARJETAS DASHBOARD
+  static Widget dashboardCard(String text, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(14),
       width: 110,
