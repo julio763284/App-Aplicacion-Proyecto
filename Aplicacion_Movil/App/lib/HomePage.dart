@@ -132,7 +132,8 @@ class HomePage extends StatelessWidget {
             const Divider(color: Colors.white30),
             const SizedBox(height: 15),
 
-            menuButton(context, Icons.inventory, "Gestionar Productos"),
+            menuButton(context, Icons.inventory, "Gestionar Productos",
+                page: GestionarInventarioPage()),
             menuButton(context, Icons.file_copy, "Gestionar Reportes",
                 page: const GestionarReportes()),
             menuButton(context, Icons.warehouse, "Visualizar Stock",
@@ -160,7 +161,8 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              dashboardCard(context, "Gestionar Productos", Icons.inventory),
+              dashboardCard(context, "Gestionar Productos", Icons.inventory,
+                  page: GestionarInventarioPage()),
               dashboardCard(context, "Gestionar Reportes", Icons.file_copy,
                   page: const GestionarReportes()),
               dashboardCard(context, "Visualizar Stock",
@@ -254,8 +256,8 @@ class HomePage extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.all(14),
-        width: 110,
-        height: 110,
+        width: 120,
+        height: 120,
         decoration: BoxDecoration(
           color: primaryColor,
           borderRadius: BorderRadius.circular(18),
