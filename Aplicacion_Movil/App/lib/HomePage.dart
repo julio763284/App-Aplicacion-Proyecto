@@ -165,7 +165,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // TARJETAS DEL DASHBOARD (como tu diseño original pero mejoradas)
+  // TARJETAS DEL DASHBOARD
   static Widget dashboardCard(String text, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(14),
