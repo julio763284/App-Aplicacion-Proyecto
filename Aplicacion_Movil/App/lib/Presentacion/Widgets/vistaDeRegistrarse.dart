@@ -37,10 +37,10 @@ class _RegisterViewState extends State<RegisterView> {
       );
 
       if (response.statusCode == 200) {
-        _mostrarMensaje("Usuario registrado correctamente 🔥");
+        _mostrarMensaje("Usuario registrado correctamente ");
         _limpiarCampos();
       } else {
-        _mostrarMensaje("Error al registrar usuario ❌");
+        _mostrarMensaje("Error al registrar usuario ");
       }
     } catch (e) {
       _mostrarMensaje("Error de conexión con el servidor");
