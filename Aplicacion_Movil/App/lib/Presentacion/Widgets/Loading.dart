@@ -9,15 +9,22 @@ class LoadingView extends StatefulWidget {
 
 class _LoadingViewState extends State<LoadingView>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )..repeat();
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween(begin: 0.9, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -35,13 +42,13 @@ class _LoadingViewState extends State<LoadingView>
         ),
       ),
       child: const Padding(
-        padding: EdgeInsets.only(left: 3),
+        padding: EdgeInsets.only(left: 4),
         child: Text(
           ".",
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(153, 0, 0, 0),
+            color: Colors.white,
           ),
         ),
       ),
@@ -51,43 +58,39 @@ class _LoadingViewState extends State<LoadingView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 1, 122, 116),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            RotationTransition(
-              turns: _controller,
-              child: const SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  strokeCap: StrokeCap.round, // bordes redondeados pro
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF22D3EE)),
-                  backgroundColor: Color.fromARGB(96, 14, 12, 12),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF017A74),
+              Color(0xFF014F4B),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+
+              /// ICONO
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: const Icon(
+                  Icons.inventory_2,
+                  size: 130,
+                  color: Colors.white,
                 ),
               ),
-            ),
-            const SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Cargando",
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                _dot(0.0),
-                _dot(0.2),
-                _dot(0.4),
-              ],
-            ),
-          ],
+
+              const SizedBox(height: 40),
+
+              const SizedBox(height: 15),
+
+
+  ]),
         ),
       ),
     );
