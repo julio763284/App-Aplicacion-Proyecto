@@ -1,77 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MER</title>
-    <link rel="stylesheet" href="../css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Modelo Entidad Relación (MER)</title>
+
+<link rel="stylesheet" href="../css/actividades.css">
+<link rel="icon" href="../favicon.io/favicon-16x16.png">
+
 </head>
+
 <body>
-<header class="header">
-  <h1><a href="../index.html" style="color: white; text-decoration: none;">Proyecto de Aplicación</a></h1>
+    <div class="container-diagrama">
+        <h1 class="titulo">Modelo Entidad Relación (MER)</h1>
 
-  <nav class="menu">
-    <ul>
-      <li class="dropdown">
-        <a href="#">Diagramas ▾</a>
-        <ul class="dropdown-menu">
-          <li><a href="casos_de_uso.html">Casos de uso</a></li>
-          <li><a href="actividades.html">Actividades</a></li>
-          <li><a href="MER.html">MER</a></li>
-          <li><a href="Modelo_relacional.html">Modelo Relacional</a></li>
-          <li><a href="diagrama_clase.html">Diagrama de clases</a></li>
-          <li><a href="pages/especificacion_de_caso_de_uso.html">Especificacion de Caso de Uso</a></li>
+        <div class="contenido">
 
-        </ul>
-      </li>
-    </ul>
-  </nav>
-</header>
+            <div class="imagen">
+                <img src="../images/MER.jpeg"
+                alt="Modelo Entidad Relación">
+            </div>
 
-<body> 
-    <h1 style="text-align: center; color: #007bff; margin-top: 40px;">MER</h1>
-    <div style="text-align: center;"> 
-<img 
-  src="../images/MER.jpeg"
-  alt="imagen de MER"
-  style="
-    display: block;
-    margin: 20px auto;
-    width: 100%;
-    max-width: 600px;
-    transition: transform 0.3s ease;
-  "
-  onmouseover="this.style.transform='scale(1.1)'"
-  onmouseout="this.style.transform='scale(1)'"
->
+            <div class="info">
 
-</div>
-    <ul style="
-  list-style: none;
-  padding: 0;
-  max-width: 600px;
-  margin: 30px auto;
-  background: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-">
-  <li style="padding: 15px; border-bottom: 1px solid #ddd;">
-    <strong>👤 Actor:</strong> Administrador del sistema
-  </li>
-  <li style="padding: 15px; border-bottom: 1px solid #ddd;">
-    <strong>🎯 Objetivo:</strong> Diseñar la base de datos del sistema.
-  </li>
-  <li style="padding: 15px;">
-    <strong>📝 Descripción:</strong> Representa entidades, atributos y relaciones del sistema de inventario.
-    
-  </li>
-</ul>
+            <div class="card">
+                <h2>👤 Actor</h2>
+                <p>Administrador del sistema</p>
+            </div>
 
-    
+            <div class="card">
+                <h2>🎯 Objetivo</h2>
+                <p>Diseñar la estructura de la base de datos
+                 del sistema de inventario.
+                </p>
+            </div>
 
-<div style="text-align: center; margin-top: 40px; margin-bottom: 30px;">
-  <a href="../index.html" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007bff'">← Regresar</a>
-</div>
+            <div class="card">
+                <h2>📝 Descripción</h2>
+                <p>El modelo entidad–relación representa las
+                 entidades principales del sistema, sus atributos
+                 y las relaciones existentes entre ellas.
+                 Este modelo permite organizar la información
+                 antes de construir la base de datos.
+                </p>
+            </div>
+        </div>
+    </div>
 
+
+    <div class="button">
+        <a href="../index.html#diagramas" class="tag-box">
+            <div class="tag">← Volver a Diagramas</div>
+        </a>
+    </div>
 </body>
-</html> 
+</html>
