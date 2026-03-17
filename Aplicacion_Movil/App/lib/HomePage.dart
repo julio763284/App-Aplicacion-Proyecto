@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/perfil.dart';
-
 import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
@@ -34,7 +33,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
 
-        // 🔹 MENÚ PERFIL
         actions: [
           PopupMenuButton<String>(
             icon: const CircleAvatar(

@@ -1,92 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Proyecto de Aplicación</title>
-<link rel="stylesheet" href="css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventary Mobile</title>
+<link rel="icon" href="favicon.io/favicon-16x16.png">
+<link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<header class="header">
-  <h1>Proyecto de Aplicación</h1>
+  <div class="layer-blur"></div>
 
-  <nav class="menu">
-    <ul>
-      <li class="dropdown">
-        <a href="#">Diagramas ▾</a>
-        <ul class="dropdown-menu">
-          <li><a href="pages/casos_de_uso.html">Casos de uso</a></li>
-          <li><a href="pages/actividades.html">Actividades</a></li>
-          <li><a href="pages/MER.html">MER</a></li>
-          <li><a href="pages/Modelo_relacional.html">Modelo Relacional</a></li>
-          <li><a href="pages/diagrama_clase.html">Diagrama de clases</a></li>
-          <li><a href="pages/especificacion_de_caso_de_uso.html">Especificacion de Caso de Uso</a></li>
+  <div id="home" class="container">
 
-        </ul>
-      </li>
-    </ul>
-  </nav>
-</header>
+    <main>
 
+      <div class="content">
 
-<div class="container">
+        <h1>INVENTARY<br>MOBILE</h1>
 
-<div class="card">
-<h2>Descripción del Proyecto</h2>
-<p id="descripcion">
-  Esta aplicación móvil está diseñada para facilitar la gestión y visualización de información de manera rápida e intuitiva. Su objetivo principal es ayudar a los usuarios a organizar, consultar y administrar datos desde su dispositivo móvil, mejorando la eficiencia y la experiencia de uso.
-Está dirigida a estudiantes, aprendices y usuarios en general que necesitan una solución digital práctica, accesible y moderna para apoyar sus actividades diarias.
+        <div class="button">
+          <a href="#" id="btnDoc" class="tag-box">
+            <div class="tag">Información</div>
+          </a>
 
-</p>
-</div>
+          <a href="#" id="btnDiag" class="tag-box">
+          <div class="tag">Diagramas</div>
+          </a>
 
-<div class="card">
-<h2>Arquitectura del Sistema</h2>
-<p>
-La aplicación está construida bajo una arquitectura moderna y escalable.
-El frontend se desarrolla en Flutter, permitiendo una interfaz multiplataforma (Android e iOS) con un diseño atractivo y responsivo.
-El backend se encarga de la lógica del negocio y la comunicación con la base de datos, gestionando las solicitudes del usuario mediante APIs.
-La base de datos almacena de forma segura la información necesaria para el funcionamiento de la aplicación, garantizando integridad y disponibilidad de los datos.
-</p>
-</div>
+        </div>
 
+      </div>
 
+      <div class="phones">
 
+        <img src="app.png" class="phone">
 
-</div>
-  </div>
+      </div>
 
-  <div class="card">
-  <h2>Capturas de la Aplicación</h2>
-  <div class="grid">
-  <img 
-  src="images/app.png"
-  alt="imagen de casos de uso"
-  style="
-    display: block;
-    margin: 20px auto;
-    width: 100%;
-    max-width: 600px;
-    transition: transform 0.3s ease;
-  "
-  onmouseover="this.style.transform='scale(1.1)'"
-  onmouseout="this.style.transform='scale(1)'"
->
+    </main>
 
   </div>
-  </div>
 
-</div>
+  <section id="documentacion">
 
-<footer>
-© 2026 Proyecto de Aplicación
-</footer>
+    <a href="#" class="btnHome tag-box">
+      <div class="tag">Volver a Home</div>
+    </a>
 
-<script src="scrit.js"></script>
+    <div class="container-doc">
+
+      <div class="card">
+        <h2>Descripción del Proyecto</h2>
+        <p>Esta aplicación móvil está diseñada para facilitar la gestión
+          y visualización de información de manera rápida e intuitiva.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Arquitectura del Sistema</h2>
+        <p>La aplicación está construida bajo una arquitectura moderna
+          y escalable. El frontend se desarrolla en Flutter y el backend
+          maneja la lógica del negocio.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="diagramas">
+
+      <a href="#" class="btnHome tag-box">
+       <div class="tag">Volver a Home</div>
+      </a>
+
+      <div class="container-diag">
+
+        <h1 class="titulo-diag">Diagramas</h1>
+
+        <div class="grid-diagramas">
+
+          <a href="pages/casos_de_uso.html" class="card-diagrama">
+            <h2>Casos de Uso</h2>
+            <p>Representa las interacciones entre el usuario y el sistema.</p>
+          </a>
+
+          <a href="pages/actividades.html" class="card-diagrama">
+            <h2>Actividades</h2>
+            <p>Muestra el flujo de procesos dentro del sistema.</p>
+          </a>
+
+          <a href="pages/MER.html" class="card-diagrama">
+            <h2>MER</h2>
+            <p>Modelo Entidad Relación de la base de datos.</p>
+          </a>
+
+          <a href="pages/Modelo_relacional.html" class="card-diagrama">
+            <h2>Modelo Relacional</h2>
+            <p>Representa las tablas y relaciones de la base de datos.</p>
+          </a>
+
+          <a href="pages/diagrama_clase.html" class="card-diagrama">
+          <h2>Diagrama de Clases</h2>
+          <p>Muestra la estructura de clases del sistema.</p>
+          </a>
+
+          <a href="pages/especificacion_de_caso_de_uso.html" class="card-diagrama">
+          <h2>Especificación CU</h2>
+          <p>Descripción detallada de cada caso de uso.</p>
+          </a>
+
+        </div>
+
+      </div>
+
+  </section>
+
+  <script src="script.js"></script>
 
 </body>
 </html>
-
-
-
