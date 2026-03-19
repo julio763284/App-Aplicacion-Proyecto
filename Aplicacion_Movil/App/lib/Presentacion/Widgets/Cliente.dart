@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Widgets/NuevoCliente.dart';
+
 
 class Cliente extends StatelessWidget {
   const Cliente({super.key});
@@ -55,15 +57,58 @@ class Cliente extends StatelessWidget {
             const Text(
               "Seleccionar + para agregar Clientes",
               style: TextStyle(fontSize: 14, color: Colors.grey),
+                
             ),
-          ],
+          ],  
         ),
       ),
        floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromARGB(255, 1, 122, 116),
-        onPressed: () {},
-        child: const Icon(Icons.add, color: Colors.white,),
-      )
+  backgroundColor: Color.fromARGB(255, 1, 122, 116),
+  child: const Icon(Icons.add, color: Colors.white),
+  onPressed: () {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.person_add, color: Color.fromARGB(255, 1, 122, 116)),
+                title: Text("Nuevo Cliente"),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>Nuevocliente(),
+      ),
+      );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.upload_file, color: Color.fromARGB(255, 1, 122, 116)),
+                title: Text("Importar Clientes"),
+                onTap: () {
+                  Navigator.pop(context);
+                  print("Importar clientes");
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.close, color: Colors.red),
+                title: Text("Cancelar"),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  },
+),
     );
   }
 }

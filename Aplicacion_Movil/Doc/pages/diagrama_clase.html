@@ -1,72 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagrama de Clases</title>
-    <link rel="stylesheet" href="../css/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Diagrama de Clases</title>
+
+<link rel="stylesheet" href="../css/actividades.css">
+<link rel="icon" href="../favicon.io/favicon-16x16.png">
+
 </head>
+
 <body>
-<header class="header">
-  <h1><a href="../index.html" style="color: white; text-decoration: none;">Proyecto de Aplicación</a></h1>
 
-  <nav class="menu">
-    <ul>
-      <li class="dropdown">
-        <a href="#">Diagramas ▾</a>
-        <ul class="dropdown-menu">
-          <li><a href="casos_de_uso.html">Casos de uso</a></li>
-          <li><a href="actividades.html">Actividades</a></li>
-          <li><a href="MER.html">MER</a></li>
-          <li><a href="Modelo_relacional.html">Modelo Relacional</a></li>
-          <li><a href="diagrama_clase.html">Diagrama de clases</a></li>
-          <li><a href="pages/especificacion_de_caso_de_uso.html">Especificacion de Caso de Uso</a></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
-</header>
+        <div class="container-diagrama">
+           <h1 class="titulo">Diagrama de Clases</h1>
+           <div class="contenido">
+                <div class="imagen">
+                    <img src="../images/diagrama_clase.png"
+                    alt="Diagrama de clases">
+                </div>
 
-<body> 
-    <h1 style="text-align: center; color: #007bff; margin-top: 40px;">Diagrama de Clases</h1>
-    <div style="text-align: center;">
-        <!-- Aquí va la imagen del diagrama de clases -->
-        <!-- Reemplaza 'diagrama_clase.jpeg' con el nombre real de tu imagen -->
-        <img 
-          src="../images/diagrama_clase.png"
-          alt="Diagrama de Clases"
-          style="
-            display: block;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 800px;
-            transition: transform 0.3s ease;
-          "
-          onmouseover="this.style.transform='scale(1.05)'"
-          onmouseout="this.style.transform='scale(1)'"
-        >
-    </div>
-    
-    <ul style="
-  list-style: none;
-  padding: 0;
-  max-width: 600px;
-  margin: 30px auto;
-  background: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-">
-  <li style="padding: 15px; border-bottom: 1px solid #ddd;">
-    <strong>👤 Actor:</strong>  Usuario
-  </li>
-  <li style="padding: 15px; border-bottom: 1px solid #ddd;">
-    <strong>🎯 Objetivo:</strong> Representar la estructura de clases y sus relaciones
-  </li>
-  <li style="padding: 15px;">
-    <strong>📝 Descripción:</strong>Muestra las entidades del sistema con sus atributos, métodos y relaciones (herencia, asociación, composición)
-    
-  </li>
-</ul>
+                <div class="info">
+                    <div class="card">
+                        <h2>👤 Actor</h2>
+                        <p>Usuario del sistema</p>
+                    </div>
 
+                    <div class="card">
+                        <h2>🎯 Objetivo</h2>
+                        <p>Representar la estructura de clases del sistema
+                          y las relaciones existentes entre ellas.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h2>📝 Descripción</h2>
+                        <p>El diagrama muestra las entidades del sistema
+                         con sus atributos, métodos y relaciones,
+                         como herencia, asociación y composición.
+                         Esto permite visualizar la arquitectura
+                         del sistema de inventario.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+            <div class="button">
+                <a href="../index.html#diagramas" class="tag-box">
+                <div class="tag">← Volver a Diagramas</div>
+                </a>
+            </div>
+        </div>
 </body>
 </html>
