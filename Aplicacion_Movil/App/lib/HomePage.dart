@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   static const Color primaryColor = Color(0xFF017A74);
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +89,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
 
-      // 🔹 DRAWER
+      // 🔹 DRAWER o Menu Desplegable //
       drawer: Drawer(
         backgroundColor: primaryColor,
         child: ListView(
