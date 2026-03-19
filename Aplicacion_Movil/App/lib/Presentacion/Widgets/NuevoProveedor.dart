@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class Nuevocliente extends StatelessWidget {
-  Nuevocliente({super.key});
-
+class Nuevoproveedor extends StatelessWidget {
+  Nuevoproveedor({super.key});
   final _formKey = GlobalKey<FormState>();
 
   final nombreController = TextEditingController();
@@ -14,7 +13,7 @@ class Nuevocliente extends StatelessWidget {
 
   static const Color colorPrincipal = Color.fromARGB(255, 1, 122, 116);
 
-  final String url = "http://10.2.136.10:3000/clientes"; 
+  final String url = "http://10.2.136.10:3000/proveedores"; 
 
   Future<void> guardarCliente(BuildContext context) async {
     try {
@@ -23,15 +22,15 @@ class Nuevocliente extends StatelessWidget {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "nombre": nombreController.text,
-          "direccion": direccionController.text,
-          "correo": correoController.text,
-          "telefono": telefonoController.text,
+          "telefono": direccionController.text,
+          "email": correoController.text,
+          "direccion": telefonoController.text,
         }),
       );
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cliente guardado correctamente ✅')),
+          const SnackBar(content: Text('Proveedor guardado correctamente ✅')),
         );
 
         nombreController.clear();
@@ -40,7 +39,7 @@ class Nuevocliente extends StatelessWidget {
         telefonoController.clear();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al guardar cliente ❌')),
+          const SnackBar(content: Text('Error al guardar proveedor❌')),
         );
       }
     } catch (e) {
@@ -50,7 +49,10 @@ class Nuevocliente extends StatelessWidget {
     }
   }
 
+
   InputDecoration estiloCampo(String texto, IconData icono) {
+    const colorPrincipal = Color.fromARGB(255, 1, 122, 116);
+
     return InputDecoration(
       labelText: texto,
       labelStyle: const TextStyle(
@@ -69,11 +71,10 @@ class Nuevocliente extends StatelessWidget {
     );
   }
 
-  Widget campo(String texto, IconData icono, TextEditingController controller) {
+  Widget campo(String texto, IconData icono) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: TextFormField(
-        controller: controller,
         validator: (value) =>
             value == null || value.isEmpty ? 'Campo obligatorio' : null,
         decoration: estiloCampo(texto, icono),
@@ -83,11 +84,14 @@ class Nuevocliente extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const colorPrincipal = Color.fromARGB(255, 1, 122, 116);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Nuevo cliente"),
+        title: const Text("Gestionar proveedores"),
         backgroundColor: colorPrincipal,
       ),
+
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(15),
         child: ElevatedButton(
@@ -95,32 +99,35 @@ class Nuevocliente extends StatelessWidget {
             backgroundColor: colorPrincipal,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              guardarCliente(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Proveedor guardado')),
+              );
             }
           },
-          child: const Text("Guardar Cliente",
-              style: TextStyle(fontSize: 16, color: Colors.white)),
+          child: const Text(
+            "Guardar Proveedor",
+            style: TextStyle(fontSize: 16, color: Colors.white),
+          ),
         ),
       ),
-      body: AnimatedOpacity(
-        opacity: 1,
-        duration: const Duration(milliseconds: 700),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                campo("Nombre", Icons.person, nombreController),
-                campo("Dirección", Icons.location_on, direccionController),
-                campo("Correo electrónico", Icons.email, correoController),
-                campo("Número de teléfono", Icons.add_ic_call, telefonoController),
-              ],
-            ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              campo("Nombre del proveedor", Icons.person),
+              campo("Dirección", Icons.location_on),
+              campo("Correo electrónico", Icons.email),
+              campo("Teléfono", Icons.phone),
+             
+            ],
           ),
         ),
       ),

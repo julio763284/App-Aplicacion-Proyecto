@@ -20,6 +20,21 @@ class Producto {
     );
   }
 }
+class Cliente {
+  final int id;
+  final String nombre;
+  final String telefono;
+
+  Cliente({required this.id, required this.nombre, required this.telefono});
+
+  factory Cliente.fromJson(Map<String, dynamic> json) {
+    return Cliente(
+      id: json['id'],
+      nombre: json['nombre'],
+      telefono: json['telefono'],
+    );
+  }
+}
 
 Future<List<Producto>> fetchProductos() async {
   final response = await http.get(
@@ -48,5 +63,43 @@ Future<bool> loginUsuario(String email, String password) async {
     return true; // Login correcto
   } else {
     return false; // Login incorrecto
+  }
+}
+
+Future<List<Cliente>> obtenerClientes() async {
+  final response = await http.get(
+    Uri.parse('http://10.2.136.10:3000/clientes'),
+  );
+
+  if (response.statusCode == 200) {
+    List data = json.decode(response.body);
+    return data.map((e) => Cliente.fromJson(e)).toList();
+  } else {
+    throw Exception('Error al cargar clientes');
+  }
+}
+
+Future<bool> guardarProveedor(
+    String nombre,
+    String telefono,
+    String email,
+    String direccion,
+) async {
+  final response = await http.post(
+    Uri.parse('http://10.2.136.10:3000/proveedores'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "nombre": nombre,
+      "telefono": telefono,
+      "email": email,
+      "direccion": direccion,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    print(response.body);
+    return false;
   }
 }
