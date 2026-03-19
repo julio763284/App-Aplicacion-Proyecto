@@ -1,43 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Nuevocliente extends StatefulWidget {
-  const Nuevocliente({super.key});
-
-  @override
-  State<Nuevocliente> createState() => _NuevoclienteState();
-}
-//animacion
-class _NuevoclienteState extends State<Nuevocliente>
-
-    with SingleTickerProviderStateMixin {
+class Nuevocliente extends StatelessWidget {
+  Nuevocliente({super.key});
 
   final _formKey = GlobalKey<FormState>();
-  late AnimationController _animController;
-  late Animation<double> _fadeAnim;
 
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-    _fadeAnim = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeIn,
-    );
-    _animController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
+  static const Color colorPrincipal = Color.fromARGB(255, 1, 122, 116);
 
   InputDecoration estiloCampo(String texto, IconData icono) {
-    const colorPrincipal = Color.fromARGB(255, 1, 122, 116);
-
     return InputDecoration(
       labelText: texto,
       labelStyle: const TextStyle(
@@ -69,15 +39,12 @@ class _NuevoclienteState extends State<Nuevocliente>
 
   @override
   Widget build(BuildContext context) {
-    const colorPrincipal = Color.fromARGB(255, 1, 122, 116);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Nuevo cliente"),
         backgroundColor: colorPrincipal,
       ),
 
-      //  Botón fijo abajo
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(15),
         child: ElevatedButton(
@@ -98,9 +65,10 @@ class _NuevoclienteState extends State<Nuevocliente>
               style: TextStyle(fontSize: 16, color: Colors.white)),
         ),
       ),
-//opciones del formulario
-      body: FadeTransition(
-        opacity: _fadeAnim,
+
+      body: AnimatedOpacity(
+        opacity: 1,
+        duration: const Duration(milliseconds: 700),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Form(
@@ -111,7 +79,6 @@ class _NuevoclienteState extends State<Nuevocliente>
                 campo("Dirección", Icons.location_on),
                 campo("Correo electrónico", Icons.email),
                 campo("Número de teléfono", Icons.add_ic_call),
-                
               ],
             ),
           ),
