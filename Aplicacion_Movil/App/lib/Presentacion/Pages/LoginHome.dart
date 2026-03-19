@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/autenticacion/bloc_autenticacion.dart';
 import '../../bloc/autenticacion/eventos_autenticacion.dart';
 
-class LoginHome extends StatelessWidget {
+class LoginHome extends StatefulWidget {
   const LoginHome({
     super.key,
     required this.userController,
@@ -12,6 +12,14 @@ class LoginHome extends StatelessWidget {
 
   final TextEditingController userController;
   final TextEditingController passController;
+
+  @override
+  State<LoginHome> createState() => _LoginHomeState();
+}
+
+class _LoginHomeState extends State<LoginHome> {
+  // Variable para controlar la visibilidad de la contraseña
+  bool _isObscured = true;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +98,7 @@ class LoginHome extends StatelessWidget {
 
                 // USUARIO
                 TextField(
-                  controller: userController,
+                  controller: widget.userController,
                   decoration: InputDecoration(
                     labelText: "Usuario",
                     prefixIcon: const Icon(Icons.person),
@@ -105,13 +113,25 @@ class LoginHome extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // CONTRASEÑA
+                // CONTRASEÑA MODIFICADA
                 TextField(
-                  controller: passController,
-                  obscureText: true,
+                  controller: widget.passController,
+                  obscureText: _isObscured, // Usa la variable de estado
                   decoration: InputDecoration(
                     labelText: "Contraseña",
                     prefixIcon: const Icon(Icons.lock),
+                    // AQUÍ ESTÁ EL BOTÓN FUNCIONAL
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscured ? Icons.visibility : Icons.visibility_off,
+                        color: const Color.fromARGB(255, 1, 122, 116),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscured = !_isObscured;
+                        });
+                      },
+                    ),
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
@@ -136,8 +156,8 @@ class LoginHome extends StatelessWidget {
                       elevation: 10,
                     ),
                     onPressed: () {
-                      String user = userController.text.trim();
-                      String pass = passController.text.trim();
+                      String user = widget.userController.text.trim();
+                      String pass = widget.passController.text.trim();
 
                       if (user.isEmpty || pass.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -146,9 +166,8 @@ class LoginHome extends StatelessWidget {
                           ),
                         );
                       } else {
-                        // AQUÍ SE ENVÍA EL EVENTO AL BLOC
                         context.read<AutenticacionBloc>().add(
-                          Ingresar(user, pass ),
+                          Ingresar(user, pass),
                         );
                       }
                     },
@@ -164,7 +183,11 @@ class LoginHome extends StatelessWidget {
                 // OLVIDÓ CONTRASEÑA
                 TextButton(
                   onPressed: () {
-                    context.read<AutenticacionBloc>().add(EventoOlvidarContrasena(userController.text.trim()));
+                    context.read<AutenticacionBloc>().add(
+                      EventoOlvidarContrasena(
+                        widget.userController.text.trim(),
+                      ),
+                    );
                   },
                   child: const Text(
                     "¿Olvidaste tu contraseña?",
@@ -183,17 +206,19 @@ class LoginHome extends StatelessWidget {
                   children: [
                     const Text("¿No tienes cuenta? "),
                     TextButton(
-                  onPressed: () {
-                    context.read<AutenticacionBloc>().add(EventoRegistrarse());
-                  },
-                  child: const Text(
-                    "Registrarse",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 1, 122, 116),
-                      fontWeight: FontWeight.bold,
+                      onPressed: () {
+                        context.read<AutenticacionBloc>().add(
+                          EventoRegistrarse(),
+                        );
+                      },
+                      child: const Text(
+                        "Registrarse",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 1, 122, 116),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
                   ],
                 ),
               ],

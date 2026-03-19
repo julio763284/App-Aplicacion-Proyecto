@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gestor/HomePage.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
-import 'package:gestor/Presentacion/Widgets/api.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
-import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,17 +16,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final TextEditingController userController = TextEditingController();
   final TextEditingController passController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
-
           if (state is Estado_Registrarse) {
             Navigator.push(
               context,
@@ -40,13 +35,10 @@ class _LoginPageState extends State<LoginPage> {
               MaterialPageRoute(builder: (_) => OlvidarContrasenaPage()),
             );
           }
-
         },
 
         child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
           builder: (context, state) {
-            
-
             // LOADING
             if (state is Logincargando) {
               return const LoadingView();
@@ -55,14 +47,10 @@ class _LoginPageState extends State<LoginPage> {
             } else {
               // LOGIN NORMAL
               return LoginHome(
-              userController: userController,
-              passController: passController,
-            );
+                userController: userController,
+                passController: passController,
+              );
             }
-
-            
-            
-
           },
         ),
       ),

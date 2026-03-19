@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:gestor/HomePage.dart'; 
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,7 +9,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-
   late AnimationController _entryController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -28,28 +25,36 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 1200),
     );
 
-    _fadeAnimation = CurvedAnimation(parent: _entryController, curve: Curves.easeIn);
-    
-    _scaleAnimation = CurvedAnimation(parent: _entryController, curve: Curves.easeOutBack);
+    _fadeAnimation = CurvedAnimation(
+      parent: _entryController,
+      curve: Curves.easeIn,
+    );
 
-    _scaleAnimation = CurvedAnimation(parent: _entryController, curve: Curves.easeOutBack);
+    _scaleAnimation = CurvedAnimation(
+      parent: _entryController,
+      curve: Curves.easeOutBack,
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _entryController,
+      curve: Curves.easeOutBack,
+    );
 
     _floatingController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
 
-    _floatingAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -0.05),
-    ).animate(CurvedAnimation(
-      parent: _floatingController,
-      curve: Curves.easeInOutSine,
-    ));
+    _floatingAnimation =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.05)).animate(
+          CurvedAnimation(
+            parent: _floatingController,
+            curve: Curves.easeInOutSine,
+          ),
+        );
 
     _entryController.forward();
     _floatingController.repeat(reverse: true);
-
   }
 
   @override
@@ -87,9 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
               const SizedBox(height: 30),
-              FadeTransition(
-                opacity: _fadeAnimation,
-              )
+              FadeTransition(opacity: _fadeAnimation),
             ],
           ),
         ),
