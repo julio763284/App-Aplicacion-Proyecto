@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o_Home/card_Home.dart';
+import 'package:gestor/Presentacion/Pages/Home2Page.dart';
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
@@ -12,15 +14,12 @@ import 'package:gestor/Presentacion/Diseño_Home/Botones_drawer.dart'; // aquí 
 
 class Homepage2 extends StatelessWidget {
   const Homepage2({super.key});
-
-  static const Color primaryColor = Color.fromARGB(255, 1, 122, 116);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // 🔹 APPBAR
       appBar: AppBar(
-        backgroundColor: primaryColor,
+        backgroundColor: Color.fromARGB(255, 1, 122, 116),
         elevation: 0,
         title: const Text(
           "INVENTARY MOBILE",
@@ -89,7 +88,7 @@ class Homepage2 extends StatelessWidget {
 
       // 🔹 DRAWER o Menu Desplegable //
       drawer: Drawer(
-        backgroundColor: primaryColor,
+        backgroundColor: Color.fromARGB(255, 1, 122, 116),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -176,13 +175,9 @@ class Homepage2 extends StatelessWidget {
         ),
       ),
 
-      // 🔹 CUERPO VACÍO (puedes agregar dashboard o contenido)
-      body: const Center(
-        child: Text(
-          "Selecciona una opción del menú",
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
+      // 🔹 Cuerpo de la vista //
+      body: Homepagebody(),
     );
   }
 }
+
