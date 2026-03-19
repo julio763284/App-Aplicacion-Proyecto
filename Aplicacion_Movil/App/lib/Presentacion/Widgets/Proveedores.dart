@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart';
 
 class Proveedores extends StatelessWidget {
   const Proveedores({super.key});
@@ -71,6 +72,12 @@ class Proveedores extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromARGB(255, 1, 122, 116),
         onPressed: () {
+          Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Nuevoproveedor(),
+      ),
+      );
           // Tu lógica aquí
         },
         child: const Icon(Icons.add),

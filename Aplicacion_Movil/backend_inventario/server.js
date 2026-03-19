@@ -44,6 +44,41 @@ const sql = "INSERT INTO usuario (nombre, correo, password) VALUES (?, ?, ?)";
 
 });
 
+app.post('/clientes', (req, res) => {
+  const { nombre, direccion, correo, telefono } = req.body;
+
+  const sql = `
+    INSERT INTO cliente (nombre, direccion, correo, telefono)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(sql, [nombre, direccion, correo, telefono], (err, result) => {
+    if (err) {
+      console.log("❌ ERROR REAL:", err); 
+      res.status(500).send(err);
+    } else {
+      res.json({ mensaje: "Cliente guardado" });
+    }
+  });
+});
+app.post('/proveedores', (req, res) => {
+  const { nombre, telefono, email, direccion } = req.body;
+
+  const sql = `
+    INSERT INTO proveedor (nombre, telefono, email, direccion)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(sql, [nombre, telefono, email, direccion], (err, result) => {
+    if (err) {
+      console.log("❌ ERROR REAL:", err); 
+      res.status(500).send(err);
+    } else {
+      res.json({ mensaje: "Proveedor guardado correctamente" });
+    }
+  });
+});
+
 app.listen(3000, () => {
     console.log('🚀 Servidor corriendo en http://localhost:3000');
 });
