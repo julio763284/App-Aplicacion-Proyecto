@@ -103,3 +103,27 @@ Future<bool> guardarProveedor(
     return false;
   }
 }
+class Movimiento {
+  final int mes;
+  final double total;
+
+  Movimiento({required this.mes, required this.total});
+
+  factory Movimiento.fromJson(Map<String, dynamic> json) {
+    return Movimiento(
+      mes: json['mes'],
+      total: (json['total'] as num).toDouble(),
+    );
+  }
+}
+
+class InventarioService {
+  static Future<List<Movimiento>> obtenerMovimientos() async { 
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:3000/movimientos'),
+    );
+
+    final List data = json.decode(response.body);
+    return data.map((e) => Movimiento.fromJson(e)).toList();
+  }
+}

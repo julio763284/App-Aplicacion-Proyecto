@@ -79,6 +79,19 @@ app.post('/proveedores', (req, res) => {
   });
 });
 
+app.get('/movimientos', (req, res) => {
+  db.query(
+    `SELECT MONTH(fecha) as mes, SUM(cantidad) as total
+     FROM movimientos_inventario
+     GROUP BY mes`,
+    (err, results) => {
+      if (err) throw err;
+      res.json(results);
+    }
+  );
+});
+
+
 app.listen(3000, () => {
     console.log('🚀 Servidor corriendo en http://localhost:3000');
 });
