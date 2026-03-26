@@ -154,7 +154,7 @@ class HomePage extends StatelessWidget {
           // 🔹 FONDO (CAMBIA AQUÍ LA IMAGEN)
           Positioned.fill(
             child: Image.asset(
-              'assets/fondo2.png', 
+              'assets/fondo4.png', 
               fit: BoxFit.cover,
             ),
           ),
