@@ -48,7 +48,7 @@ class LoginHome extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // LOGO
+                // --- LOGO ---
                 Container(
                   width: 130,
                   height: 130,
@@ -88,7 +88,7 @@ class LoginHome extends StatelessWidget {
 
                 const SizedBox(height: 30),
 
-                // USUARIO
+                // --- USUARIO ---
                 TextField(
                   controller: userController,
                   decoration: InputDecoration(
@@ -105,25 +105,12 @@ class LoginHome extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // CONTRASEÑA
-                TextField(
-                  controller: passController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Contraseña",
-                    prefixIcon: const Icon(Icons.lock),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
+                // --- CONTRASEÑA CON OJITO FUNCIONAL ---
+                _CampoContrasena(controller: passController),
 
                 const SizedBox(height: 30),
 
-                // BOTÓN INGRESAR
+                // --- BOTÓN INGRESAR ---
                 SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -146,10 +133,9 @@ class LoginHome extends StatelessWidget {
                           ),
                         );
                       } else {
-                        // AQUÍ SE ENVÍA EL EVENTO AL BLOC
                         context.read<AutenticacionBloc>().add(
-                          Ingresar(user, pass ),
-                        );
+                              Ingresar(user, pass),
+                            );
                       }
                     },
                     child: const Text(
@@ -161,10 +147,11 @@ class LoginHome extends StatelessWidget {
 
                 const SizedBox(height: 15),
 
-                // OLVIDÓ CONTRASEÑA
+                // --- OLVIDÓ CONTRASEÑA ---
                 TextButton(
                   onPressed: () {
-                    context.read<AutenticacionBloc>().add(EventoOlvidarContrasena(userController.text.trim()));
+                    context.read<AutenticacionBloc>().add(
+                        EventoOlvidarContrasena(userController.text.trim()));
                   },
                   child: const Text(
                     "¿Olvidaste tu contraseña?",
@@ -177,28 +164,70 @@ class LoginHome extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // REGISTRO
+                // --- REGISTRO ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("¿No tienes cuenta? "),
                     TextButton(
-                  onPressed: () {
-                    context.read<AutenticacionBloc>().add(EventoRegistrarse());
-                  },
-                  child: const Text(
-                    "Registrarse",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 1, 122, 116),
-                      fontWeight: FontWeight.bold,
+                      onPressed: () {
+                        context.read<AutenticacionBloc>().add(EventoRegistrarse());
+                      },
+                      child: const Text(
+                        "Registrarse",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 1, 122, 116),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
                   ],
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CampoContrasena extends StatefulWidget {
+  final TextEditingController controller;
+
+  const _CampoContrasena({required this.controller});
+
+  @override
+  State<_CampoContrasena> createState() => _CampoContrasenaState();
+}
+
+class _CampoContrasenaState extends State<_CampoContrasena> {
+  bool _obscureText = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: widget.controller,
+      obscureText: _obscureText,
+      decoration: InputDecoration(
+        labelText: "Contraseña",
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: const Color.fromARGB(255, 1, 122, 116),
+          ),
+          onPressed: () {
+            setState(() {
+              _obscureText = !_obscureText;
+            });
+          },
+        ),
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
         ),
       ),
     );
