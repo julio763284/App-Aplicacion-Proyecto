@@ -5,14 +5,13 @@ import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
 import 'package:gestor/Presentacion/Widgets/Controlar_Gastos.dart';
 import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
-import 'package:gestor/Presentacion/Widgets/NuevoCliente.dart';
 import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
+import 'package:gestor/Presentacion/Widgets/nuevoproducto.dart';
 
-
-class Gestionarproducto extends StatelessWidget {
-  const Gestionarproducto({super.key});
+class Gestionarproductos extends StatelessWidget {
+  const Gestionarproductos({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +27,9 @@ class Gestionarproducto extends StatelessWidget {
           IconButton(icon: Icon(Icons.more_vert, color: Colors.white),
           onPressed: (){print("Ver Opciones");})
         ],
-        ),
-          drawer: Drawer(
+      ),
+            // 🔹 DRAWER o Menu Desplegable //
+      drawer: Drawer(
         backgroundColor: Color.fromARGB(255, 1, 122, 116),
         child: ListView(
           padding: EdgeInsets.zero,
@@ -71,7 +71,7 @@ class Gestionarproducto extends StatelessWidget {
             MenuButton(
               icon: Icons.inventory,
               text: "Gestionar Productos",
-              page: Gestionarproducto(),
+              page: GestionarInventarioPage(),
             ),
             MenuButton(
               icon: Icons.file_copy,
@@ -116,94 +116,22 @@ class Gestionarproducto extends StatelessWidget {
           ],
         ),
       ),
-        body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                color:Color.fromARGB(255, 1, 122, 116).withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.person_add_alt_1,
-                  size: 80,
-                  color: Color.fromARGB(255, 1, 122, 116) ,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            const Text(
-              "Agregar Cliente",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            const Text(
-              "Seleccionar + para agregar Clientes",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-                
-            ),
-          ],  
-        ),
-      ),
-       floatingActionButton: FloatingActionButton(
-  backgroundColor: Color.fromARGB(255, 1, 122, 116),
-  child: const Icon(Icons.add, color: Colors.white),
-  onPressed: () {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.person_add, color: Color.fromARGB(255, 1, 122, 116)),
-                title: Text("Nuevo Cliente"),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
+      
+      body: Scaffold(
+        floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromARGB(255, 1, 122, 116),
+        onPressed: () {
+          Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>Nuevocliente(),
+        builder: (context) => Nuevoproducto(),
       ),
       );
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.upload_file, color: Color.fromARGB(255, 1, 122, 116)),
-                title: Text("Importar Clientes"),
-                onTap: () {
-                  Navigator.pop(context);
-                  print("Importar clientes");
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.close, color: Colors.red),
-                title: Text("Cancelar"),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
+          // Tu lógica aquí
+        },
+        child: const Icon(Icons.add),
+      ),
+      ) ,
     );
-  },
-),
-    );
-  }
+}
 }

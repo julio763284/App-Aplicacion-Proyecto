@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/HomePage.dart';
 import 'package:gestor/HomePage2.dart';
+import 'package:gestor/Presentacion/Widgets/login.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 
 void main() {
@@ -21,7 +21,7 @@ class InventaryMobile extends StatelessWidget {
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Homepage2(),
+        home: LoginPage(),
       ),
     );
   }

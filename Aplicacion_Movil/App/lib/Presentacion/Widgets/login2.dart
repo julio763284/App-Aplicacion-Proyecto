@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/HomePage.dart';
+import 'package:gestor/HomePage2.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
 import 'package:gestor/Presentacion/Widgets/api.dart';
@@ -39,7 +39,7 @@ class LoginPage extends StatelessWidget {
             if (state is Logincargando) {
               return const LoadingView();
             } else if (state is LoginExitoso) {
-              return HomePage();
+              return Homepage2();
             } else {
               return LoginHome(
                 userController: userController,
