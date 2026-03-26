@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'Home_event.dart';
 import 'Home_state.dart';
 
-
 class SubjectBloc extends Bloc<HomeEvent, HomeState> {
   SubjectBloc() : super(HomeInitial()) {
     on<GestionarProductosEvent>((event, emit) {
@@ -34,6 +33,3 @@ class SubjectBloc extends Bloc<HomeEvent, HomeState> {
     });
   }
 }
-
-
-

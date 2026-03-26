@@ -3,9 +3,7 @@ import 'app_event.dart';
 import 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
-
   AppBloc() : super(LoadingState()) {
-
     on<AppStarted>((event, emit) async {
       emit(LoadingState());
       await Future.delayed(const Duration(seconds: 2));
