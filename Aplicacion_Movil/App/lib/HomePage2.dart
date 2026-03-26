@@ -129,7 +129,7 @@ class Homepage2 extends StatelessWidget {
             MenuButton(
               icon: Icons.inventory,
               text: "Gestionar Productos",
-              page: GestionarInventarioPage(),
+              page: GestionInventarioView(),
             ),
             MenuButton(
               icon: Icons.file_copy,
@@ -164,7 +164,7 @@ class Homepage2 extends StatelessWidget {
             MenuButton(
               icon: Icons.storefront,
               text: "Gestionar Inventario",
-              page: GestionarInventarioPage(),
+              page: GestionInventarioView(),
             ),
             MenuButton(
               icon: Icons.settings,

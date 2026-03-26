@@ -106,7 +106,7 @@ class Gestionarproducto extends StatelessWidget {
             MenuButton(
               icon: Icons.storefront,
               text: "Gestionar Inventario",
-              page: GestionarInventarioPage(),
+              page: GestionInventarioView(),
             ),
             MenuButton(
               icon: Icons.settings,
