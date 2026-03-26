@@ -1,133 +1,201 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:gestor/Presentacion/Widgets/api.dart';
 
-class GestionarInventarioPage extends StatefulWidget {
-  @override
-  _GestionarInventarioPageState createState() =>
-      _GestionarInventarioPageState();
-}
+class GestionInventarioView extends StatelessWidget {
+  const GestionInventarioView({super.key});
 
-class _GestionarInventarioPageState extends State<GestionarInventarioPage> {
-  TextEditingController searchController = TextEditingController();
 
-  List<Map<String, dynamic>> inventariosUsuario = [];
-  List<Map<String, dynamic>> inventariosFiltrados = [];
+  final String url = "http://10.2.137.120:3000/movimientos";
 
-  @override
-  void initState() {
-    super.initState();
-    cargarInventarios(); // Aquí cargarás los datos reales
-  }
 
-  // 🔹 MÉTODO PARA CARGAR INVENTARIOS REALES
-  Future<void> cargarInventarios() async {
-    // TODO: Reemplazar con llamada real (Firebase, API, SQLite, etc)
-
-    List<Map<String, dynamic>> datosReales = await obtenerInventarios();
-
-    setState(() {
-      inventariosUsuario = datosReales;
-      inventariosFiltrados = datosReales;
-    });
-  }
-
-  // 🔹 SIMULACIÓN (ELIMÍNALA CUANDO CONECTES TU BACKEND)
-  Future<List<Map<String, dynamic>>> obtenerInventarios() async {
-    await Future.delayed(Duration(seconds: 1));
-
-    return []; // ← Aquí vendrán tus inventarios reales
-  }
-
-  void filtrarInventarios(String query) {
-    final resultados = inventariosUsuario.where((inventario) {
-      final nombre = inventario["nombre"]
-          .toString()
-          .toLowerCase();
-      return nombre.contains(query.toLowerCase());
-    }).toList();
-
-    setState(() {
-      inventariosFiltrados = resultados;
-    });
-  }
+  static const Color primaryColor = Color(0xFF017A74);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text("Mis Inventarios"),
-        backgroundColor: Colors.teal,
+        title: const Text("Gestión de Inventario"),
+        backgroundColor: primaryColor,
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.teal,
-        child: Icon(Icons.add),
-        onPressed: () {
-          // Navegar a crear inventario
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: const [
+            _ResumenInventario(),
+            SizedBox(height: 30),
+            _GraficoInventario(),
+          ],
+        ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              controller: searchController,
-              onChanged: filtrarInventarios,
-              decoration: InputDecoration(
-                hintText: "Buscar inventario...",
-                prefixIcon: Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: inventariosFiltrados.isEmpty
-                ? Center(
-                    child: Text(
-                      "No tienes inventarios registrados",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(12),
-                    itemCount: inventariosFiltrados.length,
-                    itemBuilder: (context, index) {
-                      final inventario = inventariosFiltrados[index];
+    );
+  }
+}
 
-                      return Card(
-                        elevation: 4,
-                        margin: EdgeInsets.only(bottom: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.teal,
-                            child: Icon(Icons.inventory,
-                                color: Colors.white),
-                          ),
-                          title: Text(
-                            inventario["nombre"] ?? "",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                              "${inventario["productos"] ?? 0} productos"),
-                          trailing:
-                              Icon(Icons.arrow_forward_ios, size: 18),
-                          onTap: () {
-                            // Abrir inventario seleccionado
-                          },
-                        ),
-                      );
-                    },
-                  ),
-          ),
+class _ResumenInventario extends StatelessWidget {
+  const _ResumenInventario();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: const [
+        _ResumenCard(
+          titulo: "Productos",
+          valor: "1,245",
+          icono: Icons.inventory_2,
+        ),
+        _ResumenCard(
+          titulo: "Stock Bajo",
+          valor: "23",
+          icono: Icons.warning_amber,
+        ),
+        _ResumenCard(
+          titulo: "Valor Total",
+          valor: "\$12.5M",
+          icono: Icons.attach_money,
+        ),
+      ],
+    );
+  }
+}
+
+class _ResumenCard extends StatelessWidget {
+  final String titulo;
+  final String valor;
+  final IconData icono;
+
+  const _ResumenCard({
+    required this.titulo,
+    required this.valor,
+    required this.icono,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 110,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6)
         ],
       ),
+      child: Column(
+        children: [
+          Icon(icono, color: GestionInventarioView.primaryColor, size: 28),
+          const SizedBox(height: 8),
+          Text(valor,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 4),
+          Text(titulo,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+}
+class _GraficoInventario extends StatefulWidget {
+  const _GraficoInventario();
+
+  @override
+  State<_GraficoInventario> createState() => _GraficoInventarioState();
+}
+
+class _GraficoInventarioState extends State<_GraficoInventario> {
+  late Future<List<Movimiento>> movimientosFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    movimientosFuture = InventarioService.obtenerMovimientos();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Movimiento>>(
+      future: movimientosFuture,
+      builder: (context, snapshot) {
+
+        // 🔄 Cargando
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // ❌ Error
+        if (snapshot.hasError) {
+  return Center(
+    child: Text("Error: ${snapshot.error}"),
+  );
+}
+
+       final movimientos = snapshot.data ?? [];
+
+if (movimientos.isEmpty) {
+  return const Center(child: Text("No hay datos"));
+}
+
+        // 🔥 Convertir datos a puntos
+        final puntos = movimientos.map((m) {
+          return FlSpot(
+            (m.mes - 1).toDouble(),
+            m.total,
+          );
+        }).toList();
+
+        return SizedBox(
+          height: 300,
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(show: true),
+
+              // 🔥 Ejes (meses)
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                   getTitlesWidget: (value, meta) {
+  const meses = [
+    'Ene','Feb','Mar','Abr','May','Jun',
+    'Jul','Ago','Sep','Oct','Nov','Dic'
+  ];
+
+  if (value.toInt() < 0 || value.toInt() > 11) {
+    return const Text('');
+  }
+
+  return Text(
+    meses[value.toInt()],
+    style: const TextStyle(fontSize: 10),
+  );
+},
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: true),
+                ),
+              ),
+
+              borderData: FlBorderData(show: false),
+
+              lineBarsData: [
+                LineChartBarData(
+                  spots: puntos,
+                  isCurved: true,
+                  barWidth: 4,
+                  dotData: FlDotData(show: false),
+                  belowBarData: BarAreaData(show: true),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

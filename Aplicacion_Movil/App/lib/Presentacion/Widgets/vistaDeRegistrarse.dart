@@ -17,8 +17,7 @@ class _RegisterViewState extends State<RegisterView> {
   final confirmPasswordController = TextEditingController();
 
 
-  final String url = "http://10.2.136.10:3000/registro";
-
+final String url = "http://10.2.137.120:3000/registro";
   Future<void> registrarUsuario() async {
     if (passwordController.text != confirmPasswordController.text) {
       _mostrarMensaje("Las contraseñas no coinciden ❌");
@@ -43,8 +42,9 @@ class _RegisterViewState extends State<RegisterView> {
         _mostrarMensaje("Error al registrar usuario ");
       }
     } catch (e) {
-      _mostrarMensaje("Error de conexión con el servidor");
-    }
+  print("ERROR REAL: $e");
+  _mostrarMensaje("Error: $e");
+}
   }
 
   void _limpiarCampos() {
