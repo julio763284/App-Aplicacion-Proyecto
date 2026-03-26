@@ -5,6 +5,10 @@ import 'package:gestor/Presentacion/Widgets/api.dart';
 class GestionInventarioView extends StatelessWidget {
   const GestionInventarioView({super.key});
 
+
+  final String url = "http://10.2.137.120:3000/movimientos";
+
+
   static const Color primaryColor = Color(0xFF017A74);
 
   @override
@@ -96,7 +100,6 @@ class _ResumenCard extends StatelessWidget {
     );
   }
 }
-
 class _GraficoInventario extends StatefulWidget {
   const _GraficoInventario();
 
@@ -118,25 +121,78 @@ class _GraficoInventarioState extends State<_GraficoInventario> {
     return FutureBuilder<List<Movimiento>>(
       future: movimientosFuture,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+
+        // 🔄 Cargando
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final movimientos = snapshot.data!;
+        // ❌ Error
+        if (snapshot.hasError) {
+  return Center(
+    child: Text("Error: ${snapshot.error}"),
+  );
+}
 
-        return LineChart(
-          LineChartData(
-            lineBarsData: [
-              LineChartBarData(
-                spots: movimientos
-                    .map((m) => FlSpot(m.mes.toDouble() - 1, m.total))
-                    .toList(),
-                isCurved: true,
-                barWidth: 4,
-                dotData: FlDotData(show: false),
-                belowBarData: BarAreaData(show: true),
+       final movimientos = snapshot.data ?? [];
+
+if (movimientos.isEmpty) {
+  return const Center(child: Text("No hay datos"));
+}
+
+        // 🔥 Convertir datos a puntos
+        final puntos = movimientos.map((m) {
+          return FlSpot(
+            (m.mes - 1).toDouble(),
+            m.total,
+          );
+        }).toList();
+
+        return SizedBox(
+          height: 300,
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(show: true),
+
+              // 🔥 Ejes (meses)
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                   getTitlesWidget: (value, meta) {
+  const meses = [
+    'Ene','Feb','Mar','Abr','May','Jun',
+    'Jul','Ago','Sep','Oct','Nov','Dic'
+  ];
+
+  if (value.toInt() < 0 || value.toInt() > 11) {
+    return const Text('');
+  }
+
+  return Text(
+    meses[value.toInt()],
+    style: const TextStyle(fontSize: 10),
+  );
+},
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: true),
+                ),
               ),
-            ],
+
+              borderData: FlBorderData(show: false),
+
+              lineBarsData: [
+                LineChartBarData(
+                  spots: puntos,
+                  isCurved: true,
+                  barWidth: 4,
+                  dotData: FlDotData(show: false),
+                  belowBarData: BarAreaData(show: true),
+                ),
+              ],
+            ),
           ),
         );
       },
