@@ -169,7 +169,9 @@ final String url = "http://10.2.137.120:3000/registro";
                       const SizedBox(height: 16),
 
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         child: Text(
                           "¿Ya tienes cuenta? Inicia sesión",
                           style: TextStyle(
