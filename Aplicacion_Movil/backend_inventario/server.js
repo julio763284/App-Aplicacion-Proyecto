@@ -79,8 +79,26 @@ app.post('/proveedores', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-    console.log('🚀 Servidor corriendo en http://localhost:3000');
+app.get('/movimientos', (req, res) => {
+  db.query(
+    `SELECT MONTH(fecha) as mes, SUM(cantidad) as total
+     FROM movimientos_inventario
+     WHERE tipo = 'salida'
+     GROUP BY mes
+     ORDER BY mes`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      } else {
+        res.json(results);
+      }
+    }
+  );
+  
 });
 
-
+app.listen(3000, '0.0.0.0', () => {
+  console.log('🚀 Servidor corriendo');
+}); 
+app.use(express.json({ limit: '10mb' }));

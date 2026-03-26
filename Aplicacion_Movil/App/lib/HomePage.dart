@@ -141,7 +141,7 @@ class HomePage extends StatelessWidget {
             menuButton(context, Icons.monetization_on, "Controlar Finanzas",
                 page: const Controlar_Gastos()),
             menuButton(context, Icons.storefront, "Gestionar Inventario",
-                page: GestionarInventarioPage()),
+                page: GestionInventarioView()),
             menuButton(context, Icons.settings, "Configuracion",
                 page: const Configuracion()),
           ],
@@ -200,19 +200,17 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 50),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  dashboardCard(context, "Controlar Finanzas",
-                      Icons.monetization_on,
-                      page: const Controlar_Gastos()),
-                  dashboardCard(context, "Gestionar Inventario",
-                      Icons.storefront,
-                      page: GestionarInventarioPage()),
-                  dashboardCard(context, "Configurar", Icons.settings,
-                      page: const Configuracion()),
-                ],
-              ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              dashboardCard(context, "Controlar Finanzas",
+                  Icons.monetization_on,
+                  page: const Controlar_Gastos()),
+              dashboardCard(context, "Gestionar Inventario",
+                  Icons.storefront,
+                  page: GestionarInventarioPage()),
+              dashboardCard(context, "Configurar", Icons.settings,
+                  page: const Configuracion()),
             ],
           ),
         ],

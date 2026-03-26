@@ -2,45 +2,45 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class Nuevocliente extends StatelessWidget {
-  Nuevocliente({super.key});
+class Nuevoproducto extends StatelessWidget {
+  Nuevoproducto({super.key});
 
   final _formKey = GlobalKey<FormState>();
 
-  final nombreController = TextEditingController();
-  final direccionController = TextEditingController();
-  final correoController = TextEditingController();
-  final telefonoController = TextEditingController();
+  final nombreproductoController = TextEditingController();
+  final codigodebarrasController = TextEditingController();
+  final descripcionController = TextEditingController();
+  final cantidadController = TextEditingController();
 
   static const Color colorPrincipal = Color.fromARGB(255, 1, 122, 116);
 
-  final String url = "http://10.2.137.120:3000/clientes"; 
+  final String url = "http://10.2.136.10:3000/producto"; 
 
-  Future<void> guardarCliente(BuildContext context) async {
+  Future<void> guardarProducto(BuildContext context) async {
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "nombre": nombreController.text,
-          "direccion": direccionController.text,
-          "correo": correoController.text,
-          "telefono": telefonoController.text,
+          "nombre": nombreproductoController.text,
+          "direccion": codigodebarrasController.text,
+          "correo": descripcionController.text,
+          "telefono": cantidadController.text,
         }),
       );
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cliente guardado correctamente ✅')),
+          const SnackBar(content: Text('producto guardado correctamente ✅')),
         );
 
-        nombreController.clear();
-        direccionController.clear();
-        correoController.clear();
-        telefonoController.clear();
+        nombreproductoController.clear();
+        codigodebarrasController.clear();
+        descripcionController.clear();
+        cantidadController.clear();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al guardar cliente ❌')),
+          const SnackBar(content: Text('Error al guardar productos ❌')),
         );
       }
     } catch (e) {
@@ -85,7 +85,7 @@ class Nuevocliente extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Nuevo cliente"),
+        title: const Text("Nuevo producto"),
         backgroundColor: colorPrincipal,
       ),
       bottomNavigationBar: Padding(
@@ -99,10 +99,10 @@ class Nuevocliente extends StatelessWidget {
           ),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              guardarCliente(context);
+              guardarProducto(context);
             }
           },
-          child: const Text("Guardar Cliente",
+          child: const Text("Guardar Producto",
               style: TextStyle(fontSize: 16, color: Colors.white)),
         ),
       ),
@@ -115,10 +115,10 @@ class Nuevocliente extends StatelessWidget {
             key: _formKey,
             child: ListView(
               children: [
-                campo("Nombre", Icons.person, nombreController),
-                campo("Dirección", Icons.location_on, direccionController),
-                campo("Correo electrónico", Icons.email, correoController),
-                campo("Número de teléfono", Icons.add_ic_call, telefonoController),
+                campo("Nombre", Icons.person, nombreproductoController),
+                campo("codigo de barras", Icons.location_on, codigodebarrasController),
+                campo("descripcion", Icons.email, descripcionController),
+                campo("cantidad", Icons.add_ic_call, cantidadController),
               ],
             ),
           ),
