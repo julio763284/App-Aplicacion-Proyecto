@@ -113,7 +113,7 @@ class _OlvidarContrasena2State
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Confirmar contraseña",
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      prefixIcon: const Icon(Icons.lock),
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(

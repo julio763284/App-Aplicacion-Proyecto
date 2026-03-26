@@ -77,8 +77,8 @@ class _OlvidarContrasenaPageState
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      labelText: "Número de teléfono",
-                      prefixIcon: const Icon(Icons.phone),
+                      labelText: "Correo eletrónico",
+                      prefixIcon: const Icon(Icons.mail_rounded),
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
@@ -107,7 +107,7 @@ class _OlvidarContrasenaPageState
                               .showSnackBar(
                             const SnackBar(
                               content:
-                                  Text("Ingresa tu número de teléfono"),
+                                  Text("Ingresa tu correo eletrónico"),
                             ),
                           );
                         } else {
@@ -137,7 +137,7 @@ TextButton(
     if (phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Ingresa tu número para reenviar el código"),
+          content: Text("Ingresa tu correo para reenviar el código"),
         ),
       );
     } else {
