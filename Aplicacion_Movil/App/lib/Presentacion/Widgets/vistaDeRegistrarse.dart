@@ -169,7 +169,9 @@ class _RegisterViewState extends State<RegisterView> {
                       const SizedBox(height: 16),
 
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         child: Text(
                           "¿Ya tienes cuenta? Inicia sesión",
                           style: TextStyle(
