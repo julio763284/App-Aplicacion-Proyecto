@@ -208,7 +208,7 @@ class HomePage extends StatelessWidget {
                   page: const Controlar_Gastos()),
               dashboardCard(context, "Gestionar Inventario",
                   Icons.storefront,
-                  page: GestionarInventarioPage()),
+                  page: GestionInventarioView()),
               dashboardCard(context, "Configurar", Icons.settings,
                   page: const Configuracion()),
             ],
