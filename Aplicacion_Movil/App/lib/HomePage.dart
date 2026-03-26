@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE6E6E6),
+      backgroundColor: Colors.transparent,
 
       // 🔹 APPBAR
       appBar: AppBar(
@@ -32,7 +32,6 @@ class HomePage extends StatelessWidget {
             letterSpacing: 1,
           ),
         ),
-
         actions: [
           PopupMenuButton<String>(
             icon: const CircleAvatar(
@@ -96,7 +95,6 @@ class HomePage extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             const SizedBox(height: 40),
-
             const Column(
               children: [
                 Row(
@@ -125,7 +123,6 @@ class HomePage extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
             const Divider(color: Colors.white30),
             const SizedBox(height: 15),
@@ -151,51 +148,71 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // 🔹 DASHBOARD
-      body: ListView(
+      // BODY CON FONDO
+      body: Stack(
         children: [
-          const SizedBox(height: 100),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              dashboardCard(context, "Gestionar Productos", Icons.inventory),
-              dashboardCard(context, "Gestionar Reportes", Icons.file_copy,
-                  page: const GestionarReportes()),
-              dashboardCard(context, "Visualizar Stock",
-                  Icons.inventory_rounded,
-                  page: const VisualizarStock()),
-            ],
+          // 🔹 FONDO (CAMBIA AQUÍ LA IMAGEN)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/fondo2.png', 
+              fit: BoxFit.cover,
+            ),
           ),
 
-          const SizedBox(height: 50),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              dashboardCard(context, "Gestionar Cliente", Icons.person,
-                  page: const Cliente()),
-              dashboardCard(context, "Gestionar Proveedores",
-                  Icons.local_shipping,
-                  page: const Proveedores()),
-              dashboardCard(context, "Revisar Alertas", Icons.warning,
-                  page: const NotificationView()),
-            ],
+          // 🔹 CAPA BLANCA PARA SUAVIZAR
+          Positioned.fill(
+            child: Container(
+              color: Colors.white.withOpacity(0.25),
+            ),
           ),
 
-          const SizedBox(height: 50),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          // 🔹 CONTENIDO
+          ListView(
             children: [
-              dashboardCard(context, "Controlar Finanzas",
-                  Icons.monetization_on,
-                  page: const Controlar_Gastos()),
-              dashboardCard(context, "Gestionar Inventario",
-                  Icons.storefront,
-                  page: GestionarInventarioPage()),
-              dashboardCard(context, "Configurar", Icons.settings,
-                  page: const Configuracion()),
+              const SizedBox(height: 100),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  dashboardCard(context, "Gestionar Productos", Icons.inventory),
+                  dashboardCard(context, "Gestionar Reportes", Icons.file_copy,
+                      page: const GestionarReportes()),
+                  dashboardCard(context, "Visualizar Stock",
+                      Icons.inventory_rounded,
+                      page: const VisualizarStock()),
+                ],
+              ),
+
+              const SizedBox(height: 50),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  dashboardCard(context, "Gestionar Cliente", Icons.person,
+                      page: const Cliente()),
+                  dashboardCard(context, "Gestionar Proveedores",
+                      Icons.local_shipping,
+                      page: const Proveedores()),
+                  dashboardCard(context, "Revisar Alertas", Icons.warning,
+                      page: const NotificationView()),
+                ],
+              ),
+
+              const SizedBox(height: 50),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  dashboardCard(context, "Controlar Finanzas",
+                      Icons.monetization_on,
+                      page: const Controlar_Gastos()),
+                  dashboardCard(context, "Gestionar Inventario",
+                      Icons.storefront,
+                      page: GestionarInventarioPage()),
+                  dashboardCard(context, "Configurar", Icons.settings,
+                      page: const Configuracion()),
+                ],
+              ),
             ],
           ),
         ],
@@ -235,7 +252,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // 🔹 TARJETAS DASHBOARD
+  // 🔹 TARJETAS
   static Widget dashboardCard(
     BuildContext context,
     String text,
