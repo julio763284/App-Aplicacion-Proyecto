@@ -100,8 +100,8 @@ class _LoginHomeState extends State<LoginHome> {
                 TextField(
                   controller: widget.userController, // Agregamos 'widget.' porque ahora es Stateful
                   decoration: InputDecoration(
-                    labelText: "Usuario",
-                    prefixIcon: const Icon(Icons.person),
+                    labelText: "Correo eletrónico",
+                    prefixIcon: const Icon(Icons.mail_rounded),
                     filled: true,
                     fillColor: Colors.grey[100],
                     border: OutlineInputBorder(
