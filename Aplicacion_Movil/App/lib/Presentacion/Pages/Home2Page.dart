@@ -25,7 +25,7 @@ class Homepagebody extends StatelessWidget {
             CardHome(
               text: "Gestionar Productos",
               icon: Icons.inventory,
-              page: GestionarInventarioPage(),
+              page: GestionInventarioView(),
             ),
             // tarjeta de Gestionar Reportes //
             CardHome(
@@ -83,7 +83,7 @@ class Homepagebody extends StatelessWidget {
               // tarjeta de Gestionar Inventario //
               text: "Gestionar Inventario",
               icon: Icons.storefront,
-              page: GestionarInventarioPage(),
+              page: GestionInventarioView(),
             ),
             CardHome(
               // tarjeta de Configurar//
