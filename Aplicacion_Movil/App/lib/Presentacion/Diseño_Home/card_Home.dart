@@ -11,7 +11,7 @@ class CardHome extends StatelessWidget {
   static const Color primaryColor = Color(0xFF017A74);
 
   const CardHome({
-    super.key,
+super.key,
     required this.text,
     required this.icon,
     this.page,
