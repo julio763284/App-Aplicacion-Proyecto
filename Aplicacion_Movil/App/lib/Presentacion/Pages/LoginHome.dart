@@ -98,7 +98,8 @@ class _LoginHomeState extends State<LoginHome> {
 
                 // USUARIO
                 TextField(
-                  controller: widget.userController, // Agregamos 'widget.' porque ahora es Stateful
+                  controller: widget
+                      .userController, // Agregamos 'widget.' porque ahora es Stateful
                   decoration: InputDecoration(
                     labelText: "Correo eletrónico",
                     prefixIcon: const Icon(Icons.mail_rounded),
@@ -165,8 +166,8 @@ class _LoginHomeState extends State<LoginHome> {
                         );
                       } else {
                         context.read<AutenticacionBloc>().add(
-                              Ingresar(user, pass),
-                            );
+                          Ingresar(user, pass),
+                        );
                       }
                     },
                     child: const Text(
@@ -182,7 +183,10 @@ class _LoginHomeState extends State<LoginHome> {
                 TextButton(
                   onPressed: () {
                     context.read<AutenticacionBloc>().add(
-                        EventoOlvidarContrasena(widget.userController.text.trim()));
+                      EventoOlvidarContrasena(
+                        widget.userController.text.trim(),
+                      ),
+                    );
                   },
                   child: const Text(
                     "¿Olvidaste tu contraseña?",
@@ -202,7 +206,9 @@ class _LoginHomeState extends State<LoginHome> {
                     const Text("¿No tienes cuenta? "),
                     TextButton(
                       onPressed: () {
-                        context.read<AutenticacionBloc>().add(EventoRegistrarse());
+                        context.read<AutenticacionBloc>().add(
+                          EventoRegistrarse(),
+                        );
                       },
                       child: const Text(
                         "Registrarse",

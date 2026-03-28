@@ -19,17 +19,11 @@ class MenuButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () {
           if (page != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => page!),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
           }
         },
         icon: Icon(icon, color: Colors.white),
-        label: Text(
-          text,
-          style: const TextStyle(color: Colors.white),
-        ),
+        label: Text(text, style: const TextStyle(color: Colors.white)),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF017A74),
           elevation: 0,
