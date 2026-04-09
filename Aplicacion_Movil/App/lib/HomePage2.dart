@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Dise%C3%B1o_Home/card_Home.dart';
 import 'package:gestor/Presentacion/Pages/Home2Page.dart';
 import 'package:gestor/Presentacion/Widgets/Gestionarproducto.dart';
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
@@ -11,14 +10,13 @@ import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
 import 'package:gestor/perfil.dart';
-import 'package:gestor/Presentacion/Diseño_Home/Botones_drawer.dart'; // aquí está MenuButton
+import 'package:gestor/Presentacion/Diseño_Home/Botones_drawer.dart'; 
 
 class Homepage2 extends StatelessWidget {
   const Homepage2({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 🔹 APPBAR
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 1, 122, 116),
         elevation: 0,
