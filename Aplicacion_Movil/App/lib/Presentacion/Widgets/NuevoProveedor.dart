@@ -13,7 +13,7 @@ class Nuevoproveedor extends StatelessWidget {
 
   static const Color colorPrincipal = Color.fromARGB(255, 1, 122, 116);
 
-  final String url = "http://10.2.136.10:3000/proveedores"; 
+  final String url = "http://10.2.139.243:3000/proveedores"; 
 
   Future<void> guardarCliente(BuildContext context) async {
     try {

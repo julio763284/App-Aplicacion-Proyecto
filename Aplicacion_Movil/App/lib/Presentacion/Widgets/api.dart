@@ -38,7 +38,7 @@ class Cliente {
 
 Future<List<Producto>> fetchProductos() async {
   final response = await http.get(
-    Uri.parse('http://10.2.137.120:3000/productos'),
+    Uri.parse('http://10.2.139.243:3000/productos'),
   );
 
   if (response.statusCode == 200) {
@@ -51,7 +51,7 @@ Future<List<Producto>> fetchProductos() async {
   
 Future<bool> loginUsuario(String email, String password) async {
   final response = await http.post(
-    Uri.parse('http://10.2.137.120:3000/login'),
+    Uri.parse('http://10.2.139.243:3000/login'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
       "email": email,
@@ -68,7 +68,7 @@ Future<bool> loginUsuario(String email, String password) async {
 
 Future<List<Cliente>> obtenerClientes() async {
   final response = await http.get(
-    Uri.parse('http://10.2.136.10:3000/clientes'),
+    Uri.parse('http://10.2.139.243:3000/clientes'),
   );
 
   if (response.statusCode == 200) {
@@ -86,7 +86,7 @@ Future<bool> guardarProveedor(
     String direccion,
 ) async {
   final response = await http.post(
-    Uri.parse('http://10.2.136.10:3000/proveedores'),
+    Uri.parse('http://10.2.139.243:3000/proveedores'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
       "nombre": nombre,
@@ -120,7 +120,7 @@ class Movimiento {
 class InventarioService {
   static Future<List<Movimiento>> obtenerMovimientos() async {
     final response = await http.get(
-      Uri.parse('http://10.2.137.120:3000/movimientos'),
+      Uri.parse('http://10.2.139.243:3000/movimientos'),
     );
     print(response.body);
 

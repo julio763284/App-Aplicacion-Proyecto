@@ -6,7 +6,7 @@ class GestionInventarioView extends StatelessWidget {
   const GestionInventarioView({super.key});
 
 
-  final String url = "http://10.2.137.120:3000/movimientos";
+  final String url = "http://10.2.139.243:3000/movimientos";
 
 
   static const Color primaryColor = Color(0xFF017A74);

@@ -3,7 +3,7 @@ import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart';
 
 class Proveedores extends StatelessWidget {
   const Proveedores({super.key});
-  final String url = "http://10.2.137.120:3000/proveedores";
+  final String url = "http://10.2.139.243:3000/proveedores";
 
 
   @override
