@@ -63,11 +63,6 @@ app.post('/proveedores', (req, res) => {
 });
 
 app.get('/movimientos', (req, res) => {
-<<<<<<< Updated upstream
-    const sql = "SELECT MONTH(fecha) as mes, SUM(cantidad) as total FROM movimientos_inventario WHERE tipo = 'salida' GROUP BY mes ORDER BY mes";
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).send(err);
-=======
   db.query(
     `SELECT MONTH(fecha) as mes, SUM(cantidad) as total
      FROM movimiento_inventario
@@ -77,11 +72,12 @@ app.get('/movimientos', (req, res) => {
     (err, results) => {
       if (err) {
         console.log(err);
-        res.status(500).send(err);
+        return res.status(500).send(err);
       } else {
->>>>>>> Stashed changes
         res.json(results);
-    });
+      }
+    }
+  );
 });
 
 app.listen(3000, '0.0.0.0', () => {
