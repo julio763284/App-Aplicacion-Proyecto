@@ -78,7 +78,7 @@ class Homepagebody extends StatelessWidget {
               // tarjeta de Gestionar Inventario //
               text : "Gestionar Inventario",
               icon :  Icons.storefront,
-              page: GestionarInventarioPage()),
+              page: GestionInventarioView()),
             CardHome(
               // tarjeta de Configurar//
               text : "Configurar",
