@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Dise%C3%B1o_Home/card_Home.dart';
 import 'package:gestor/Presentacion/Pages/Home2Page.dart';
+import 'package:gestor/Presentacion/Widgets/Gestionarproducto.dart';
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
@@ -129,7 +130,7 @@ class Homepage2 extends StatelessWidget {
             MenuButton(
               icon: Icons.inventory,
               text: "Gestionar Productos",
-              page: GestionarInventarioPage(),
+              page: Gestionarproducto(),
             ),
             MenuButton(
               icon: Icons.file_copy,
@@ -164,7 +165,7 @@ class Homepage2 extends StatelessWidget {
             MenuButton(
               icon: Icons.storefront,
               text: "Gestionar Inventario",
-              page: GestionarInventarioPage(),
+              page: GestionInventarioView(),
             ),
             MenuButton(
               icon: Icons.settings,
