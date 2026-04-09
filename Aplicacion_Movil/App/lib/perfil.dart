@@ -5,11 +5,7 @@ class PerfilPage extends StatelessWidget {
   final String nombre;
   final String email;
 
-  const PerfilPage({
-    super.key,
-    required this.nombre,
-    required this.email,
-  });
+  const PerfilPage({super.key, required this.nombre, required this.email});
 
   static const Color primaryColor = Color(0xFF017A74);
 
@@ -35,13 +31,12 @@ class PerfilPage extends StatelessWidget {
                 color: Colors.black26,
                 blurRadius: 10,
                 offset: Offset(0, 5),
-              )
+              ),
             ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               // 🔥 FOTO CIRCULAR
               const CircleAvatar(
                 radius: 55,
@@ -65,10 +60,7 @@ class PerfilPage extends StatelessWidget {
               // 🔥 EMAIL DINÁMICO
               Text(
                 email,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
 
               const SizedBox(height: 30),
@@ -79,26 +71,20 @@ class PerfilPage extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton.icon(
                   onPressed: () {
-
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const LoginPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
                       (route) => false,
                     );
-
                   },
                   icon: const Icon(Icons.logout),
                   label: const Text(
                     "Cerrar Sesión",
                     style: TextStyle(fontSize: 16),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -1,5 +1,3 @@
-
-
 abstract class AppState {}
 
 class LoadingState extends AppState {}
@@ -29,4 +27,3 @@ class ErrorState extends AppState {}
 class OlvidarContrasenaState extends AppState {}
 
 class OlvidarContrasena2State extends AppState {}
-

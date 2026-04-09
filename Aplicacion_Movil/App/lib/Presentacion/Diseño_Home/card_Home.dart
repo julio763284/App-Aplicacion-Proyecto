@@ -10,7 +10,7 @@ class CardHome extends StatelessWidget {
   static const Color primaryColor = Color(0xFF017A74);
 
   const CardHome({
-    super.key,
+super.key,
     required this.text,
     required this.icon,
     this.page,
@@ -21,10 +21,7 @@ class CardHome extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (page != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => page!),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
         }
       },
       child: Container(
@@ -39,7 +36,7 @@ class CardHome extends StatelessWidget {
               color: Colors.black26,
               blurRadius: 8,
               offset: Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Column(
