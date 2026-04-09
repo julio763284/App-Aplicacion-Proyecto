@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/autenticacion/bloc_autenticacion.dart';
 import '../../bloc/autenticacion/eventos_autenticacion.dart';
+import '../../bloc/autenticacion/estados_autenticacion.dart';
 
 class LoginHome extends StatefulWidget {
   const LoginHome({
@@ -18,209 +19,130 @@ class LoginHome extends StatefulWidget {
 }
 
 class _LoginHomeState extends State<LoginHome> {
-  // Variable para controlar la visibilidad de la contraseña
   bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color.fromARGB(255, 1, 122, 116),
-            Color.fromARGB(255, 0, 168, 150),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.all(20),
-            padding: const EdgeInsets.all(25),
-            width: 370,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Colors.white,
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 15,
-                  offset: Offset(2, 6),
-                ),
-              ],
+    return BlocListener<AutenticacionBloc, Autenticacionestados>(
+      listener: (context, state) {
+        if (state is LoginExitoso) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Acceso concedido"), backgroundColor: Colors.green),
+          );
+        } else if (state is LoginError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Credenciales incorrectas"), backgroundColor: Colors.red),
+          );
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF017A74), Color(0xFF00A896)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // LOGO
-                Container(
-                  width: 130,
-                  height: 130,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 1, 122, 116),
-                        Color.fromARGB(255, 0, 168, 150),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(35),
-                  ),
-                  child: const Icon(
-                    Icons.inventory_2,
-                    size: 75,
-                    color: Colors.white,
-                  ),
+          ),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(25),
+                width: 370,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: Colors.white,
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(2, 6)),
+                  ],
                 ),
-
-                const SizedBox(height: 20),
-
-                const Text(
-                  "Inventary Mobile",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 1, 122, 116),
-                  ),
-                ),
-
-                const SizedBox(height: 5),
-
-                const Text(
-                  "Gestión inteligente de inventario",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-
-                const SizedBox(height: 30),
-
-                // USUARIO
-                TextField(
-                  controller: widget
-                      .userController, // Agregamos 'widget.' porque ahora es Stateful
-                  decoration: InputDecoration(
-                    labelText: "Correo eletrónico",
-                    prefixIcon: const Icon(Icons.mail_rounded),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                TextField(
-                  controller: widget.passController,
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    labelText: "Contraseña",
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: const Color.fromARGB(255, 1, 122, 116),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF017A74), Color(0xFF00A896)]),
+                        borderRadius: BorderRadius.circular(35),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
+                      child: const Icon(Icons.inventory_2, size: 75, color: Colors.white),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // BOTÓN INGRESAR
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 1, 122, 116),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                    const SizedBox(height: 20),
+                    const Text("Inventary Mobile", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF017A74))),
+                    const SizedBox(height: 30),
+                    TextField(
+                      controller: widget.userController,
+                      decoration: InputDecoration(
+                        labelText: "Correo electrónico",
+                        prefixIcon: const Icon(Icons.mail_rounded),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
                       ),
-                      elevation: 10,
                     ),
-                    onPressed: () {
-                      String user = widget.userController.text.trim();
-                      String pass = widget.passController.text.trim();
-
-                      if (user.isEmpty || pass.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Completa todos los campos"),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: widget.passController,
+                      obscureText: _obscureText,
+                      decoration: InputDecoration(
+                        labelText: "Contraseña",
+                        prefixIcon: const Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF017A74)),
+                          onPressed: () => setState(() => _obscureText = !_obscureText),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    BlocBuilder<AutenticacionBloc, Autenticacionestados>(
+                      builder: (context, state) {
+                        if (state is Logincargando) {
+                          return const CircularProgressIndicator();
+                        }
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF017A74),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              elevation: 10,
+                            ),
+                            onPressed: () {
+                              context.read<AutenticacionBloc>().add(
+                                Ingresar(widget.userController.text, widget.passController.text),
+                              );
+                            },
+                            child: const Text("Ingresar", style: TextStyle(fontSize: 18, color: Colors.white)),
                           ),
                         );
-                      } else {
-                        context.read<AutenticacionBloc>().add(
-                          Ingresar(user, pass),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      "Ingresar",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // OLVIDÓ CONTRASEÑA
-                TextButton(
-                  onPressed: () {
-                    context.read<AutenticacionBloc>().add(
-                      EventoOlvidarContrasena(
-                        widget.userController.text.trim(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "¿Olvidaste tu contraseña?",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 1, 122, 116),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // REGISTRO
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("¿No tienes cuenta? "),
-                    TextButton(
-                      onPressed: () {
-                        context.read<AutenticacionBloc>().add(
-                          EventoRegistrarse(),
-                        );
                       },
-                      child: const Text(
-                        "Registrarse",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 1, 122, 116),
-                          fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 15),
+                    TextButton(
+                      onPressed: () => context.read<AutenticacionBloc>().add(EventoOlvidarContrasena(widget.userController.text)),
+                      child: const Text("¿Olvidaste tu contraseña?", style: TextStyle(color: Color(0xFF017A74), fontWeight: FontWeight.bold)),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("¿No tienes cuenta? "),
+                        TextButton(
+                          onPressed: () => context.read<AutenticacionBloc>().add(EventoRegistrarse()),
+                          child: const Text("Registrarse", style: TextStyle(color: Color(0xFF017A74), fontWeight: FontWeight.bold)),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
