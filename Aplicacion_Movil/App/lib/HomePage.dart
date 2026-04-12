@@ -1,119 +1,79 @@
-import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
-import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
-import 'package:gestor/Presentacion/Widgets/Cliente.dart';
-import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
-import 'package:gestor/Presentacion/Widgets/notificationView.dart';
-import 'package:gestor/Presentacion/Widgets/Controlar_Gastos.dart';
-import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
-import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
+import "package:flutter/material.dart";
 
-class Homepage2 extends StatelessWidget {
-  const Homepage2({super.key});
 
-  static const Color primaryColor = Color(0xFF017A74);
+class Home extends StatelessWidget {
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("INVENTARY MOBILE"),
-        backgroundColor: primaryColor,
-      ),
-      body: GridView.count(
-        crossAxisCount: 3,
-        padding: const EdgeInsets.all(20),
-        crossAxisSpacing: 15,
-        mainAxisSpacing: 15,
-        children: [
-          dashboardCard(
-            context,
-            "Gestionar Reportes",
-            Icons.file_copy,
-            const GestionarReportes(),
+      body: ListView(
+        children: [ 
+            Column(
+            children: [
+              SizedBox(height: 70),
+              //Row contiene el titulo y el icono del Home//
+              Row(
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      border: BoxBorder.all(color: Colors.red)
+                    ),
+                  ),
+                  Expanded(child: Center(child: Text("Inventario Movil", style: TextStyle(fontSize: 30,))))
+                ],
+              ),
+              //Row contiene el titulo y el icono del Home//
+              Container(
+                margin: EdgeInsets.only(top: 80, left: 30, right: 30),
+                padding: EdgeInsets.only(top: 20),
+                height: 900,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: BoxBorder.all(color: Colors.black)
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //BotonHome es la clase que contiene el diseño de los botones de la vista Home//
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(), SizedBox(width: 10)  , BotonHome()]),
+                    SizedBox(height: 20),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(), SizedBox(width: 10)  , BotonHome()]),
+                    SizedBox(height: 20),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(), SizedBox(width: 10)  , BotonHome()]),
+                    SizedBox(height: 20),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(), SizedBox(width: 10)  , BotonHome()]),
+                    SizedBox(height: 20),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [BotonHome()])
+                  ],
+                )
+              )
+            ],
           ),
-
-          dashboardCard(
-            context,
-            "Visualizar Stock",
-            Icons.warehouse,
-            const VisualizarStock(),
-          ),
-
-          dashboardCard(context, "Clientes", Icons.person, const Cliente()),
-
-          dashboardCard(
-            context,
-            "Proveedores",
-            Icons.local_shipping,
-            const Proveedores(),
-          ),
-
-          dashboardCard(
-            context,
-            "Alertas",
-            Icons.warning,
-            const NotificationView(),
-          ),
-
-          dashboardCard(
-            context,
-            "Finanzas",
-            Icons.monetization_on,
-            const Controlar_Gastos(),
-          ),
-
-          // ✅ CORREGIDO AQUI
-          dashboardCard(
-            context,
-            "Inventario",
-            Icons.storefront,
-            const GestionInventarioView(),
-          ),
-
-          dashboardCard(
-            context,
-            "Configuración",
-            Icons.settings,
-            const Configuracion(),
-          ),
-        ],
+        ]
       ),
     );
   }
+}
 
-  Widget dashboardCard(
-    BuildContext context,
-    String titulo,
-    IconData icono,
-    Widget page,
-  ) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: primaryColor,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icono, color: Colors.white, size: 32),
-            const SizedBox(height: 10),
-            Text(
-              titulo,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+class BotonHome extends StatelessWidget {
+  const BotonHome({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(onTap: (){},  borderRadius: BorderRadius.circular(12),
+    child: Ink(
+      height: 150,
+      width: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.blue
       ),
+    ),
     );
   }
 }
