@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/Presentacion/Widgets/login.dart';
-import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
+import 'package:gestor/HomePage2.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 
 void main() {
@@ -17,7 +16,7 @@ class InventaryMobile extends StatelessWidget {
       providers: [BlocProvider(create: (context) => AutenticacionBloc())],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        home: Homepage2(),
       ),
     );
   }
