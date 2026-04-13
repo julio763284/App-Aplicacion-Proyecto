@@ -16,6 +16,8 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  final String url = "http://10.2.139.243:3000/registro";
+
   final String url = "http://10.2.137.120:3000/registro";
 
   Future<void> registrarUsuario() async {
@@ -40,17 +42,20 @@ class _RegisterViewState extends State<RegisterView> {
         body: jsonEncode({
           "nombre": nombreController.text,
           "correo": correoController.text,
-          "password": passwordController.text
+          "password": passwordController.text,
         }),
       );
 
       if (response.statusCode == 200) {
-        _mostrarMensaje("Usuario registrado correctamente ");
+        _mostrarMensaje("Usuario registrado correctamente ✅");
         _limpiarCampos();
       } else {
-        _mostrarMensaje("Error al registrar usuario ");
+        _mostrarMensaje("Error al registrar usuario ⚠️");
       }
     } catch (e) {
+      print("ERROR REAL: $e");
+      _mostrarMensaje("Error de conexión: $e");
+    }
       print("ERROR REAL: $e");
       _mostrarMensaje("Error: $e");
     }
@@ -64,9 +69,9 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   void _mostrarMensaje(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensaje)));
   }
 
   @override
@@ -175,6 +180,7 @@ class _RegisterViewState extends State<RegisterView> {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 16),
 
                       TextButton(
