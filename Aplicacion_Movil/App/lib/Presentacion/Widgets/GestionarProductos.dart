@@ -127,7 +127,7 @@ class Gestionarproductos extends StatelessWidget {
         builder: (context) => Nuevoproducto(),
       ),
       );
-          // Tu lógica aquí
+          // lógica aquí
         },
         child: const Icon(Icons.add),
       ),

@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gestor/HomePage2.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
-import 'package:gestor/Presentacion/Widgets/api.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
-import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 
 
