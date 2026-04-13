@@ -42,7 +42,10 @@ app.post('/registro', (req, res) => {
     const { nombre, correo, password } = req.body;
     const sql = "INSERT INTO usuario (nombre, correo, password) VALUES (?, ?, ?)";
     db.query(sql, [nombre, correo, password], (err, result) => {
-        if (err) return res.status(500).json({ mensaje: "error al registrar", detalle: err });
+        if (err) {
+            console.log("❌ error al registrar:", err);
+            return res.status(500).json({ mensaje: "error al registrar", detalle: err });
+        }
         res.json({ mensaje: "usuario registrado correctamente" });
     });
 });
@@ -67,21 +70,9 @@ app.post('/proveedores', (req, res) => {
     });
 });
 
-// obtener movimientos de inventario (corregido)
+// obtener movimientos
 app.get('/movimientos', (req, res) => {
-<<<<<<< HEAD
-  db.query(
-    `SELECT MONTH(fecha) as mes, SUM(cantidad) as total
-     FROM movimiento_inventario
-     WHERE tipo = 'salida'
-     GROUP BY mes
-     ORDER BY mes`,
-    (err, results) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).send(err);
-      } else {
-=======
+
     const sql = `
         SELECT MONTH(fecha) as mes, SUM(cantidad) as total 
         FROM movimiento_inventario 
@@ -95,14 +86,11 @@ app.get('/movimientos', (req, res) => {
             console.log("❌ error en query movimientos:", err);
             return res.status(500).json({ mensaje: "error al obtener movimientos", detalle: err });
         }
->>>>>>> main
         res.json(results);
-      }
-    }
-  );
+    });
 });
 
-// servidor escuchando
+// servidor
 app.listen(3000, '0.0.0.0', () => {
     console.log('🚀 servidor corriendo en el puerto 3000');
 });
