@@ -20,7 +20,7 @@ class HomepageBodyLayout extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0D1B1E), Color(0xFF002B28)], 
+          colors: [Color(0xFF0D1B1E), Color(0xFF002B28)],
         ),
       ),
       child: SafeArea(
@@ -36,7 +36,6 @@ class HomepageBodyLayout extends StatelessWidget {
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   children: [
-                    // Quitamos const de las páginas para evitar errores de compilación
                     nexusFrostedGlassCard(context, "Reportes", Icons.file_copy, GestionarReportes()),
                     nexusFrostedGlassCard(context, "Stock", Icons.warehouse, VisualizarStock()),
                     nexusFrostedGlassCard(context, "Clientes", Icons.person, Cliente()),
@@ -51,27 +50,30 @@ class HomepageBodyLayout extends StatelessWidget {
                 height: 140,
                 child: Row(
                   children: [
-                    Expanded(child: nexusFrostedGlassCard(context, "Inventario", Icons.storefront, GestionInventarioView())),
+                    Expanded(
+                      child: nexusFrostedGlassCard(context, "Inventario", Icons.storefront, GestionInventarioView()),
+                    ),
                     const SizedBox(width: 12),
-                    Expanded(child: nexusFrostedGlassCard(context, "Configuración", Icons.settings, Configuracion())),
+                    Expanded(
+                      child: nexusFrostedGlassCard(context, "Configuración", Icons.settings, Configuracion()),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-              // Indicador de Servidor
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(Icons.circle, color: Colors.greenAccent, size: 8),
                   SizedBox(width: 10),
                   Text(
-                    "SERVIDOR CONECTADO", 
+                    "SERVIDOR CONECTADO",
                     style: TextStyle(
-                      color: Colors.greenAccent, 
-                      fontSize: 10, 
-                      fontWeight: FontWeight.bold, 
-                      letterSpacing: 1.5
-                    )
+                      color: Colors.greenAccent,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ],
               ),
@@ -79,70 +81,22 @@ class HomepageBodyLayout extends StatelessWidget {
             ],
           ),
         ),
-import "package:flutter/material.dart";
-
-
-class Home extends StatelessWidget {
-  const Home({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        children: [ 
-            Column(
-            children: [
-              SizedBox(height: 50),
-              //Row contiene el titulo y el icono del Home//
-              Row(
-                children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(image: AssetImage("assets/Logo.png"))
-                    ),
-                  ),
-                  Expanded(child: Center(child: Text("Inventario Movil", style: TextStyle(fontSize: 30,))))
-                ],
-              ),
-              //Row contiene el titulo y el icono del Home//
-              Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: 50, left: 30, right: 30),
-                    padding: EdgeInsets.only(top: 20),
-                    height: 900,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        //BotonHome es la clase que contiene el diseño de los botones de la vista Home//
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(url : "GestionarProducto.jpg"), SizedBox(width: 10)  , BotonHome(url : "GestionarReportes.jpg")]),
-                        SizedBox(height: 20),
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(url:  "VisualizarStock.jpg"), SizedBox(width: 10)  , BotonHome(url: "GestionarCliente.jpg")]),
-                        SizedBox(height: 20),
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [SizedBox(width: 10) , BotonHome(url:  "GestionarProveedor.jpg"), SizedBox(width: 10)  , BotonHome(url : "Alertas.jpg")]),
-                        SizedBox(height: 20),
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [BotonHome(url: "ControlarFinanzas.jpg")])
-                      ],
-                    )
-                  ),
-                ],
-              )
-            ],
-          ),
-        ]
       ),
     );
   }
-}
 
-  Widget nexusFrostedGlassCard(BuildContext context, String titulo, IconData icono, Widget page, {bool isAlert = false}) {
+  Widget nexusFrostedGlassCard(
+    BuildContext context,
+    String titulo,
+    IconData icono,
+    Widget page, {
+    bool isAlert = false,
+  }) {
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => page),
+      ),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -168,43 +122,39 @@ class Home extends StatelessWidget {
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              color: isAlert ? Colors.red.withOpacity(0.1) : const Color(0xFF017A74).withOpacity(0.08),
+              color: isAlert
+                  ? Colors.red.withOpacity(0.1)
+                  : const Color(0xFF017A74).withOpacity(0.08),
               border: Border.all(
-                color: isAlert ? Colors.redAccent.withOpacity(0.5) : Colors.cyanAccent.withOpacity(0.2),
+                color: isAlert
+                    ? Colors.redAccent.withOpacity(0.5)
+                    : Colors.cyanAccent.withOpacity(0.2),
                 width: 1,
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icono, color: isAlert ? Colors.redAccent : Colors.cyanAccent, size: 26),
+                Icon(
+                  icono,
+                  color: isAlert ? Colors.redAccent : Colors.cyanAccent,
+                  size: 26,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   titulo,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
           ),
         ],
-class BotonHome extends StatelessWidget {
-  final String url;
-  const BotonHome({super.key, required this.url});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(onTap: (){},  borderRadius: BorderRadius.circular(12),
-    child: Ink(
-      height: 150,
-      width: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(image: AssetImage(url),
-        fit: BoxFit.cover
-        ),
       ),
-    ),
     );
   }
 }
