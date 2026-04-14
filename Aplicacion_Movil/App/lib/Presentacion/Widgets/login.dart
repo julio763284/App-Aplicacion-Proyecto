@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/HomePage2.dart';
-import 'package:gestor/Presentacion/Pages/LoginHome.dart';
+import 'package:gestor/HomePage2.dart'; 
+import 'package:gestor/Presentacion/Pages/LoginHome.dart'; 
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
-import 'package:gestor/Presentacion/Widgets/api.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
-import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 
-///////El login tiene su propio bloc///////
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
@@ -18,45 +15,42 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final TextEditingController userController = TextEditingController();
   final TextEditingController passController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
+      backgroundColor: const Color(0xFF0D1B1E), 
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
-
           if (state is Estado_Registrarse) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => RegisterView()),
+              MaterialPageRoute(builder: (_) => const RegisterView()),
             );
           } else if (state is EstadoOlvidarcontrasena) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => OlvidarContrasenaPage()),
+              MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()),
             );
           }
-
         },
-
         child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
           builder: (context, state) {
-            // LOADING
+            
             if (state is Logincargando) {
               return const LoadingView();
-            } else if (state is LoginExitoso) {
-              return Homepage2();
-            } else {
-              // LOGIN NORMAL
-              return LoginHome(
+            } 
+            
+            if (state is LoginExitoso) {
+              return const Homepage2(); 
+            } 
+
+            return LoginHome( 
               userController: userController,
               passController: passController,
             );
-            }
           },
         ),
       ),

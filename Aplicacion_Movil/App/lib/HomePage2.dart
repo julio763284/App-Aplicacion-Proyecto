@@ -1,184 +1,117 @@
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Dise%C3%B1o_Home/card_Home.dart';
-import 'package:gestor/Presentacion/Pages/Home2Page.dart';
-import 'package:gestor/Presentacion/Widgets/Gestionarproducto.dart';
-import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
-import 'package:gestor/Presentacion/Widgets/Cliente.dart';
-import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
-import 'package:gestor/Presentacion/Widgets/Controlar_Gastos.dart';
-import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
-import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
-import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
+import 'package:gestor/HomePage.dart';
+import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
-import 'package:gestor/perfil.dart';
-import 'package:gestor/Presentacion/Diseño_Home/Botones_drawer.dart'; // aquí está MenuButton
+import 'package:gestor/perfil.dart'; 
 
-class Homepage2 extends StatelessWidget {
+class Homepage2 extends StatefulWidget {
   const Homepage2({super.key});
+
+  @override
+  State<Homepage2> createState() => _Homepage2State();
+}
+
+class _Homepage2State extends State<Homepage2> {
+  bool _isSearching = false; 
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 🔹 APPBAR
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFF0D1B1E),
+      drawer: const CustomNexusDrawer(),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 1, 122, 116),
+        backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
         elevation: 0,
-        title: const Text(
-          "INVENTARY MOBILE",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
+        ),
+        title: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: _isSearching 
+            ? _buildSearchField() 
+            : const Text(
+                "NEXUS INVENTORY", 
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.2)
+              ),
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const CircleAvatar(
-              radius: 18,
-              backgroundImage: AssetImage('assets/profile.png'),
-            ),
-            onSelected: (value) {
-              if (value == "perfil") {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const PerfilPage(
-                      nombre: "Jorge",
-                      email: "jorge@email.com",
-                    ),
-                  ),
-                );
-              }
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search, color: Colors.white70),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) _searchController.clear();
+              });
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: "perfil",
-                child: Row(
-                  children: [
-                    Icon(Icons.person),
-                    SizedBox(width: 10),
-                    Text("Mi perfil"),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: "config",
-                child: Row(
-                  children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 10),
-                    Text("Configuración"),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: "logout",
-                child: Row(
-                  children: [
-                    Icon(Icons.logout),
-                    SizedBox(width: 10),
-                    Text("Cerrar sesión"),
-                  ],
-                ),
-              ),
-            ],
           ),
-          const SizedBox(width: 10),
-        ],
-      ),
-
-      // 🔹 DRAWER o Menu Desplegable //
-      drawer: Drawer(
-        backgroundColor: Color.fromARGB(255, 1, 122, 116),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const SizedBox(height: 40),
-            Column(
+          IconButton(
+            icon: Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.move_to_inbox, color: Colors.white, size: 38),
-                    SizedBox(width: 12),
-                    Text(
-                      "Mobile Inventory",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  "Tu inventario siempre bajo control",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                const Icon(Icons.notifications_none, color: Colors.white70),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(1),
+                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                    constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
+                    child: const Text('3', style: TextStyle(color: Colors.white, fontSize: 8), textAlign: TextAlign.center),
                   ),
-                ),
+                )
               ],
             ),
-            const SizedBox(height: 20),
-            const Divider(color: Colors.white30),
-            const SizedBox(height: 15),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationView()));
+            },
+          ),
 
-            // 🔹 BOTONES DEL DRAWER
-            MenuButton(
-              icon: Icons.inventory,
-              text: "Gestionar Productos",
-              page: Gestionarproducto(),
-            ),
-            MenuButton(
-              icon: Icons.file_copy,
-              text: "Gestionar Reportes",
-              page: const GestionarReportes(),
-            ),
-            MenuButton(
-              icon: Icons.warehouse,
-              text: "Visualizar Stock",
-              page: const VisualizarStock(),
-            ),
-            MenuButton(
-              icon: Icons.person,
-              text: "Gestionar Cliente",
-              page: const Cliente(),
-            ),
-            MenuButton(
-              icon: Icons.local_shipping,
-              text: "Gestionar Proveedores",
-              page: const Proveedores(),
-            ),
-            MenuButton(
-              icon: Icons.warning,
-              text: "Revisar Alertas",
-              page: const NotificationView(),
-            ),
-            MenuButton(
-              icon: Icons.monetization_on,
-              text: "Controlar Finanzas",
-              page: const Controlar_Gastos(),
-            ),
-            MenuButton(
-              icon: Icons.storefront,
-              text: "Gestionar Inventario",
-              page: GestionInventarioView(),
-            ),
-            MenuButton(
-              icon: Icons.settings,
-              text: "Configuración",
-              page: const Configuracion(),
-            ),
-          ],
+          IconButton(
+            icon: const Icon(Icons.person_pin, color: Colors.greenAccent, size: 28),
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => PerfilPage(
+                    nombre: 'JHOLIAN MANUEL', 
+                    email: 'jholianmanuel@gmail.com', 
+                    urlImagen: 'https://avatars.githubusercontent.com/u/12345678?v=4',
+                  )
+                )
+              ); 
+            },
+          ),
+          const SizedBox(width: 5),
+        ],
+      ),
+      body: const HomepageBodyLayout(),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24)
+      ),
+      child: TextField(
+        controller: _searchController,
+        autofocus: true,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        decoration: const InputDecoration(
+          hintText: "Buscar...",
+          hintStyle: TextStyle(color: Colors.white54),
+          border: InputBorder.none,
+          prefixIcon: Icon(Icons.search, color: Colors.white54, size: 20),
+          contentPadding: EdgeInsets.symmetric(vertical: 10),
         ),
       ),
-
-      // 🔹 Cuerpo de la vista //
-      body: Homepagebody(),
     );
   }
 }
-

@@ -15,3 +15,5 @@ class EventoOlvidarContrasena extends Autenticacion_Event {
   final String email; // normalmente necesitas un email para recuperar
   EventoOlvidarContrasena(this.email);
 }
+
+

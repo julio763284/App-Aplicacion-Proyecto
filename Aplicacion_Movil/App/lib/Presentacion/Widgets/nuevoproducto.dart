@@ -1,20 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Nuevoproducto extends StatelessWidget {
   Nuevoproducto({super.key});
 
   final _formKey = GlobalKey<FormState>();
-
   final nombreproductoController = TextEditingController();
   final codigodebarrasController = TextEditingController();
   final descripcionController = TextEditingController();
   final cantidadController = TextEditingController();
 
-  static const Color colorPrincipal = Color.fromARGB(255, 1, 122, 116);
-
-  final String url = "http://10.2.139.243:3000/producto"; 
+  final String url = "http://10.2.139.243:3000/producto";
 
   Future<void> guardarProducto(BuildContext context) async {
     try {
@@ -23,106 +21,105 @@ class Nuevoproducto extends StatelessWidget {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "nombre": nombreproductoController.text,
-          "direccion": codigodebarrasController.text,
+          "direccion": codigodebarrasController.text, 
           "correo": descripcionController.text,
           "telefono": cantidadController.text,
         }),
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('producto guardado correctamente ✅')),
-        );
-
-        nombreproductoController.clear();
-        codigodebarrasController.clear();
-        descripcionController.clear();
-        cantidadController.clear();
+        _notificar(context, 'Producto guardado en Nexus ✅', Colors.greenAccent);
+        _limpiar();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al guardar productos ❌')),
-        );
+        _notificar(context, 'Error al guardar productos ❌', Colors.redAccent);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error de conexión con el servidor 🌐')),
-      );
+      _notificar(context, 'Error de conexión 🌐', Colors.orangeAccent);
     }
   }
 
-  InputDecoration estiloCampo(String texto, IconData icono) {
-    return InputDecoration(
-      labelText: texto,
-      labelStyle: const TextStyle(
-        color: colorPrincipal,
-        fontWeight: FontWeight.bold,
-      ),
-      suffixIcon: Icon(icono, color: colorPrincipal),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: colorPrincipal, width: 1.5),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.green, width: 2),
-      ),
-    );
+  void _limpiar() {
+    nombreproductoController.clear();
+    codigodebarrasController.clear();
+    descripcionController.clear();
+    cantidadController.clear();
   }
 
-  Widget campo(String texto, IconData icono, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: TextFormField(
-        controller: controller,
-        validator: (value) =>
-            value == null || value.isEmpty ? 'Campo obligatorio' : null,
-        decoration: estiloCampo(texto, icono),
-      ),
-    );
+  void _notificar(BuildContext context, String msg, Color col) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg, style: const TextStyle(color: Color(0xFF0D1B1E), fontWeight: FontWeight.bold)),
+      backgroundColor: col,
+      behavior: SnackBarBehavior.floating,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+    const primaryDark = Color(0xFF0D1B1E);
+    const accentTeal = Color(0xFF017A74);
+
     return Scaffold(
+      backgroundColor: primaryDark,
+      drawer: const CustomNexusDrawer(),
       appBar: AppBar(
-        title: const Text("Nuevo producto"),
-        backgroundColor: colorPrincipal,
+        backgroundColor: accentTeal.withOpacity(0.2),
+        elevation: 0,
+        title: const Text("NUEVO PRODUCTO", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(15),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorPrincipal,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
-          ),
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              guardarProducto(context);
-            }
-          },
-          child: const Text("Guardar Producto",
-              style: TextStyle(fontSize: 16, color: Colors.white)),
-        ),
-      ),
-      body: AnimatedOpacity(
-        opacity: 1,
-        duration: const Duration(milliseconds: 700),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                campo("Nombre", Icons.person, nombreproductoController),
-                campo("codigo de barras", Icons.location_on, codigodebarrasController),
-                campo("descripcion", Icons.email, descripcionController),
-                campo("cantidad", Icons.add_ic_call, cantidadController),
-              ],
-            ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(25),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              const Icon(Icons.add_shopping_cart, size: 60, color: Colors.greenAccent),
+              const SizedBox(height: 30),
+              _campoNexus("Nombre del Producto", Icons.inventory_2_outlined, nombreproductoController),
+              _campoNexus("Código de Barras", Icons.qr_code_scanner, codigodebarrasController),
+              _campoNexus("Descripción", Icons.description_outlined, descripcionController),
+              _campoNexus("Cantidad en Stock", Icons.numbers, cantidadController, type: TextInputType.number),
+              const SizedBox(height: 40),
+              _botonGuardar(context, accentTeal),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _campoNexus(String label, IconData icon, TextEditingController ctr, {TextInputType type = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: TextFormField(
+        controller: ctr,
+        keyboardType: type,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+          prefixIcon: Icon(icon, color: Colors.greenAccent, size: 22),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.05),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.white.withOpacity(0.1))),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF017A74))),
+        ),
+      ),
+    );
+  }
+
+  Widget _botonGuardar(BuildContext context, Color color) {
+    return Container(
+      width: double.infinity,
+      height: 55,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(colors: [color, const Color(0xFF00C9B1)]),
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+        onPressed: () => guardarProducto(context),
+        child: const Text("REGISTRAR PRODUCTO", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }

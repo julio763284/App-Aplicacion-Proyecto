@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -10,68 +11,107 @@ class NotificationView extends StatefulWidget {
 
 class _NotificationViewState extends State<NotificationView> {
   final TextEditingController _searchController = TextEditingController();
-
-  List<String> notifications = [];
+  List<String> notifications = []; // Aquí puedes llenar tu lista
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color.fromARGB(255, 1, 122, 116);
+    // Color principal de Nexus Inventory
+    const primaryDark = Color(0xFF0D1B1E);
+    const accentTeal = Color(0xFF017A74);
 
     return Scaffold(
-      backgroundColor: primaryColor,
-      body: Column(
+      backgroundColor: primaryDark,
+      // 1. Agregamos el Drawer para que funcione el deslizamiento (swipe)
+      drawer: const CustomNexusDrawer(), 
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: TextField(
-                  controller: _searchController,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Buscar notificación...",
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.85)),
-                    prefixIcon: const Icon(Icons.search, color: Colors.white),
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.30), // 👈 MÁS OPACO
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 18,
-                      horizontal: 18,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(22),
-                      borderSide: BorderSide(
-                        color: Colors.white.withOpacity(0.45),
+          // Fondo decorativo (opcional, para dar profundidad)
+          Positioned(
+            top: -50,
+            right: -50,
+            child: CircleAvatar(
+              radius: 100,
+              backgroundColor: accentTeal.withOpacity(0.1),
+            ),
+          ),
+          
+          SafeArea(
+            child: Column(
+              children: [
+                // 2. Barra Superior con botón atrás y menú
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
+                        onPressed: () => Navigator.pop(context),
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(22),
-                      borderSide: const BorderSide(
-                        color: Colors.white,
-                        width: 1.8,
+                      const Text(
+                        "NOTIFICACIONES",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const Spacer(),
+                      // Botón para abrir el drawer manualmente si no quieren deslizar
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: const Icon(Icons.sort, color: Colors.greenAccent),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 3. Campo de Búsqueda con estilo Glassmorphism
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: TextField(
+                        controller: _searchController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: "Buscar en el historial...",
+                          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                          prefixIcon: const Icon(Icons.search, color: Colors.greenAccent),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.05),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(22),
+                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(22),
+                            borderSide: const BorderSide(color: accentTeal),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
 
-          Expanded(
-            child: notifications.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      return _buildNotificationCard(notifications[index]);
-                    },
-                  ),
+                // 4. Lista de Notificaciones
+                Expanded(
+                  child: notifications.isEmpty
+                      ? _buildEmptyState()
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: notifications.length,
+                          itemBuilder: (context, index) {
+                            return _buildNotificationCard(notifications[index]);
+                          },
+                        ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -82,15 +122,16 @@ class _NotificationViewState extends State<NotificationView> {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.notifications_off_outlined, size: 80, color: Colors.white),
-          SizedBox(height: 20),
+        children: [
+          Icon(Icons.notifications_off_outlined, 
+               size: 80, color: Colors.white.withOpacity(0.2)),
+          const SizedBox(height: 20),
           Text(
-            "No tienes notificaciones",
+            "Bandeja de entrada vacía",
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Colors.white.withOpacity(0.5),
             ),
           ),
         ],
@@ -103,27 +144,25 @@ class _NotificationViewState extends State<NotificationView> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF162A2D), // Un poco más claro que el fondo
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.notifications,
-            color: Color.fromARGB(255, 1, 122, 116),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF017A74).withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.bolt, color: Colors.greenAccent, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 15),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ),
         ],
