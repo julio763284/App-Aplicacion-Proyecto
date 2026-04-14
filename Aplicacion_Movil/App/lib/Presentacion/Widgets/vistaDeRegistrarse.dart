@@ -11,15 +11,17 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  final nombreController = TextEditingController();
-  final correoController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+final nombreController = TextEditingController();
+final correoController = TextEditingController();
+final passwordController = TextEditingController();
+final confirmPasswordController = TextEditingController();
 
-  final String url = "http://10.2.137.120:3000/registro";
+
+
+  // DEJA SOLO UNA URL (usa la que te funcione)
+  final String url = "http://10.2.139.243:3000/registro";
 
   Future<void> registrarUsuario() async {
-
     // VALIDAR CORREO
     if (!correoController.text.contains("@") ||
         !correoController.text.contains(".com")) {
@@ -40,7 +42,7 @@ class _RegisterViewState extends State<RegisterView> {
         body: jsonEncode({
           "nombre": nombreController.text,
           "correo": correoController.text,
-          "password": passwordController.text
+          "password": passwordController.text,
         }),
       );
 
@@ -52,7 +54,9 @@ class _RegisterViewState extends State<RegisterView> {
       }
     } catch (e) {
       print("ERROR REAL: $e");
-      _mostrarMensaje("Error: $e");
+
+      _mostrarMensaje("Error de conexión: $e");
+
     }
   }
 
@@ -64,9 +68,9 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   void _mostrarMensaje(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensaje)));
   }
 
   @override
@@ -118,7 +122,6 @@ class _RegisterViewState extends State<RegisterView> {
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          letterSpacing: 1,
                         ),
                       ),
                       const SizedBox(height: 30),
@@ -156,38 +159,17 @@ class _RegisterViewState extends State<RegisterView> {
                       SizedBox(
                         width: double.infinity,
                         height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            elevation: 10,
-                          ),
-                          onPressed: registrarUsuario,
-                          child: const Text(
-                            "Registrarse",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          "¿Ya tienes cuenta? Inicia sesión",
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                       child: ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    foregroundColor: primaryColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+  ),
+  onPressed: registrarUsuario,
+  child: const Text("Registrarse"),
+),
                       ),
                     ],
                   ),
@@ -212,22 +194,8 @@ class _RegisterViewState extends State<RegisterView> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+        labelStyle: TextStyle(color: Colors.white70),
         prefixIcon: Icon(icon, color: Colors.white70),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.08),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 18,
-          horizontal: 16,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Colors.white, width: 1.5),
-        ),
       ),
     );
   }
