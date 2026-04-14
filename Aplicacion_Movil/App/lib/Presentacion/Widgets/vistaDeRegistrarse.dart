@@ -16,11 +16,20 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  final String url = "http://10.2.139.243:3000/registro";
+  final String url = "http://10.2.137.120:3000/registro";
 
   Future<void> registrarUsuario() async {
+
+    // VALIDAR CORREO
+    if (!correoController.text.contains("@") ||
+        !correoController.text.contains(".com")) {
+      _mostrarMensaje("Ingrese un correo válido con @ y .com");
+      return;
+    }
+
+    // VALIDAR CONTRASEÑAS
     if (passwordController.text != confirmPasswordController.text) {
-      _mostrarMensaje("Las contraseñas no coinciden ❌");
+      _mostrarMensaje("Las contraseñas no coinciden");
       return;
     }
 
@@ -36,23 +45,14 @@ class _RegisterViewState extends State<RegisterView> {
       );
 
       if (response.statusCode == 200) {
-        _mostrarMensaje("Usuario registrado correctamente ✅");
+        _mostrarMensaje("Usuario registrado correctamente ");
         _limpiarCampos();
-
-        // Esperar 2 segundos para que lean el mensaje de éxito
-        await Future.delayed(const Duration(seconds: 2));
-
-        // Verificar si el widget sigue activo antes de navegar
-        if (!mounted) return;
-
-        // Redirigir al login (asumiendo que el login está debajo en la pila)
-        Navigator.pop(context);
       } else {
-        _mostrarMensaje("Error al registrar usuario ⚠️");
+        _mostrarMensaje("Error al registrar usuario ");
       }
     } catch (e) {
       print("ERROR REAL: $e");
-      _mostrarMensaje("Error de conexión: $e");
+      _mostrarMensaje("Error: $e");
     }
   }
 
@@ -122,18 +122,21 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                       ),
                       const SizedBox(height: 30),
+
                       _buildInput(
                         label: "Nombre completo",
                         icon: Icons.person_outline,
                         controller: nombreController,
                       ),
                       const SizedBox(height: 18),
+
                       _buildInput(
                         label: "Correo electrónico",
                         icon: Icons.email_outlined,
                         controller: correoController,
                       ),
                       const SizedBox(height: 18),
+
                       _buildInput(
                         label: "Contraseña",
                         icon: Icons.lock_outline,
@@ -141,6 +144,7 @@ class _RegisterViewState extends State<RegisterView> {
                         isPassword: true,
                       ),
                       const SizedBox(height: 18),
+
                       _buildInput(
                         label: "Confirmar contraseña",
                         icon: Icons.lock_reset_outlined,
@@ -148,6 +152,7 @@ class _RegisterViewState extends State<RegisterView> {
                         isPassword: true,
                       ),
                       const SizedBox(height: 28),
+
                       SizedBox(
                         width: double.infinity,
                         height: 50,
@@ -171,6 +176,7 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                       ),
                       const SizedBox(height: 16),
+
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
