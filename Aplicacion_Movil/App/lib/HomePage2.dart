@@ -32,23 +32,13 @@ class _Homepage2State extends State<Homepage2> {
         ),
         title: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          child: _isSearching 
-            ? _buildSearchField() 
-            : const Text(
+          child:  
+             const Text(
                 "NEXUS INVENTORY", 
                 style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.2)
               ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search, color: Colors.white70),
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-                if (!_isSearching) _searchController.clear();
-              });
-            },
-          ),
           IconButton(
             icon: Stack(
               children: [
@@ -89,29 +79,6 @@ class _Homepage2State extends State<Homepage2> {
         ],
       ),
       body: const HomepageBodyLayout(),
-    );
-  }
-
-  Widget _buildSearchField() {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24)
-      ),
-      child: TextField(
-        controller: _searchController,
-        autofocus: true,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
-        decoration: const InputDecoration(
-          hintText: "Buscar...",
-          hintStyle: TextStyle(color: Colors.white54),
-          border: InputBorder.none,
-          prefixIcon: Icon(Icons.search, color: Colors.white54, size: 20),
-          contentPadding: EdgeInsets.symmetric(vertical: 10),
-        ),
-      ),
     );
   }
 }
