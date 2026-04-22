@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gestor/HomePage2.dart';
-import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/Loading.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
@@ -39,10 +38,7 @@ class LoginPage extends StatelessWidget {
             } else if (state is LoginExitoso) {
               return Homepage2();
             } else {
-              return LoginHome(
-                userController: userController,
-                passController: passController,
-              );
+              return Homepage2();
             }
           },
         ),

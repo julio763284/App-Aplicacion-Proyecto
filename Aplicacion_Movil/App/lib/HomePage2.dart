@@ -12,8 +12,6 @@ class Homepage2 extends StatefulWidget {
 }
 
 class _Homepage2State extends State<Homepage2> {
-  bool _isSearching = false; 
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
