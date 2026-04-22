@@ -6,7 +6,7 @@ import 'server/auth_service.dart';
 class AutenticacionBloc extends Bloc<Autenticacion_Event, Autenticacionestados> {
   final AuthService authService = AuthService();
 
-  AutenticacionBloc() : super(Login()) {
+  AutenticacionBloc() : super(Login()) { // Estado inicial: Login
     on<Ingresar>((event, emit) async {
       emit(Logincargando());
       bool exito = await authService.validarLogin(event.usuario, event.password);

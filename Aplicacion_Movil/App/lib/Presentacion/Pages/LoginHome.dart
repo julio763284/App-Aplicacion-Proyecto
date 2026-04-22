@@ -1,141 +1,171 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
-import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
-import 'package:gestor/Presentacion/Widgets/Cliente.dart';
-import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
-import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
-import 'package:gestor/Presentacion/Widgets/Controlar_Gastos.dart';
-import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
-import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gestor/HomePage2.dart'; 
+import 'package:gestor/Presentacion/Widgets/Loading.dart';
+import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
+import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
+import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
+import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
+import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart'; // Asegúrate de que este import existe
 
-class LoginHome extends StatelessWidget {
-  // 🔹 REPARADO: Eliminamos los controladores requeridos que causaban el error en main.dart
-  const LoginHome({super.key, required TextEditingController userController, required TextEditingController passController});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController userController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+
+  @override
+  void dispose() {
+    userController.dispose();
+    passController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // 🔹 Agregamos Scaffold para manejar mejor el layout
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0D1B1E), Color(0xFF003D33)],
-          ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D1B1E),
+      body: BlocListener<AutenticacionBloc, Autenticacionestados>(
+        listener: (context, state) {
+          // Si el estado cambia a Estado_Registrarse, navegamos a la vista de registro
+          if (state is Estado_Registrarse) {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(builder: (_) => const RegisterView())
+            );
+          } else if (state is EstadoOlvidarcontrasena) {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage())
+            );
+          } else if (state is LoginExitoso) {
+            Navigator.pushReplacement(
+              context, 
+              MaterialPageRoute(builder: (_) => const Homepage2())
+            );
+          }
+        },
+        child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
+          builder: (context, state) {
+            if (state is Logincargando) {
+              return const LoadingView();
+            }
+            return _buildLoginUI(context);
+          },
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                // Título o Logo opcional aquí
-                Expanded(
-                  flex: 4,
-                  child: GridView.count(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    children: [
-                      nexusDoubleGlassCard(context, "Reportes", Icons.file_copy, const GestionarReportes()),
-                      nexusDoubleGlassCard(context, "Stock", Icons.warehouse, const VisualizarStock()),
-                      nexusDoubleGlassCard(context, "Clientes", Icons.person, const Cliente()),
-                      nexusDoubleGlassCard(context, "Proveedores", Icons.local_shipping, const Proveedores()),
-                      nexusDoubleGlassCard(context, "Alertas", Icons.warning, const NotificationView(), isAlert: true),
-                      nexusDoubleGlassCard(context, "Finanzas", Icons.monetization_on, const Controlar_Gastos()),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-                SizedBox(
-                  height: 140,
-                  child: Row(
-                    children: [
-                      Expanded(child: nexusDoubleGlassCard(context, "Inventario", Icons.storefront, const GestionInventarioView())),
-                      const SizedBox(width: 12),
-                      Expanded(child: nexusDoubleGlassCard(context, "Configuración", Icons.settings, const Configuracion())),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 25),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.circle, color: Colors.greenAccent, size: 8),
-                    SizedBox(width: 10),
-                    Text("SERVIDOR CONECTADO", 
-                      style: TextStyle(
-                        color: Colors.greenAccent, 
-                        fontSize: 10, 
-                        fontWeight: FontWeight.bold, 
-                        letterSpacing: 1.5
-                      )
+      ),
+    );
+  }
+
+  Widget _buildLoginUI(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0D1B1E), Color(0xFF003D33)],
+        ),
+      ),
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.security, size: 80, color: Colors.cyanAccent.withOpacity(0.8)),
+              const SizedBox(height: 20),
+              const Text(
+                "ACCESO AL SISTEMA",
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3),
+              ),
+              const SizedBox(height: 40),
+              
+              ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    padding: const EdgeInsets.all(25),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
                     ),
-                  ],
+                    child: Column(
+                      children: [
+                        _buildStyledField(userController, "Usuario", Icons.person_outline),
+                        const SizedBox(height: 20),
+                        _buildStyledField(passController, "Contraseña", Icons.lock_outline, isPass: true),
+                        const SizedBox(height: 30),
+                        
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.cyanAccent,
+                              foregroundColor: const Color(0xFF0D1B1E),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            ),
+                            onPressed: () {
+                    
+                              context.read<AutenticacionBloc>().add(
+                                Ingresar(userController.text, passController.text)
+                              );
+                            },
+                            child: const Text("INGRESAR", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 10),
-              ],
-            ),
+              ),
+              
+              const SizedBox(height: 25),
+              TextButton(
+                onPressed: () {
+                  context.read<AutenticacionBloc>().add(EventoRegistrarse());
+                },
+                child: const Text(
+                  "¿No tienes cuenta? Regístrate", 
+                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold)
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget nexusDoubleGlassCard(BuildContext context, String titulo, IconData icono, Widget page, {bool isAlert = false}) {
-    return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Capa de Efecto Glassmorphism
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: isAlert ? Colors.redAccent.withOpacity(0.3) : Colors.white.withOpacity(0.1),
-                    width: 1.2,
-                  ),
-                  color: Colors.white.withOpacity(0.05),
-                ),
-              ),
-            ),
-          ),
-
-          // Contenedor de contenido
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            margin: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isAlert ? Colors.red.withOpacity(0.1) : const Color(0xFF017A74).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: isAlert ? Colors.redAccent : Colors.cyanAccent.withOpacity(0.3),
-                width: 0.8,
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icono, color: isAlert ? Colors.redAccent : Colors.cyanAccent, size: 28),
-                const SizedBox(height: 6),
-                Text(
-                  titulo,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ],
+  Widget _buildStyledField(TextEditingController controller, String hint, IconData icon, {bool isPass = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: isPass,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: Colors.cyanAccent, size: 20),
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.2),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.white10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.cyanAccent),
+        ),
       ),
     );
   }
