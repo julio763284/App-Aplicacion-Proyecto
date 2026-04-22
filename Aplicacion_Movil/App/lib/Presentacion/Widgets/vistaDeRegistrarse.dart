@@ -18,10 +18,9 @@ class _RegisterViewState extends State<RegisterView> {
   final confirmPasswordController = TextEditingController();
 
   final String url = "http://10.2.137.120:3000/registro";
-  final Color accentColor = const Color(0xFF00BFA5); // El mismo verde neón del login
+  final Color accentColor = const Color(0xFF00BFA5); 
 
   Future<void> registrarUsuario() async {
-    // VALIDACIÓN BÁSICA
     if (nombreController.text.isEmpty || correoController.text.isEmpty) {
       _mostrarMensaje("Por favor rellena todos los campos");
       return;
@@ -79,7 +78,7 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF070F11), // Mismo fondo oscuro
+      backgroundColor: const Color(0xFF070F11), 
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -97,7 +96,6 @@ class _RegisterViewState extends State<RegisterView> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  // Icono superior
                   Icon(Icons.person_add_alt, size: 70, color: accentColor),
                   const SizedBox(height: 15),
                   const Text(
@@ -111,7 +109,6 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Tarjeta Glassmorphism
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: BackdropFilter(
@@ -133,8 +130,7 @@ class _RegisterViewState extends State<RegisterView> {
                             const SizedBox(height: 20),
                             _buildInputField(confirmPasswordController, "Confirmar contraseña", Icons.shield_outlined, isPass: true),
                             const SizedBox(height: 35),
-                            
-                            // Botón de Registro Neón
+          
                             GestureDetector(
                               onTap: registrarUsuario,
                               child: Container(
@@ -172,11 +168,11 @@ class _RegisterViewState extends State<RegisterView> {
                   const SizedBox(height: 30),
                   TextButton(
                     onPressed: () {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const LoginPage()),
-  );
-},
+                         Navigator.pushReplacement(
+                            context,
+                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                        );
+                      },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

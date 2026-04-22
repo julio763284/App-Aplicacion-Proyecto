@@ -2,12 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gestor/HomePage2.dart'; 
-import 'package:gestor/Presentacion/Widgets/Loading.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
-import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart'; // Asegúrate de que este import existe
+import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,40 +29,28 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFF0D1B1E),
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
-          // Si el estado cambia a Estado_Registrarse, navegamos a la vista de registro
           if (state is Estado_Registrarse) {
-            Navigator.push(
-              context, 
-              MaterialPageRoute(builder: (_) => const RegisterView())
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
           } else if (state is EstadoOlvidarcontrasena) {
-            Navigator.push(
-              context, 
-              MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage())
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()));
           } else if (state is LoginExitoso) {
-            Navigator.pushReplacement(
-              context, 
-              MaterialPageRoute(builder: (_) => const Homepage2())
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Homepage2()));
           }
         },
         child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
           builder: (context, state) {
-            if (state is Logincargando) {
-              return const LoadingView();
-            }
-            return _buildLoginUI(context);
+            return _buildLoginUI(context, state);
           },
         ),
       ),
     );
   }
 
-  Widget _buildLoginUI(BuildContext context) {
+  Widget _buildLoginUI(BuildContext context, Autenticacionestados state) {
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -87,7 +74,6 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3),
               ),
               const SizedBox(height: 40),
-              
               ClipRRect(
                 borderRadius: BorderRadius.circular(25),
                 child: BackdropFilter(
@@ -104,24 +90,50 @@ class _LoginPageState extends State<LoginPage> {
                         _buildStyledField(userController, "Usuario", Icons.person_outline),
                         const SizedBox(height: 20),
                         _buildStyledField(passController, "Contraseña", Icons.lock_outline, isPass: true),
-                        const SizedBox(height: 30),
                         
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              // Corregido: Llamada al evento de olvidar contraseña
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> OlvidarContrasenaPage()));
+                            },
+                            child: Text(
+                              "¿Olvidaste tu contraseña?",
+                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.cyanAccent,
+                              disabledBackgroundColor: Colors.cyanAccent,
                               foregroundColor: const Color(0xFF0D1B1E),
+                              disabledForegroundColor: const Color(0xFF0D1B1E),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             ),
-                            onPressed: () {
-                    
-                              context.read<AutenticacionBloc>().add(
-                                Ingresar(userController.text, passController.text)
-                              );
-                            },
-                            child: const Text("INGRESAR", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
+                            onPressed: state is Logincargando 
+                              ? null 
+                              : () {
+                                  context.read<AutenticacionBloc>().add(
+                                    Ingresar(userController.text, passController.text)
+                                  );
+                                },
+                            child: state is Logincargando
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFF0D1B1E),
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text("INGRESAR", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
                           ),
                         ),
                       ],
@@ -129,11 +141,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              
               const SizedBox(height: 25),
               TextButton(
                 onPressed: () {
-                  context.read<AutenticacionBloc>().add(EventoRegistrarse());
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterView()));
                 },
                 child: const Text(
                   "¿No tienes cuenta? Regístrate", 
