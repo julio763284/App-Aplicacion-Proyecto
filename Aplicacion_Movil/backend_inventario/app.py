@@ -1,4 +1,3 @@
-# backend_inventario/app.py
 from flask import Flask
 from flask_cors import CORS
 from config.db_config import SERVER_SETTINGS
@@ -20,12 +19,13 @@ def test():
     return {"status": "error", "message": "No hay conexión a la DB"}, 500
 
 if __name__ == '__main__':
+    # Mantenemos tu print informativo
     print(f"Servidor corriendo en http://{SERVER_SETTINGS['host']}:{SERVER_SETTINGS['port']}")
+    
     app.run(
-        host=SERVER_SETTINGS['host'], 
+        # CRÍTICO: '0.0.0.0' abre el servidor a la red local
+        host='0.0.0.0', 
         port=SERVER_SETTINGS['port'], 
         debug=True
     )
-    # En app.py
-
     
