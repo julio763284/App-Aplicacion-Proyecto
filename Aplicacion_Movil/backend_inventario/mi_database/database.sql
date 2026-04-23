@@ -20,5 +20,5 @@ CREATE TABLE producto (
 CREATE TABLE pedido (
     id_pedido INT AUTO_INCREMENT PRIMARY KEY,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('pendiente', 'enviado', 'entregado') NOT NULL
+    estado ENUM('en espera', 'recibido') NOT NULL
 );
