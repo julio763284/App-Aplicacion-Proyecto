@@ -1,9 +1,9 @@
 
 DB_SETTINGS = {
-    'host': '127.0.0.1', 
+    'host': 'localhost', 
     'user': 'root',  
     'password': '', 
-    'database': 'mi_tienda_db' 
+    'database': 'db_inventario' 
 }
 
 SERVER_SETTINGS = {

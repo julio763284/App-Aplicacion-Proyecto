@@ -1,32 +1,22 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'estados_autenticacion.dart';
 import 'eventos_autenticacion.dart';
-import 'server/auth_service.dart';
+import 'estados_autenticacion.dart';
+import 'server/auth_service.dart'; // Verifica que esta ruta sea correcta
 
-class AutenticacionBloc extends Bloc<Autenticacion_Event, Autenticacionestados> {
+class AutenticacionBloc extends Bloc<AutenticacionEventos, Autenticacionestados> {
   final AuthService authService = AuthService();
 
-  AutenticacionBloc() : super(Login()) { // Estado inicial: Login
+  AutenticacionBloc() : super(AutenticacionInicial()) {
     on<Ingresar>((event, emit) async {
       emit(Logincargando());
-      bool exito = await authService.validarLogin(event.usuario, event.password);
-      if (exito) {
-        emit(LoginExitoso());
+      
+      final res = await authService.login(event.usuario, event.password);
+      
+      if (res['status'] == 'success') {
+        emit(LoginExitoso(res['user']));
       } else {
-        emit(LoginError());
+        emit(LoginError(res['message'] ?? "Error desconocido"));
       }
-    });
-
-    on<EventoRegistrarse>((event, emit) async {
-      emit(Logincargando());
-      await Future.delayed(const Duration(seconds: 2));
-      emit(Estado_Registrarse());
-    });
-
-    on<EventoOlvidarContrasena>((event, emit) async {
-      emit(Logincargando());
-      await Future.delayed(const Duration(seconds: 2));
-      emit(EstadoOlvidarcontrasena());
     });
   }
 }
