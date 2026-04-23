@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterView extends StatefulWidget {
@@ -17,71 +16,53 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  final String url = "http://10.2.137.120:3000/registro";
-  final Color accentColor = const Color(0xFF00BFA5); 
+  // IMPORTANTE: Verifica tu IP con 'ipconfig' en la PC
+  final String urlBase = "http://10.2.125.207:5000"; 
+  final Color accentColor = const Color(0xFF00BFA5);
 
   Future<void> registrarUsuario() async {
-    if (nombreController.text.isEmpty || correoController.text.isEmpty) {
-      _mostrarMensaje("Por favor rellena todos los campos");
-      return;
-    }
-
-    if (!correoController.text.contains("@") || !correoController.text.contains(".com")) {
-      _mostrarMensaje("Ingrese un correo válido");
+    if (nombreController.text.isEmpty || correoController.text.isEmpty || passwordController.text.isEmpty) {
+      _snack("Rellena todos los campos", Colors.orange);
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
-      _mostrarMensaje("Las contraseñas no coinciden");
+      _snack("Las contraseñas no coinciden", Colors.red);
       return;
     }
 
     try {
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse("$urlBase/registro"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "nombre": nombreController.text,
-          "correo": correoController.text,
+          "usuario": nombreController.text,
+          "email": correoController.text,
           "password": passwordController.text
         }),
       );
 
-      if (response.statusCode == 200) {
-        _mostrarMensaje("¡Registro exitoso!");
-        _limpiarCampos();
-        if (mounted) Navigator.pop(context);
+      final res = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        _snack("¡Bienvenido a Nexus!", Colors.green);
+        Future.delayed(const Duration(seconds: 1), () => Navigator.pop(context));
       } else {
-        _mostrarMensaje("Error al registrar usuario");
+        _snack(res['message'] ?? "Error", Colors.red);
       }
     } catch (e) {
-      _mostrarMensaje("Error de conexión: $e");
+      _snack("Error de conexión con el servidor", Colors.red);
     }
   }
 
-  void _limpiarCampos() {
-    nombreController.clear();
-    correoController.clear();
-    passwordController.clear();
-    confirmPasswordController.clear();
-  }
-
-  void _mostrarMensaje(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: mensaje.contains("exitoso") ? accentColor : Colors.redAccent,
-      ),
-    );
+  void _snack(String m, Color c) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), backgroundColor: c));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF070F11), 
+      backgroundColor: const Color(0xFF070F11),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.bottomRight,
@@ -95,20 +76,10 @@ class _RegisterViewState extends State<RegisterView> {
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
                   Icon(Icons.person_add_alt, size: 70, color: accentColor),
                   const SizedBox(height: 15),
-                  const Text(
-                    "UNIRSE A NEXUS",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 3,
-                    ),
-                  ),
+                  const Text("UNIRSE A NEXUS", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3)),
                   const SizedBox(height: 40),
-
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: BackdropFilter(
@@ -122,66 +93,29 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         child: Column(
                           children: [
-                            _buildInputField(nombreController, "Nombre completo", Icons.person_outline),
+                            _field(nombreController, "Usuario", Icons.person_outline),
                             const SizedBox(height: 20),
-                            _buildInputField(correoController, "Correo electrónico", Icons.alternate_email),
+                            _field(correoController, "Email", Icons.alternate_email),
                             const SizedBox(height: 20),
-                            _buildInputField(passwordController, "Contraseña", Icons.lock_outline, isPass: true),
+                            _field(passwordController, "Contraseña", Icons.lock_outline, isPass: true),
                             const SizedBox(height: 20),
-                            _buildInputField(confirmPasswordController, "Confirmar contraseña", Icons.shield_outlined, isPass: true),
+                            _field(confirmPasswordController, "Confirmar", Icons.shield_outlined, isPass: true),
                             const SizedBox(height: 35),
-          
-                            GestureDetector(
-                              onTap: registrarUsuario,
-                              child: Container(
-                                height: 55,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  gradient: LinearGradient(colors: [accentColor, accentColor.withBlue(200)]),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: accentColor.withOpacity(0.3),
-                                      blurRadius: 15,
-                                      offset: const Offset(0, 5),
-                                    )
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    "CREAR CUENTA",
-                                    style: TextStyle(
-                                      color: Color(0xFF070F11),
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1.5,
-                                    ),
-                                  ),
-                                ),
+                            ElevatedButton(
+                              onPressed: registrarUsuario,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: accentColor,
+                                foregroundColor: Colors.black,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                               ),
+                              child: const Text("CREAR CUENTA", style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  
-                  const SizedBox(height: 30),
-                  TextButton(
-                    onPressed: () {
-                         Navigator.pushReplacement(
-                            context,
-                              MaterialPageRoute(builder: (context) => const LoginPage()),
-                        );
-                      },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("¿Ya tienes cuenta? ", style: TextStyle(color: Colors.white38)),
-                        Text("Inicia Sesión", style: TextStyle(color: accentColor, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -191,26 +125,18 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  Widget _buildInputField(TextEditingController controller, String hint, IconData icon, {bool isPass = false}) {
+  Widget _field(TextEditingController c, String h, IconData i, {bool isPass = false}) {
     return TextField(
-      controller: controller,
+      controller: c,
       obscureText: isPass,
-      style: const TextStyle(color: Colors.white, fontSize: 15),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
-        prefixIcon: Icon(icon, color: accentColor.withOpacity(0.7), size: 20),
+        hintText: h,
+        hintStyle: const TextStyle(color: Colors.white24),
+        prefixIcon: Icon(i, color: accentColor, size: 20),
         filled: true,
-        fillColor: Colors.black.withOpacity(0.3),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: accentColor.withOpacity(0.5)),
-        ),
+        fillColor: Colors.black26,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
       ),
     );
   }

@@ -38,7 +38,7 @@ class Cliente {
 
 Future<List<Producto>> fetchProductos() async {
   final response = await http.get(
-    Uri.parse('http://10.2.139.243:3000/productos'),
+    Uri.parse('http://10.2.125.207:5000/productos'),
   );
 
   if (response.statusCode == 200) {

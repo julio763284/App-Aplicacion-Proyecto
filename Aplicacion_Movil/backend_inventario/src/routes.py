@@ -1,6 +1,6 @@
 # backend_inventario/src/routes.py
 from flask import request, jsonify
-from src.database import validar_usuario
+from src.database import validar_usuario, registrar_usuario
 
 def init_routes(app):
     
@@ -24,9 +24,28 @@ def init_routes(app):
                 "message": "Bienvenido al sistema",
                 "user": usuario_encontrado
             }), 200
-       # En backend_inventario/src/routes.py
         else:
             return jsonify({
                 "status": "error", 
                 "message": "Este usuario no está registrado. ¿Deseas crear una cuenta nueva?"
             }), 401
+
+    @app.route('/registro', methods=['POST'])
+    def registro():
+        data = request.json
+        if not data:
+            return jsonify({"status": "error", "message": "No se enviaron datos"}), 400
+
+        usuario = data.get('usuario')
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not usuario or not email or not password:
+            return jsonify({"status": "error", "message": "Todos los campos son obligatorios"}), 400
+            
+        resultado = registrar_usuario(usuario, email, password)
+        
+        if resultado["status"] == "success":
+            return jsonify(resultado), 201
+        else:
+            return jsonify(resultado), 400
