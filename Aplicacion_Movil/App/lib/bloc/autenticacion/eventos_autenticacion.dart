@@ -1,19 +1,7 @@
-abstract class Autenticacion_Event {}
+abstract class AutenticacionEventos {}
 
-class Ingresar extends Autenticacion_Event {
+class Ingresar extends AutenticacionEventos {
   final String usuario;
   final String password;
-
   Ingresar(this.usuario, this.password);
 }
-
-class EventoRegistrarse extends Autenticacion_Event {
-  // aquí puedes agregar los datos necesarios para registrar
-}
-
-class EventoOlvidarContrasena extends Autenticacion_Event {
-  final String email; // normalmente necesitas un email para recuperar
-  EventoOlvidarContrasena(this.email);
-}
-
-

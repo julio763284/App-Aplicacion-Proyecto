@@ -14,3 +14,29 @@ def obtener_conexion():
     except Exception as e:
         print(f"Error de conexión: {e}")
         return None
+        
+def validar_usuario(identificador, password):
+    print(f"\n--- INTENTO DE ACCESO ---")
+    print(f"Identificador (User/Email): '{identificador}'")
+    
+    db = obtener_conexion()
+    if db:
+        try:
+            cursor = db.cursor(dictionary=True)
+            sql = """
+                SELECT id_usuario, usuario, email 
+                FROM usuario 
+                WHERE (usuario = %s OR email = %s) 
+                AND contrasena = %s
+            """
+            cursor.execute(sql, (identificador, identificador, password))
+            resultado = cursor.fetchone()
+            
+            cursor.close()
+            db.close()
+            return resultado
+            
+        except Exception as e:
+            print(f"❌ Error en la consulta: {e}")
+            return None
+    return None

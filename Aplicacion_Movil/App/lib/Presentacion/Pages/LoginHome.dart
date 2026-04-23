@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// Importaciones de tu proyecto
 import 'package:gestor/HomePage2.dart'; 
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
@@ -18,8 +20,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController userController = TextEditingController();
   final TextEditingController passController = TextEditingController();
-  
-  // Variable inicializada para evitar errores de tipo 'Null'
   bool _obscureText = true;
 
   @override
@@ -29,6 +29,51 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Función para manejar errores de login (Pop-up o SnackBar)
+  void _manejarErrorLogin(BuildContext context, String mensaje) {
+    final bool noRegistrado = mensaje.toLowerCase().contains("registrarse") || 
+                               mensaje.toLowerCase().contains("no registrado");
+
+    if (noRegistrado) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF0D1B1E),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text("Aviso del Sistema", style: TextStyle(color: Colors.cyanAccent)),
+          content: Text(mensaje, style: const TextStyle(color: Colors.white70)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("CANCELAR", style: TextStyle(color: Colors.white38)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.cyanAccent,
+                foregroundColor: const Color(0xFF0D1B1E),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Cierra el diálogo
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
+              },
+              child: const Text("REGISTRARME", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensaje),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,12 +81,17 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: const Color(0xFF0D1B1E),
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
+          // Navegaciones directas por eventos
           if (state is Estado_Registrarse) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
           } else if (state is EstadoOlvidarcontrasena) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()));
-          } else if (state is LoginExitoso) {
+          } 
+          // Resultado de la petición al servidor
+          else if (state is LoginExitoso) {
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Homepage2()));
+          } else if (state is LoginError) {
+            _manejarErrorLogin(context, state.mensaje);
           }
         },
         child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
@@ -74,7 +124,12 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 20),
               const Text(
                 "ACCESO AL SISTEMA",
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3),
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontSize: 22, 
+                  fontWeight: FontWeight.bold, 
+                  letterSpacing: 3
+                ),
               ),
               const SizedBox(height: 40),
               ClipRRect(
@@ -90,14 +145,14 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: [
-                        _buildStyledField(userController, "Usuario", Icons.person_outline),
+                        _buildStyledField(userController, "Usuario o Correo", Icons.person_outline),
                         const SizedBox(height: 20),
                         _buildStyledField(passController, "Contraseña", Icons.lock_outline, isPass: true),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> const OlvidarContrasenaPage()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const OlvidarContrasenaPage()));
                             },
                             child: Text(
                               "¿Olvidaste tu contraseña?",
@@ -112,10 +167,9 @@ class _LoginPageState extends State<LoginPage> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.cyanAccent,
-                              disabledBackgroundColor: Colors.cyanAccent,
                               foregroundColor: const Color(0xFF0D1B1E),
-                              disabledForegroundColor: const Color(0xFF0D1B1E),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              elevation: 5,
                             ),
                             onPressed: state is Logincargando 
                               ? null 
@@ -144,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 25),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterView()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterView()));
                 },
                 child: const Text(
                   "¿No tienes cuenta? Regístrate", 
