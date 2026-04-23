@@ -18,6 +18,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController userController = TextEditingController();
   final TextEditingController passController = TextEditingController();
+  
+  // Variable inicializada para evitar errores de tipo 'Null'
+  bool _obscureText = true;
 
   @override
   void dispose() {
@@ -90,13 +93,11 @@ class _LoginPageState extends State<LoginPage> {
                         _buildStyledField(userController, "Usuario", Icons.person_outline),
                         const SizedBox(height: 20),
                         _buildStyledField(passController, "Contraseña", Icons.lock_outline, isPass: true),
-                        
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // Corregido: Llamada al evento de olvidar contraseña
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> OlvidarContrasenaPage()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> const OlvidarContrasenaPage()));
                             },
                             child: Text(
                               "¿Olvidaste tu contraseña?",
@@ -104,7 +105,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        
                         const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
@@ -144,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 25),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> RegisterView()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterView()));
                 },
                 child: const Text(
                   "¿No tienes cuenta? Regístrate", 
@@ -161,10 +161,24 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildStyledField(TextEditingController controller, String hint, IconData icon, {bool isPass = false}) {
     return TextField(
       controller: controller,
-      obscureText: isPass,
+      obscureText: isPass ? _obscureText : false,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.cyanAccent, size: 20),
+        suffixIcon: isPass 
+          ? IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility_off : Icons.visibility,
+                color: Colors.cyanAccent.withOpacity(0.5),
+                size: 20,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            )
+          : null,
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
         filled: true,
