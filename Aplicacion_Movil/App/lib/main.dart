@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 
+
 void main() {
   runApp(const InventaryMobile());
 }

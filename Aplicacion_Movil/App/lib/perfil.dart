@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/login.dart';
+import 'package:gestor/Presentacion/Widgets/login2.dart';
 
 class PerfilPage extends StatelessWidget {
   final String nombre;
@@ -212,7 +212,7 @@ class PerfilPage extends StatelessWidget {
       onTap: () {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
+          MaterialPageRoute(builder: (_) =>  LoginPage()),
           (route) => false,
         );
       },
