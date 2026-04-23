@@ -16,31 +16,38 @@ def obtener_conexion():
         print(f"Error de conexión: {e}")
         return None
         
-def validar_usuario(identificador, password):
+def validar_usuario(identificador, password_plana):
     print(f"\n--- INTENTO DE ACCESO ---")
-    print(f"Identificador (User/Email): '{identificador}'")
-    
     db = obtener_conexion()
-    if db:
-        try:
-            cursor = db.cursor(dictionary=True)
-            sql = """
-                SELECT id_usuario, usuario, email 
-                FROM usuario 
-                WHERE (usuario = %s OR email = %s) 
-                AND contrasena = %s
-            """
-            cursor.execute(sql, (identificador, identificador, password))
-            resultado = cursor.fetchone()
+    if not db: 
+        return None
+
+    try:
+        cursor = db.cursor(dictionary=True)
+        # 1. Buscamos al usuario por nombre o correo
+        sql = "SELECT id_usuario, usuario, email, contrasena FROM usuario WHERE usuario = %s OR email = %s"
+        cursor.execute(sql, (identificador, identificador))
+        resultado = cursor.fetchone()
+        
+        cursor.close()
+        db.close()
+
+        if resultado:
+            # 2. Extraemos el hash (código secreto) guardado en la DB
+            hash_almacenado = resultado['contrasena'].encode('utf-8')
             
-            cursor.close()
-            db.close()
-            return resultado
+            # 3. COMPARACIÓN MÁGICA: Compara la clave que escribió el usuario con el hash
+            if bcrypt.checkpw(password_plana.encode('utf-8'), hash_almacenado):
+                # Si coinciden, borramos la contraseña del resultado por seguridad y lo devolvemos
+                resultado.pop('contrasena') 
+                return resultado
+        
+        # Si no coinciden o el usuario no existe
+        return None 
             
-        except Exception as e:
-            print(f"❌ Error en la consulta: {e}")
-            return None
-    return None
+    except Exception as e:
+        print(f"❌ Error en la validación: {e}")
+        return None
 
 # backend_inventario/src/database.py
 def registrar_usuario(usuario, email, password_plana):
