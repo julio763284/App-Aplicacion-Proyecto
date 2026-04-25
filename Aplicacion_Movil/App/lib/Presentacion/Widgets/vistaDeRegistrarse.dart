@@ -17,7 +17,7 @@ class _RegisterViewState extends State<RegisterView> {
   final confirmPasswordController = TextEditingController();
 
   // IMPORTANTE: Verifica tu IP con 'ipconfig' en la PC
-  final String url = "http://192.168.201.247:5000/registro_cliente";
+  final String url = "http://10.198.83.247:5000/registro_cliente";
   final Color accentColor = const Color(0xFF00BFA5);
 
   Future<void> registrarUsuario() async {

@@ -13,7 +13,7 @@ class Nuevocliente extends StatelessWidget {
   final correoController = TextEditingController();
   final telefonoController = TextEditingController();
 
-  final String url = "http://192.168.201.247:5000/registro_cliente";
+  final String url = "http://10.198.83.247:5000/registro_cliente";
 
   Future<void> guardarCliente(BuildContext context) async {
     try {

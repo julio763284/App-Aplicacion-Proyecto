@@ -1,4 +1,5 @@
-# backend_inventario/src/routes.py
+import csv
+import io
 from flask import request, jsonify
 from src.database import validar_usuario, registrar_usuario, registrar_cliente
 
@@ -60,7 +61,7 @@ def init_routes(app):
         direccion = data.get('direccion_residencia')
         gmail = data.get('gmail_corporativo')
         celular = data.get('celular')
-        imagen = data.get('imagen', '') # Si no envían imagen, queda vacío
+        imagen = data.get('imagen', '')
         
         if not nombre or not direccion or not gmail or not celular:
             return jsonify({"status": "error", "message": "Todos los campos excepto imagen son obligatorios"}), 400
@@ -71,3 +72,30 @@ def init_routes(app):
             return jsonify(resultado), 201
         else:
             return jsonify(resultado), 400
+
+    # --- RUTA DE IMPORTACIÓN CORREGIDA ---
+    @app.route('/importar_clientes', methods=['POST'])
+    def importar_clientes():
+        if 'archivo' not in request.files:
+            return jsonify({"status": "error", "message": "No se envió archivo"}), 400
+            
+        archivo = request.files['archivo']
+        try:
+            contenido = archivo.stream.read().decode("UTF-8")
+            stream = io.StringIO(contenido)
+            lector_csv = csv.DictReader(stream)
+
+            conteo = 0
+            for fila in lector_csv:
+                registrar_cliente(
+                    fila.get('nombre'), 
+                    fila.get('direccion'), 
+                    fila.get('gmail'), 
+                    fila.get('celular'), 
+                    '' 
+                )
+                conteo += 1
+
+            return jsonify({"status": "success", "message": f"Se importaron {conteo} clientes"}), 201
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
