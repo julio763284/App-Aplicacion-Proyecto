@@ -1,6 +1,6 @@
 # backend_inventario/src/routes.py
 from flask import request, jsonify
-from src.database import validar_usuario, registrar_usuario
+from src.database import validar_usuario, registrar_usuario, registrar_cliente
 
 def init_routes(app):
     
@@ -44,6 +44,28 @@ def init_routes(app):
             return jsonify({"status": "error", "message": "Todos los campos son obligatorios"}), 400
             
         resultado = registrar_usuario(usuario, email, password)
+        
+        if resultado["status"] == "success":
+            return jsonify(resultado), 201
+        else:
+            return jsonify(resultado), 400
+
+    @app.route('/registro_cliente', methods=['POST'])
+    def registro_cliente():
+        data = request.json
+        if not data:
+            return jsonify({"status": "error", "message": "No se enviaron datos"}), 400
+
+        nombre = data.get('nombre')
+        direccion = data.get('direccion_residencia')
+        gmail = data.get('gmail_corporativo')
+        celular = data.get('celular')
+        imagen = data.get('imagen', '') # Si no envían imagen, queda vacío
+        
+        if not nombre or not direccion or not gmail or not celular:
+            return jsonify({"status": "error", "message": "Todos los campos excepto imagen son obligatorios"}), 400
+            
+        resultado = registrar_cliente(nombre, direccion, gmail, celular, imagen)
         
         if resultado["status"] == "success":
             return jsonify(resultado), 201

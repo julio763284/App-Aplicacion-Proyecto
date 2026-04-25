@@ -67,3 +67,29 @@ def registrar_usuario(usuario, email, password_plana):
         return {"status": "error", "message": str(e)}
     finally:
         db.close()
+        
+        
+def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, imagen):
+    db = obtener_conexion()
+    if not db:
+        return {"status": "error", "message": "Error de conexión a la base de datos"}
+        
+    try:
+        cursor = db.cursor()
+        sql = """INSERT INTO cliente 
+                 (nombre, direccion_residencia, gmail_corporativo, celular, imagen) 
+                 VALUES (%s, %s, %s, %s, %s)"""
+        valores = (nombre, direccion_residencia, gmail_corporativo, celular, imagen)
+        
+        cursor.execute(sql, valores)
+        db.commit()
+        return {"status": "success", "message": "Cliente registrado correctamente"}
+    except Exception as e:
+        db.rollback()
+        # Capturar error de correo duplicado
+        if "Duplicate entry" in str(e):
+            return {"status": "error", "message": "Este Gmail corporativo ya está registrado"}
+        return {"status": "error", "message": f"Error al guardar: {str(e)}"}
+    finally:
+        cursor.close()
+        db.close()

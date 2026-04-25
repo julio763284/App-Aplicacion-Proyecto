@@ -22,3 +22,14 @@ CREATE TABLE pedido (
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado ENUM('en espera', 'recibido') NOT NULL
 );
+
+USE db_inventario;
+
+CREATE TABLE cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    direccion_residencia VARCHAR(255) NOT NULL,
+    gmail_corporativo VARCHAR(255) NOT NULL UNIQUE,
+    celular VARCHAR(20) NOT NULL,
+    imagen VARCHAR(255)
+);
