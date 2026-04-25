@@ -1,180 +1,170 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena2.dart';
-
-
 
 class OlvidarContrasenaPage extends StatefulWidget {
   const OlvidarContrasenaPage({super.key});
 
   @override
-  State<OlvidarContrasenaPage> createState() =>
-      _OlvidarContrasenaPageState();
+  State<OlvidarContrasenaPage> createState() => _OlvidarContrasenaPageState();
 }
 
-class _OlvidarContrasenaPageState
-    extends State<OlvidarContrasenaPage> {
+class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
+  final TextEditingController emailController = TextEditingController();
 
-  final TextEditingController phoneController =
-      TextEditingController();
+  // Función para validar el formato del correo
+  bool _esCorreoValido(String email) {
+    final regex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+    return regex.hasMatch(email);
+  }
+
+  void _mostrarMensaje(String mensaje, {bool esError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje, style: const TextStyle(color: Colors.white)),
+        backgroundColor: esError ? Colors.redAccent : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: const Color(0xFF0D1B1E),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 1, 122, 116),
-              Color.fromARGB(255, 0, 168, 150),
-            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
+            colors: [Color(0xFF0D1B1E), Color(0xFF003D33)],
           ),
         ),
         child: Center(
           child: SingleChildScrollView(
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              padding: const EdgeInsets.all(25),
-              width: 370,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 15,
-                    offset: Offset(2, 6),
-                  )
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-
-                  const Icon(
-                    Icons.lock_reset,
-                    size: 90,
-                    color: Color.fromARGB(255, 1, 122, 116),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    "Recuperar Contraseña",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 1, 122, 116),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  TextField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: "Correo eletrónico",
-                      prefixIcon: const Icon(Icons.mail_rounded),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.lock_reset, size: 80, color: Colors.cyanAccent.withOpacity(0.8)),
+                const SizedBox(height: 20),
+                const Text(
+                  "RECUPERAR CONTRASEÑA",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 3),
+                ),
+                const SizedBox(height: 40),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                    child: Container(
+                      padding: const EdgeInsets.all(25),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
                       ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(255, 1, 122, 116),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (phoneController.text.isEmpty) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text("Ingresa tu correo eletrónico"),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.mail_outline, color: Colors.cyanAccent, size: 20),
+                              hintText: "Correo electrónico",
+                              hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.2),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(color: Colors.white10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: const BorderSide(color: Colors.cyanAccent),
+                              ),
                             ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const OlvidarContrasena2(),
+                          ),
+                          const SizedBox(height: 30),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.cyanAccent,
+                                foregroundColor: const Color(0xFF0D1B1E),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              ),
+                              onPressed: () {
+                                String email = emailController.text.trim();
+                                if (email.isEmpty) {
+                                  _mostrarMensaje("Ingresa tu correo electrónico", esError: true);
+                                } else if (!_esCorreoValido(email)) {
+                                  _mostrarMensaje("Ingresa un correo válido", esError: true);
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const OlvidarContrasena2(),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Text("ENVIAR CÓDIGO", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
                             ),
-                          );
-                        }
-                      },
-                      child: const Text(
-                        "Enviar código",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ),
-
-                 const SizedBox(height: 15),
-
-// 🔹 BOTÓN REENVIAR CÓDIGO
-TextButton(
-  onPressed: () {
-    if (phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Ingresa tu correo para reenviar el código"),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Código reenviado correctamente"),
-        ),
-      );
-
-      // Aquí luego puedes agregar la lógica real para reenviar código
-    }
-  },
-  child: const Text(
-    "Reenviar código",
-    style: TextStyle(
-      color: Color.fromARGB(255, 1, 122, 116),
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-),
-
-const SizedBox(height: 5),
-
-        TextButton(
-        onPressed: () {
-            Navigator.pop(context);
-        },
-        child: const Text(
-            "Volver al Login",
-            style: TextStyle(
-            color: Color.fromARGB(255, 1, 122, 116),
-            fontWeight: FontWeight.bold,
-            ),
-        ),
-        ),
+                          ),
                         ],
-              ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 35),
+                
+                // Botones inferiores con mejor estilo e iconos
+                TextButton.icon(
+                  onPressed: () {
+                    String email = emailController.text.trim();
+                    if (email.isEmpty) {
+                      _mostrarMensaje("Ingresa tu correo para reenviar el código", esError: true);
+                    } else if (!_esCorreoValido(email)) {
+                      _mostrarMensaje("Ingresa un correo válido", esError: true);
+                    } else {
+                      _mostrarMensaje("Código reenviado correctamente");
+                    }
+                  },
+                  icon: const Icon(Icons.refresh, color: Colors.cyanAccent, size: 18),
+                  label: const Text(
+                    "Reenviar código",
+                    style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1),
+                  ),
+                ),
+                
+                const SizedBox(height: 10),
+                
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.5), size: 18),
+                  label: Text(
+                    "Volver al Login",
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

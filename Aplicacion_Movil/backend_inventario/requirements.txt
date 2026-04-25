@@ -1,0 +1,6 @@
+flask
+flask-cors
+mysql-connector-python
+
+# istaler libreria para manejar variables de entorno (opcional pero recomendado)
+pip freeze > requirements.txt
