@@ -1,6 +1,6 @@
-
 from flask import request, jsonify
-from src.database import validar_usuario, registrar_usuario, registrar_cliente
+
+from src.database import validar_usuario, registrar_usuario, registrar_cliente, obtener_productos
 
 def init_routes(app):
     
@@ -71,5 +71,14 @@ def init_routes(app):
             return jsonify(resultado), 201
         else:
             return jsonify(resultado), 400
-
-    
+        
+    @app.route('/productos', methods=['GET'])
+    def listar_productos():
+        productos = obtener_productos()
+        if productos is not None:
+            return jsonify(productos), 200
+        
+        return jsonify({
+            "status": "error", 
+            "message": "No se pudieron obtener los productos"
+        }), 500
