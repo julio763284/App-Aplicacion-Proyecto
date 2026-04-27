@@ -32,3 +32,10 @@ CREATE TABLE cliente (
     celular VARCHAR(20) NOT NULL,
     imagen VARCHAR(255)
 );
+
+CREATE TABLE notificaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mensaje TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    leido BOOLEAN DEFAULT FALSE
+);
