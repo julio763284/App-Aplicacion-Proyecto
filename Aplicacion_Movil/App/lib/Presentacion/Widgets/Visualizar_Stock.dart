@@ -162,12 +162,16 @@ class _VisualizarStockState extends State<VisualizarStock> {
   }
 
   Widget _buildSummaryGrid(List<Producto> productos) {
+    final totalConExistencia = productos.where((p) => p.cantidad > 0).length;
+    final bajoStock = productos.where((p) => p.cantidad < 10 && p.cantidad > 0).length;
+    final agotados = productos.where((p) => p.cantidad <= 0).length;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSummaryCard("TOTAL", productos.length.toString(), Icons.inventory_2, accentTeal),
-        _buildSummaryCard("BAJO", productos.where((p) => p.cantidad < 10 && p.cantidad > 0).length.toString(), Icons.bolt, Colors.orangeAccent),
-        _buildSummaryCard("AGOTADO", productos.where((p) => p.cantidad <= 0).length.toString(), Icons.block, Colors.redAccent),
+        _buildSummaryCard("TOTAL", totalConExistencia.toString(), Icons.inventory_2, accentTeal),
+        _buildSummaryCard("BAJO", bajoStock.toString(), Icons.bolt, Colors.orangeAccent),
+        _buildSummaryCard("AGOTADO", agotados.toString(), Icons.block, Colors.redAccent),
       ],
     );
   }
