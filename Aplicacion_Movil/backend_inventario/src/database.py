@@ -24,7 +24,6 @@ def validar_usuario(identificador, password_plana):
 
     try:
         cursor = db.cursor(dictionary=True)
-        # 1. Buscamos al usuario por nombre o correo
         sql = "SELECT id_usuario, usuario, email, contrasena FROM usuario WHERE usuario = %s OR email = %s"
         cursor.execute(sql, (identificador, identificador))
         resultado = cursor.fetchone()
@@ -33,29 +32,23 @@ def validar_usuario(identificador, password_plana):
         db.close()
 
         if resultado:
-            # 2. Extraemos el hash (código secreto) guardado en la DB
             hash_almacenado = resultado['contrasena'].encode('utf-8')
             
-            # 3. COMPARACIÓN MÁGICA: Compara la clave que escribió el usuario con el hash
             if bcrypt.checkpw(password_plana.encode('utf-8'), hash_almacenado):
-                # Si coinciden, borramos la contraseña del resultado por seguridad y lo devolvemos
                 resultado.pop('contrasena') 
                 return resultado
-        
-        # Si no coinciden o el usuario no existe
+
         return None 
             
     except Exception as e:
         print(f"❌ Error en la validación: {e}")
         return None
 
-# backend_inventario/src/database.py
 def registrar_usuario(usuario, email, password_plana):
     db = obtener_conexion()
     if not db: return {"status": "error", "message": "Error de DB"}
     try:
         cursor = db.cursor()
-        # Encriptación
         sal = bcrypt.gensalt()
         hash_pw = bcrypt.hashpw(password_plana.encode('utf-8'), sal).decode('utf-8')
         
@@ -86,10 +79,24 @@ def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, 
         return {"status": "success", "message": "Cliente registrado correctamente"}
     except Exception as e:
         db.rollback()
-        # Capturar error de correo duplicado
         if "Duplicate entry" in str(e):
             return {"status": "error", "message": "Este Gmail corporativo ya está registrado"}
         return {"status": "error", "message": f"Error al guardar: {str(e)}"}
     finally:
         cursor.close()
         db.close()
+
+def obtener_productos():
+    db = obtener_conexion()
+    if not db: return None
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM producto")
+        productos = cursor.fetchall()
+        return productos
+    except Exception as e:
+        print(f"Error al obtener productos: {e}")
+        return None
+    finally:
+        cursor.close()
+        db.close()    
