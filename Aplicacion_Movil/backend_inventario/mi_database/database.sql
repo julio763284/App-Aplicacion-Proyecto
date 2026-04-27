@@ -8,7 +8,7 @@ CREATE TABLE usuario (
     contrasena VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE productos (
+CREATE TABLE producto (
     id_producto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     descripcion TEXT,
@@ -18,13 +18,13 @@ CREATE TABLE productos (
     imagen VARCHAR(255) 
 );
 
-CREATE TABLE pedidos (
+CREATE TABLE pedido (
     id_pedido INT AUTO_INCREMENT PRIMARY KEY,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado ENUM('en espera', 'recibido') NOT NULL
 );
 
-CREATE TABLE clientes (
+CREATE TABLE cliente (
     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     direccion_residencia VARCHAR(255) NOT NULL,

@@ -2,57 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/NuevoCliente.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
-import 'package:file_picker/file_picker.dart'; 
-import 'package:http/http.dart' as http;      
 
 class Cliente extends StatelessWidget {
   const Cliente({super.key});
 
- Future<void> _importarDesdeCSV(BuildContext context) async {
-  print("Abriendo selector de archivos..."); 
-  try {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
-      withData: true,
-    );
-
-    if (result == null) {
-      print("El usuario canceló la selección del archivo.");
-      return;
-    }
-
-    print("Archivo seleccionado: ${result.files.single.name}");
-    _mostrarNotificacion(context, "Enviando al servidor...", Colors.blue);
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse("http://10.198.83.247:5000/importar_clientes"),
-    );
-
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'archivo',
-        result.files.single.bytes!,
-        filename: result.files.single.name,
-      ),
-    );
-
-    print("Enviando petición a la IP: 10.198.83.247");
-    var response = await request.send();
-
-    print("Respuesta del servidor: ${response.statusCode}");
-
-    if (response.statusCode == 201) {
-      _mostrarNotificacion(context, "¡Importación exitosa! ✅", Colors.greenAccent);
-    } else {
-      _mostrarNotificacion(context, "Error servidor: ${response.statusCode}", Colors.redAccent);
-    }
-  } catch (e) {
-    print("ERROR CRÍTICO: $e");
-    _mostrarNotificacion(context, "Error: $e", Colors.orangeAccent);
-  }
-}
 
   void _mostrarNotificacion(BuildContext context, String mensaje, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -125,16 +78,6 @@ class Cliente extends StatelessWidget {
                       },
                     ),
                     // Busca esta parte dentro del FloatingActionButton y reemplázala:
-_buildMenuOption(
-  context,
-  icon: Icons.file_upload_outlined,
-  label: "Importar Clientes",
-  onTap: () async {
-    print("Botón presionado: Iniciando selección de archivo..."); // ESTO DEBE SALIR EN LA CONSOLA DE FLUTTER
-    Navigator.pop(context); // Cierra el menú
-    await _importarDesdeCSV(context); // Ejecuta la importación
-  },
-),
                   ],
                 ),
               ),
