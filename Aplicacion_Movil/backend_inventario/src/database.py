@@ -100,3 +100,26 @@ def obtener_productos():
     finally:
         cursor.close()
         db.close()    
+        
+def registrar_notificacion(mensaje):
+    db = obtener_conexion()
+    if not db: return
+    try:
+        cursor = db.cursor()
+        sql = "INSERT INTO notificaciones (mensaje) VALUES (%s)"
+        cursor.execute(sql, (mensaje,))
+        db.commit()
+    finally:
+        cursor.close()
+        db.close()
+
+def obtener_notificaciones_db():
+    db = obtener_conexion()
+    if not db: return []
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT mensaje FROM notificaciones ORDER BY fecha DESC")
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        db.close()

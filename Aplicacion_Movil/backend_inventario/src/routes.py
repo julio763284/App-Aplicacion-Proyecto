@@ -1,6 +1,6 @@
 from flask import request, jsonify
 
-from src.database import validar_usuario, registrar_usuario, registrar_cliente, obtener_productos
+from src.database import validar_usuario, registrar_usuario, registrar_cliente, obtener_productos, obtener_notificaciones_db
 
 def init_routes(app):
     
@@ -82,3 +82,8 @@ def init_routes(app):
             "status": "error", 
             "message": "No se pudieron obtener los productos"
         }), 500
+        
+    @app.route('/notificaciones', methods=['GET'])
+    def listar_notificaciones():
+        alertas = obtener_notificaciones_db()
+        return jsonify(alertas), 200
