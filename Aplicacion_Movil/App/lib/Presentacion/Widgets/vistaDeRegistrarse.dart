@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:gestor/common/custom_notification.dart';
+import 'package:gestor/common/Alertmessage.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterView extends StatefulWidget {
@@ -68,7 +68,7 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   void _notify(String message, NotificationType type) {
-    CustomNotification.show(context, message: message, type: type);
+    Alertmessage.show(context, message: message, type: type);
   }
 
   @override

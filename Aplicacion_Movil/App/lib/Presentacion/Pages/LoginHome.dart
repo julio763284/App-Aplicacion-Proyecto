@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/common/custom_notification.dart';
+import 'package:gestor/common/Alertmessage.dart';
 
 // Importaciones de tu proyecto
 import 'package:gestor/HomePage2.dart'; 
@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
   // 🔔 NOTIFICACIÓN GLOBAL
   void _notify(String message, NotificationType type) {
-    CustomNotification.show(
+    Alertmessage.show(
       context,
       message: message,
       type: type,

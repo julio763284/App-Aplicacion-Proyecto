@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 enum NotificationType { success, error, warning, info }
 
 /// Widget de notificación personalizada estilo "glassmorphism"
-class CustomNotification {
+class Alertmessage {
   static void show(
     BuildContext context, {
     required String message,
