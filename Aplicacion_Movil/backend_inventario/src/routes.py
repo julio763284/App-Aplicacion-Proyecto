@@ -4,7 +4,7 @@ from src.database import (
     registrar_usuario, 
     registrar_cliente, 
     obtener_productos, 
-    obtener_notificaciones_db # Cambiamos obtener_conexion por esta
+    obtener_notificaciones_db 
 )
 
 def init_routes(app):
@@ -40,7 +40,6 @@ def init_routes(app):
     @app.route('/notificaciones', methods=['GET'])
     def listar_notificaciones():
         try:
-            # Usamos la función del database.py directamente
             alertas = obtener_notificaciones_db()
             return jsonify(alertas), 200
         except Exception as e:

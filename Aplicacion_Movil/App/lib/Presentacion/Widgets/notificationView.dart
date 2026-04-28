@@ -27,7 +27,6 @@ class _NotificationViewState extends State<NotificationView> {
   Future<void> _fetchNotifications() async {
     setState(() => _isLoading = true);
     try {
-      // Reemplaza con tu IP dinámica o el host configurado
       final response = await http.get(Uri.parse('http://10.137.30.247:5000/notificaciones'));
 
       if (response.statusCode == 200) {

@@ -19,17 +19,28 @@ def validar_usuario(identificador, password_plana):
     db = obtener_conexion()
     if not db: return None
     try:
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(dictionary=True, buffered=True) 
+        
         sql = "SELECT id_usuario, usuario, email, contrasena FROM usuario WHERE usuario = %s OR email = %s"
         cursor.execute(sql, (identificador, identificador))
+        
         resultado = cursor.fetchone()
-        if resultado and bcrypt.checkpw(password_plana.encode('utf-8'), resultado['contrasena'].encode('utf-8')):
-            resultado.pop('contrasena') 
-            return resultado
+        
+        if resultado:
+            hash_almacenado = resultado['contrasena'].encode('utf-8')
+            if bcrypt.checkpw(password_plana.encode('utf-8'), hash_almacenado):
+                resultado.pop('contrasena') 
+                return resultado
+        
         return None 
+    except Exception as e:
+        print(f"Error en validar_usuario: {e}")
+        return None
     finally:
-        cursor.close()
-        db.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'db' in locals() and db:
+            db.close()
 
 def registrar_usuario(usuario, email, password_plana):
     db = obtener_conexion()
@@ -77,7 +88,6 @@ def obtener_notificaciones_db():
     if not db: return []
     try:
         cursor = db.cursor(dictionary=True)
-        # Coincide exactamente con tu tabla: id, mensaje, fecha, leido
         cursor.execute("SELECT mensaje, DATE_FORMAT(fecha, '%H:%i') as fecha, leido FROM notificaciones ORDER BY id DESC")
         return cursor.fetchall()
     finally:
@@ -89,7 +99,6 @@ def validar_y_notificar_stock(id_producto):
     if not db: return
     try:
         cursor = db.cursor(dictionary=True)
-        # Asegúrate que la tabla producto use 'id' o cambia esto a 'id_producto'
         cursor.execute("SELECT nombre, stock, umbral_minimo FROM producto WHERE id = %s", (id_producto,))
         p = cursor.fetchone()
         if p and p['stock'] <= p['umbral_minimo']:

@@ -16,13 +16,23 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  // IMPORTANTE: Verifica tu IP con 'ipconfig' en la PC
   final String url = "http://10.137.30.247:5000/registro";
   final Color accentColor = const Color(0xFF00BFA5);
 
   Future<void> registrarUsuario() async {
-    if (nombreController.text.isEmpty || correoController.text.isEmpty || passwordController.text.isEmpty) {
+    if (nombreController.text.isEmpty ||
+        correoController.text.isEmpty ||
+        passwordController.text.isEmpty) {
       _snack("Rellena todos los campos", Colors.orange);
+      return;
+    }
+
+    final bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(correoController.text);
+
+    if (!emailValid) {
+      _snack("Necesitas un correo válido", Colors.red);
       return;
     }
 
@@ -33,7 +43,7 @@ class _RegisterViewState extends State<RegisterView> {
 
     try {
       final response = await http.post(
-        Uri.parse("$url"),
+        Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "usuario": nombreController.text,
@@ -55,7 +65,9 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   void _snack(String m, Color c) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), backgroundColor: c));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(m), backgroundColor: c),
+    );
   }
 
   @override
@@ -78,7 +90,15 @@ class _RegisterViewState extends State<RegisterView> {
                 children: [
                   Icon(Icons.person_add_alt, size: 70, color: accentColor),
                   const SizedBox(height: 15),
-                  const Text("UNIRSE A NEXUS", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 3)),
+                  const Text(
+                    "UNIRSE A NEXUS",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 3,
+                    ),
+                  ),
                   const SizedBox(height: 40),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
@@ -95,11 +115,14 @@ class _RegisterViewState extends State<RegisterView> {
                           children: [
                             _field(nombreController, "Usuario", Icons.person_outline),
                             const SizedBox(height: 20),
-                            _field(correoController, "Email", Icons.alternate_email),
+                            _field(correoController, "Email", Icons.alternate_email, 
+                                type: TextInputType.emailAddress),
                             const SizedBox(height: 20),
-                            _field(passwordController, "Contraseña", Icons.lock_outline, isPass: true),
+                            _field(passwordController, "Contraseña", Icons.lock_outline, 
+                                isPass: true),
                             const SizedBox(height: 20),
-                            _field(confirmPasswordController, "Confirmar", Icons.shield_outlined, isPass: true),
+                            _field(confirmPasswordController, "Confirmar", 
+                                Icons.shield_outlined, isPass: true),
                             const SizedBox(height: 35),
                             ElevatedButton(
                               onPressed: registrarUsuario,
@@ -107,9 +130,14 @@ class _RegisterViewState extends State<RegisterView> {
                                 backgroundColor: accentColor,
                                 foregroundColor: Colors.black,
                                 minimumSize: const Size(double.infinity, 55),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
                               ),
-                              child: const Text("CREAR CUENTA", style: TextStyle(fontWeight: FontWeight.bold)),
+                              child: const Text(
+                                "CREAR CUENTA",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ],
                         ),
@@ -125,10 +153,12 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  Widget _field(TextEditingController c, String h, IconData i, {bool isPass = false}) {
+  Widget _field(TextEditingController c, String h, IconData i, 
+      {bool isPass = false, TextInputType type = TextInputType.text}) {
     return TextField(
       controller: c,
       obscureText: isPass,
+      keyboardType: type,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: h,
@@ -136,7 +166,10 @@ class _RegisterViewState extends State<RegisterView> {
         prefixIcon: Icon(i, color: accentColor, size: 20),
         filled: true,
         fillColor: Colors.black26,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }
