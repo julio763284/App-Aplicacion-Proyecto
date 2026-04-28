@@ -5,7 +5,9 @@ from src.database import (
     registrar_cliente, 
     obtener_productos, 
     obtener_notificaciones_db,
-    obtener_clientes_ordenados
+    obtener_clientes_ordenados,
+    registrar_producto_db
+
 )
 
 def init_routes(app):
@@ -53,3 +55,16 @@ def init_routes(app):
         if clientes is not None:
             return jsonify(clientes), 200
         return jsonify({"status": "error", "message": "Error al obtener clientes"}), 500    
+
+
+    @app.route('/producto', methods=['POST'])
+    def guardar_producto():
+        data = request.json
+        res = registrar_producto_db(
+            data.get('nombre'),
+            data.get('descripcion'),
+            data.get('precio'),
+            data.get('cantidad'),
+            data.get('imagen', '')
+        )
+        return jsonify(res), (201 if res["status"] == "success" else 400)   

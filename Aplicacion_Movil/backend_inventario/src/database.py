@@ -122,3 +122,20 @@ def obtener_clientes_ordenados():
     except Exception as e:
         print(f"Error: {e}")
         return None
+
+def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
+    db = obtener_conexion()
+    if not db: return {"status": "error", "message": "Error de conexión"}
+    try:
+        cursor = db.cursor()
+        # El estado se manejará por defecto como 'Agotado' según tu SQL si no se envía
+        sql = """INSERT INTO producto (nombre, descripcion, precio, cantidad, imagen, estado) 
+                 VALUES (%s, %s, %s, %s, %s, 'Disponible')"""
+        cursor.execute(sql, (nombre, descripcion, precio, cantidad, imagen))
+        db.commit()
+        return {"status": "success", "message": "Producto registrado en DB"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    finally:
+        cursor.close()
+        db.close()        

@@ -49,7 +49,7 @@ class _VisualizarStockState extends State<VisualizarStock> {
 
   Future<List<Producto>> fetchProductos() async {
     try {
-      final response = await http.get(Uri.parse('http://10.2.124.104:5000/productos'));
+      final response = await http.get(Uri.parse('http://10.2.127.40:5000/productos'));
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
         return jsonData.map((item) => Producto.fromJson(item)).toList();
