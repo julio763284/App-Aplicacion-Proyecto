@@ -13,7 +13,7 @@ class Nuevocliente extends StatelessWidget {
   final correoController = TextEditingController();
   final telefonoController = TextEditingController();
 
-  final String url = "http://10.2.139.243:3000/clientes";
+  final String url = "http://10.137.30.247:5000/registro_cliente";
 
   Future<void> guardarCliente(BuildContext context) async {
     try {
@@ -22,13 +22,14 @@ class Nuevocliente extends StatelessWidget {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "nombre": nombreController.text,
-          "direccion": direccionController.text,
-          "correo": correoController.text,
-          "telefono": telefonoController.text,
+          "direccion_residencia": direccionController.text,
+          "gmail_corporativo": correoController.text,
+          "celular": telefonoController.text,
+          "imagen": ""
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         _notificar(context, 'Cliente guardado correctamente ✅', Colors.greenAccent);
         nombreController.clear();
         direccionController.clear();

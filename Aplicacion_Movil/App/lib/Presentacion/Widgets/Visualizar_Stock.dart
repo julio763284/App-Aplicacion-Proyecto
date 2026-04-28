@@ -1,131 +1,250 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
-class VisualizarStock extends StatelessWidget {
+class Producto {
+  final int idProducto;
+  final String nombre;
+  final int cantidad;
+
+  Producto({
+    required this.idProducto,
+    required this.nombre,
+    required this.cantidad,
+  });
+
+  factory Producto.fromJson(Map<String, dynamic> json) {
+    return Producto(
+      idProducto: json['id_producto'] ?? 0,
+      nombre: json['nombre'] ?? 'Sin nombre',
+      cantidad: json['cantidad'] ?? 0,
+    );
+  }
+
+  String get estado {
+    if (cantidad >= 10) return 'Disponible';
+    if (cantidad > 0 && cantidad < 10) return 'Stock Bajo';
+    return 'Agotado';
+  }
+
+  Color get colorEstado {
+    if (cantidad >= 10) return Colors.greenAccent;
+    if (cantidad > 0 && cantidad < 10) return Colors.orangeAccent;
+    return Colors.redAccent;
+  }
+}
+
+class VisualizarStock extends StatefulWidget {
   const VisualizarStock({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
+  State<VisualizarStock> createState() => _VisualizarStockState();
+}
 
+class _VisualizarStockState extends State<VisualizarStock> {
+  final primaryDark = const Color(0xFF0D1B1E);
+  final cardDark = const Color(0xFF162A2D);
+  final accentTeal = const Color(0xFF017A74);
+
+  Future<List<Producto>> fetchProductos() async {
+    try {
+      final response = await http.get(Uri.parse('http://10.137.30.247:5000/productos'));
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = jsonDecode(response.body);
+        return jsonData.map((item) => Producto.fromJson(item)).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
       appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-            onPressed: () => Navigator.pop(context),
-          ),
+        toolbarHeight: 80,
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("INVENTARIO GENERAL", 
+              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+            Text("Sincronizado en tiempo real", 
+              style: TextStyle(color: Colors.grey, fontSize: 14)),
+          ],
         ),
-        title: const Text(
-          "VISUALIZAR STOCK",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.sort, color: Colors.greenAccent),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 15.0),
-            decoration: BoxDecoration(
-              color: accentTeal.withOpacity(0.1),
-              border: Border(
-                bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: FutureBuilder<List<Producto>>(
+        future: fetchProductos(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Color(0xFF017A74)));
+          }
+
+          final productos = snapshot.data ?? [];
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            child: Column(
               children: [
-                _buildOptionButton(Icons.grid_view_rounded, "Tarjetas"),
-                _buildOptionButton(Icons.table_chart_rounded, "Tablas"),
-                _buildOptionButton(Icons.bar_chart_rounded, "Gráfico"),
+                _buildSummaryGrid(productos),
+                const SizedBox(height: 35),
+                
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: cardDark,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.3), size: 28),
+                      const SizedBox(width: 15),
+                      const Expanded(
+                        child: TextField(
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          decoration: InputDecoration(
+                            hintText: "Buscar en el almacén...",
+                            hintStyle: TextStyle(color: Colors.white30),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(color: accentTeal, borderRadius: BorderRadius.circular(15)),
+                        child: const Icon(Icons.search_rounded, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 35),
+
+                Container(
+                  decoration: BoxDecoration(
+                    color: cardDark,
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                  ),
+                  child: Column(
+                    children: [
+                      _buildTableHeader(),
+                      if (productos.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(50),
+                          child: Text("No hay datos en la tabla", style: TextStyle(color: Colors.white24, fontSize: 18)),
+                        )
+                      else
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: productos.length,
+                          separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
+                          itemBuilder: (context, index) => _buildProductRow(productos[index]),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 50),
               ],
             ),
-          ),
-          const Spacer(),
-          Center(
-            child: Container(
-              height: 380.0,
-              width: 320.0,
-              decoration: BoxDecoration(
-                color: const Color(0xFF162A2D),
-                borderRadius: BorderRadius.circular(30.0),
-                border: Border.all(color: Colors.white.withOpacity(0.05)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      "No Hay Productos en Inventario...",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 16.0,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const Spacer(flex: 2),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSummaryGrid(List<Producto> productos) {
+    final totalConExistencia = productos.where((p) => p.cantidad > 0).length;
+    final bajoStock = productos.where((p) => p.cantidad < 10 && p.cantidad > 0).length;
+    final agotados = productos.where((p) => p.cantidad <= 0).length;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildSummaryCard("TOTAL", totalConExistencia.toString(), Icons.inventory_2, accentTeal),
+        _buildSummaryCard("BAJO", bajoStock.toString(), Icons.bolt, Colors.orangeAccent),
+        _buildSummaryCard("AGOTADO", agotados.toString(), Icons.block, Colors.redAccent),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.28,
+      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
+      decoration: BoxDecoration(
+        color: cardDark,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: color.withOpacity(0.2), width: 2),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 35),
+          const SizedBox(height: 15),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12, fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 
-  Widget _buildOptionButton(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF162A2D),
-            foregroundColor: Colors.greenAccent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-              side: BorderSide(color: Colors.white.withOpacity(0.05)),
+  Widget _buildTableHeader() {
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 1, child: Center(child: Text("PRODUCTO", style: TextStyle(color: accentTeal, fontWeight: FontWeight.w900, fontSize: 13)))),
+          VerticalDivider(color: Colors.white.withOpacity(0.1), thickness: 1, indent: 15, endIndent: 15),
+          Expanded(flex: 1, child: Center(child: Text("CANTIDAD", style: TextStyle(color: accentTeal, fontWeight: FontWeight.w900, fontSize: 13)))),
+          VerticalDivider(color: Colors.white.withOpacity(0.1), thickness: 1, indent: 15, endIndent: 15),
+          Expanded(flex: 1, child: Center(child: Text("ESTADO", style: TextStyle(color: accentTeal, fontWeight: FontWeight.w900, fontSize: 13)))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductRow(Producto prod) {
+    return IntrinsicHeight(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          children: [
+            Expanded(flex: 1, child: Center(child: Text(prod.nombre.toUpperCase(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)))),
+            VerticalDivider(color: Colors.white.withOpacity(0.05), thickness: 1, indent: 5, endIndent: 5),
+            Expanded(flex: 1, child: Center(child: Text(prod.cantidad.toString(), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)))),
+            VerticalDivider(color: Colors.white.withOpacity(0.05), thickness: 1, indent: 5, endIndent: 5),
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: prod.colorEstado.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: prod.colorEstado.withOpacity(0.5)),
+                  ),
+                  child: Text(
+                    prod.estado.toUpperCase(),
+                    style: TextStyle(color: prod.colorEstado, fontSize: 10, fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ),
             ),
-            padding: const EdgeInsets.all(15),
-            elevation: 0,
-          ),
-          child: Icon(icon, size: 24),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
-        ),
-      ],
+      ),
     );
   }
 }

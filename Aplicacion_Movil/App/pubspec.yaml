@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   font_awesome_flutter: ^10.7.0  
-  http: ^1.1.0
+  http: ^1.6.0
   fl_chart: ^0.66.0
 
   # The following adds the Cupertino Icons font to your application.
@@ -40,6 +40,7 @@ dependencies:
   bloc: ^9.2.0
   flutter_bloc: ^9.1.1
   image_picker: ^1.0.7
+  file_picker: ^10.3.10
 
 dev_dependencies:
   flutter_test:
