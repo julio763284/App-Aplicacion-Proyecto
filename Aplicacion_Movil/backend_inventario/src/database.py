@@ -78,6 +78,16 @@ def registrar_proveedor(nombre, direccion, gmail, telefono):
     db = obtener_conexion()
     if not db: return {"status": "error", "message": "Error de conexion"}
     try:
+        cursor = db.cursor()
+        sql = "INSERT INTO proveedor (nombre, direccion, gmail, telefono) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, (nombre, direccion, gmail, telefono))
+        db.commit()
+        return {"status": "success", "message": "Cliente registrado"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    finally:
+        cursor.close()
+        db.close()
 
 def obtener_productos():
     db = obtener_conexion()
