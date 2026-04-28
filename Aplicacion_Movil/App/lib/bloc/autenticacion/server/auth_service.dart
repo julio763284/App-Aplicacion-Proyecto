@@ -2,10 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  // 1. Asegúrate que la IP sea la de tu PC (la que viste en el error)
+  // 1. Asegúrate que la IP sea la de tu PC
   // 2. CAMBIA EL PUERTO A 5000
   final String baseUrl = "http://10.2.124.104:5000"; 
 
+  /// LOGIN
+  /// Devuelve un Map con:
+  ///  - status: "success" | "error"
+  ///  - message: mensaje listo para mostrar al usuario
   Future<Map<String, dynamic>> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/login');
     try {
@@ -14,13 +18,43 @@ class AuthService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"username": username, "password": password}),
       );
-      return jsonDecode(response.body);
+
+      final data = jsonDecode(response.body);
+
+      switch (response.statusCode) {
+        case 200:
+          return {
+            "status": "success",
+            "message": "Inicio de sesión exitoso.",
+            "data": data,
+          };
+        case 401:
+          return {
+            "status": "error",
+            "message": "Contraseña incorrecta.",
+          };
+        case 404:
+          return {
+            "status": "error",
+            "message": "Usuario no registrado.",
+          };
+        default:
+          return {
+            "status": "error",
+            "message": data['message'] ?? "Ocurrió un error. Inténtalo más tarde.",
+          };
+      }
     } catch (e) {
-      return {"status": "error", "message": "Error de conexión: $e"};
+      return {
+        "status": "error",
+        "message": "Ocurrió un error. Inténtalo más tarde.",
+      };
     }
   }
 
-  Future<Map<String, dynamic>> registrar(String usuario, String email, String password) async {
+  /// REGISTRO
+  Future<Map<String, dynamic>> registrar(
+      String usuario, String email, String password) async {
     final url = Uri.parse('$baseUrl/registro');
     try {
       final response = await http.post(
@@ -32,10 +66,32 @@ class AuthService {
           "password": password,
         }),
       );
-      return jsonDecode(response.body);
+
+      final data = jsonDecode(response.body);
+
+      switch (response.statusCode) {
+        case 201:
+        case 200:
+          return {
+            "status": "success",
+            "message": "Usuario registrado con éxito.",
+          };
+        case 409:
+          return {
+            "status": "error",
+            "message": "El usuario o correo ya está registrado.",
+          };
+        default:
+          return {
+            "status": "error",
+            "message": data['message'] ?? "Ocurrió un error. Inténtalo de nuevo.",
+          };
+      }
     } catch (e) {
-      // ESTE ES EL MENSAJE QUE VES EN ROJO
-      return {"status": "error", "message": "Error de conexión: $e"};
+      return {
+        "status": "error",
+        "message": "Ocurrió un error. Inténtalo de nuevo.",
+      };
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gestor/common/custom_notification.dart';
 
 // Importaciones de tu proyecto
 import 'package:gestor/HomePage2.dart'; 
@@ -29,48 +30,34 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Función para manejar errores de login (Pop-up o SnackBar)
+  // 🔔 NOTIFICACIÓN GLOBAL
+  void _notify(String message, NotificationType type) {
+    CustomNotification.show(
+      context,
+      message: message,
+      type: type,
+    );
+  }
+
+  // 🔥 MANEJO DE ERRORES LOGIN (SIN SNACKBAR)
   void _manejarErrorLogin(BuildContext context, String mensaje) {
-    final bool noRegistrado = mensaje.toLowerCase().contains("registrarse") || 
-                               mensaje.toLowerCase().contains("no registrado");
+
+    final bool noRegistrado =
+        mensaje.toLowerCase().contains("no registrado");
 
     if (noRegistrado) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: const Color(0xFF0D1B1E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("Aviso del Sistema", style: TextStyle(color: Colors.cyanAccent)),
-          content: Text(mensaje, style: const TextStyle(color: Colors.white70)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("CANCELAR", style: TextStyle(color: Colors.white38)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyanAccent,
-                foregroundColor: const Color(0xFF0D1B1E),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onPressed: () {
-                Navigator.pop(context); // Cierra el diálogo
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
-              },
-              child: const Text("REGISTRARME", style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      );
+      _notify(mensaje, NotificationType.error);
+
+      // 👉 Redirige a registro automáticamente
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RegisterView()),
+        );
+      });
+
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(mensaje),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+      _notify(mensaje, NotificationType.error);
     }
   }
 
@@ -81,16 +68,35 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: const Color(0xFF0D1B1E),
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
-          // Navegaciones directas por eventos
+
+          // Navegaciones directas
           if (state is Estado_Registrarse) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const RegisterView()),
+            );
+
           } else if (state is EstadoOlvidarcontrasena) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()),
+            );
+
           } 
-          // Resultado de la petición al servidor
+          // ✅ LOGIN EXITOSO
           else if (state is LoginExitoso) {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Homepage2()));
-          } else if (state is LoginError) {
+            _notify("Inicio de sesión exitoso.", NotificationType.success);
+
+            Future.delayed(const Duration(seconds: 1), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const Homepage2()),
+              );
+            });
+
+          } 
+          // ❌ ERROR LOGIN
+          else if (state is LoginError) {
             _manejarErrorLogin(context, state.mensaje);
           }
         },
@@ -120,8 +126,10 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+
               Icon(Icons.security, size: 80, color: Colors.cyanAccent.withOpacity(0.8)),
               const SizedBox(height: 20),
+
               const Text(
                 "ACCESO AL SISTEMA",
                 style: TextStyle(
@@ -131,7 +139,9 @@ class _LoginPageState extends State<LoginPage> {
                   letterSpacing: 3
                 ),
               ),
+
               const SizedBox(height: 40),
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(25),
                 child: BackdropFilter(
@@ -145,14 +155,20 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: [
+
                         _buildStyledField(userController, "Usuario o Correo", Icons.person_outline),
                         const SizedBox(height: 20),
+
                         _buildStyledField(passController, "Contraseña", Icons.lock_outline, isPass: true),
+
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const OlvidarContrasenaPage()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const OlvidarContrasenaPage()),
+                              );
                             },
                             child: Text(
                               "¿Olvidaste tu contraseña?",
@@ -160,7 +176,9 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 20),
+
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -168,16 +186,20 @@ class _LoginPageState extends State<LoginPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.cyanAccent,
                               foregroundColor: const Color(0xFF0D1B1E),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)
+                              ),
                             ),
-                            onPressed: state is Logincargando 
-                              ? null 
-                              : () {
-                                  context.read<AutenticacionBloc>().add(
-                                    Ingresar(userController.text, passController.text)
-                                  );
-                                },
+                            onPressed: state is Logincargando
+                                ? null
+                                : () {
+                                    context.read<AutenticacionBloc>().add(
+                                      Ingresar(
+                                        userController.text,
+                                        passController.text,
+                                      ),
+                                    );
+                                  },
                             child: state is Logincargando
                                 ? const SizedBox(
                                     height: 20,
@@ -187,7 +209,13 @@ class _LoginPageState extends State<LoginPage> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text("INGRESAR", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                : const Text(
+                                    "INGRESAR",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 2
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -195,14 +223,22 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 25),
+
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterView()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RegisterView()),
+                  );
                 },
                 child: const Text(
-                  "¿No tienes cuenta? Regístrate", 
-                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold)
+                  "¿No tienes cuenta? Regístrate",
+                  style: TextStyle(
+                    color: Colors.cyanAccent,
+                    fontWeight: FontWeight.bold
+                  ),
                 ),
               ),
             ],
@@ -212,35 +248,44 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildStyledField(TextEditingController controller, String hint, IconData icon, {bool isPass = false}) {
+  Widget _buildStyledField(
+    TextEditingController controller,
+    String hint,
+    IconData icon,
+    {bool isPass = false}
+  ) {
     return TextField(
       controller: controller,
       obscureText: isPass ? _obscureText : false,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.cyanAccent, size: 20),
-        suffixIcon: isPass 
-          ? IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-                color: Colors.cyanAccent.withOpacity(0.5),
-                size: 20,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            )
-          : null,
+
+        suffixIcon: isPass
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.cyanAccent.withOpacity(0.5),
+                  size: 20,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : null,
+
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
         filled: true,
         fillColor: Colors.black.withOpacity(0.2),
+
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(color: Colors.white10),
         ),
+
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(color: Colors.cyanAccent),

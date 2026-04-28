@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:gestor/common/custom_notification.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterView extends StatefulWidget {
@@ -23,21 +24,21 @@ class _RegisterViewState extends State<RegisterView> {
     if (nombreController.text.isEmpty ||
         correoController.text.isEmpty ||
         passwordController.text.isEmpty) {
-      _snack("Rellena todos los campos", Colors.orange);
+      _notify("Rellena todos los campos.", NotificationType.warning);
       return;
     }
 
     final bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(correoController.text);
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(correoController.text);
 
     if (!emailValid) {
-      _snack("Necesitas un correo válido", Colors.red);
+      _notify("Ingresa un correo electrónico válido.", NotificationType.error);
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
-      _snack("Las contraseñas no coinciden", Colors.red);
+      _notify("Las contraseñas no coinciden.", NotificationType.error);
       return;
     }
 
@@ -48,26 +49,26 @@ class _RegisterViewState extends State<RegisterView> {
         body: jsonEncode({
           "usuario": nombreController.text,
           "email": correoController.text,
-          "password": passwordController.text
+          "password": passwordController.text,
         }),
       );
 
-      final res = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        _snack("¡Bienvenido a Nexus!", Colors.green);
-        Future.delayed(const Duration(seconds: 1), () => Navigator.pop(context));
+        _notify("Usuario registrado con éxito.", NotificationType.success);
+        Future.delayed(
+          const Duration(seconds: 1),
+          () => Navigator.pop(context),
+        );
       } else {
-        _snack(res['message'] ?? "Error", Colors.red);
+        _notify("Ocurrió un error. Inténtalo de nuevo.", NotificationType.error);
       }
     } catch (e) {
-      _snack("Error de conexión con el servidor", Colors.red);
+      _notify("Ocurrió un error. Inténtalo de nuevo.", NotificationType.error);
     }
   }
 
-  void _snack(String m, Color c) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(m), backgroundColor: c),
-    );
+  void _notify(String message, NotificationType type) {
+    CustomNotification.show(context, message: message, type: type);
   }
 
   @override
@@ -90,6 +91,7 @@ class _RegisterViewState extends State<RegisterView> {
                 children: [
                   Icon(Icons.person_add_alt, size: 70, color: accentColor),
                   const SizedBox(height: 15),
+
                   const Text(
                     "UNIRSE A NEXUS",
                     style: TextStyle(
@@ -99,7 +101,9 @@ class _RegisterViewState extends State<RegisterView> {
                       letterSpacing: 3,
                     ),
                   ),
+
                   const SizedBox(height: 40),
+
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: BackdropFilter(
@@ -109,21 +113,43 @@ class _RegisterViewState extends State<RegisterView> {
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.03),
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.white.withOpacity(0.05)),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.05),
+                          ),
                         ),
                         child: Column(
                           children: [
-                            _field(nombreController, "Usuario", Icons.person_outline),
+                            _field(
+                              nombreController,
+                              "Usuario",
+                              Icons.person_outline,
+                            ),
                             const SizedBox(height: 20),
-                            _field(correoController, "Email", Icons.alternate_email, 
-                                type: TextInputType.emailAddress),
+
+                            _field(
+                              correoController,
+                              "Email",
+                              Icons.alternate_email,
+                              type: TextInputType.emailAddress,
+                            ),
                             const SizedBox(height: 20),
-                            _field(passwordController, "Contraseña", Icons.lock_outline, 
-                                isPass: true),
+
+                            _field(
+                              passwordController,
+                              "Contraseña",
+                              Icons.lock_outline,
+                              isPass: true,
+                            ),
                             const SizedBox(height: 20),
-                            _field(confirmPasswordController, "Confirmar", 
-                                Icons.shield_outlined, isPass: true),
+
+                            _field(
+                              confirmPasswordController,
+                              "Confirmar",
+                              Icons.shield_outlined,
+                              isPass: true,
+                            ),
                             const SizedBox(height: 35),
+
                             ElevatedButton(
                               onPressed: registrarUsuario,
                               style: ElevatedButton.styleFrom(
@@ -153,8 +179,13 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  Widget _field(TextEditingController c, String h, IconData i, 
-      {bool isPass = false, TextInputType type = TextInputType.text}) {
+  Widget _field(
+    TextEditingController c,
+    String h,
+    IconData i, {
+    bool isPass = false,
+    TextInputType type = TextInputType.text,
+  }) {
     return TextField(
       controller: c,
       obscureText: isPass,
