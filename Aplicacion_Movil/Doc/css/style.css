@@ -14,6 +14,74 @@ line-height:1.5;
 overflow:hidden;
 }
 
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 70px;
+  background: rgba(15, 15, 25, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 1000;
+}
+
+/* Logo */
+.logo {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #6c63ff;
+}
+
+/* Links */
+.nav-links a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #ccc;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: white;
+}
+
+/* Right side */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Search */
+.search {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+/* Button */
+.btn-login {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #6c63ff;
+  color: white;
+  cursor: pointer;
+}
+
+/* Para que no tape el contenido */
+body {
+  padding-top: 80px;
+}
+
 .layer-blur{
 height:0;
 width:30rem;
