@@ -16,7 +16,7 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  final String url = "http://10.137.30.247:5000/registro";
+  final String url = "http://10.2.124.104:5000/registro";
   final Color accentColor = const Color(0xFF00BFA5);
 
   Future<void> registrarUsuario() async {

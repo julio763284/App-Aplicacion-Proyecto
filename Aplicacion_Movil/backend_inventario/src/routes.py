@@ -4,7 +4,8 @@ from src.database import (
     registrar_usuario, 
     registrar_cliente, 
     obtener_productos, 
-    obtener_notificaciones_db 
+    obtener_notificaciones_db,
+    obtener_clientes_ordenados
 )
 
 def init_routes(app):
@@ -45,3 +46,10 @@ def init_routes(app):
         except Exception as e:
             print(f"Error en ruta notificaciones: {e}")
             return jsonify({"status": "error", "message": str(e)}), 500
+        
+    @app.route('/clientes', methods=['GET'])
+    def listar_clientes():
+        clientes = obtener_clientes_ordenados()
+        if clientes is not None:
+            return jsonify(clientes), 200
+        return jsonify({"status": "error", "message": "Error al obtener clientes"}), 500    

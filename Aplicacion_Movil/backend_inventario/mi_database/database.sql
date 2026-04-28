@@ -30,7 +30,8 @@ CREATE TABLE cliente (
     direccion_residencia VARCHAR(255) NOT NULL,
     gmail_corporativo VARCHAR(255) NOT NULL UNIQUE,
     celular VARCHAR(20) NOT NULL,
-    imagen VARCHAR(255)
+    imagen VARCHAR(255),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE notificaciones (
