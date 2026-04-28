@@ -108,3 +108,17 @@ def validar_y_notificar_stock(id_producto):
     finally:
         cursor.close()
         db.close()
+        
+def obtener_clientes_ordenados():
+    try:
+        conn = obtener_conexion() # Tu función de conexión
+        cursor = conn.cursor(dictionary=True)
+        # Ordenamos por fecha_registro descendente (los más nuevos primero)
+        cursor.execute("SELECT * FROM cliente ORDER BY fecha_registro DESC")
+        clientes = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return clientes
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
