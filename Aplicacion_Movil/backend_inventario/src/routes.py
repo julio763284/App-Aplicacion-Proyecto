@@ -8,6 +8,8 @@ from src.database import (
     obtener_clientes_ordenados
 )
 
+# el archivo routes se comunica con flutter o el fronted //
+
 def init_routes(app):
     
     @app.route('/login', methods=['POST'])

@@ -5,7 +5,7 @@ import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Proveedores extends StatelessWidget {
   const Proveedores({super.key});
-  final String url = "http://10.2.139.243:3000/proveedores";
+  final String url = "http://10.2.124.134:5000/proveedores";
 
   @override
   Widget build(BuildContext context) {

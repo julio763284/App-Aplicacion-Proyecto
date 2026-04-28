@@ -2,6 +2,8 @@ import bcrypt
 import mysql.connector 
 from config.db_config import DB_SETTINGS
 
+# el archivo database.py se conecta con la base de datos #
+
 def obtener_conexion():
     try:
         conexion = mysql.connector.connect(
@@ -71,6 +73,11 @@ def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, 
     finally:
         cursor.close()
         db.close()
+
+def registrar_proveedor(nombre, direccion, gmail, telefono):
+    db = obtener_conexion()
+    if not db: return {"status": "error", "message": "Error de conexion"}
+    try:
 
 def obtener_productos():
     db = obtener_conexion()

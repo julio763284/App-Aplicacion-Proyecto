@@ -24,7 +24,7 @@ class _ClienteState extends State<Cliente> {
 
   Future<void> fetchClientes() async {
     try {
-      final response = await http.get(Uri.parse('http://10.2.124.104:5000/clientes'));
+      final response = await http.get(Uri.parse('http://10.2.124.134:5000/clientes'));
       if (response.statusCode == 200) {
         setState(() {
           clientes = json.decode(response.body);

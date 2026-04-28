@@ -13,7 +13,7 @@ class Nuevoproveedor extends StatelessWidget {
   final correoController = TextEditingController();
   final telefonoController = TextEditingController();
 
-  final String url = "http://10.2.139.243:3000/proveedores";
+  final String url = "http://10.2.124.134:5000/proveedores";
 
   Future<void> guardarProveedor(BuildContext context) async {
     try {

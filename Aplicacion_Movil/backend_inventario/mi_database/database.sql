@@ -34,6 +34,15 @@ CREATE TABLE cliente (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE proveedor (
+    id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    gmail VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255) NOT NULL
+);
+
+
 CREATE TABLE notificaciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     mensaje TEXT NOT NULL,
