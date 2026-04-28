@@ -1,89 +1,48 @@
 from flask import request, jsonify
-
-from src.database import validar_usuario, registrar_usuario, registrar_cliente, obtener_productos, obtener_notificaciones_db
+from src.database import (
+    validar_usuario, 
+    registrar_usuario, 
+    registrar_cliente, 
+    obtener_productos, 
+    obtener_notificaciones_db # Cambiamos obtener_conexion por esta
+)
 
 def init_routes(app):
     
     @app.route('/login', methods=['POST'])
     def login():
         data = request.json
-        if not data:
-            return jsonify({"status": "error", "message": "No se enviaron datos"}), 400
-            
-        user = data.get('username')
-        pw = data.get('password')
-        
-        if not user or not pw:
-            return jsonify({"status": "error", "message": "Usuario y contraseña requeridos"}), 400
-        
-        usuario_encontrado = validar_usuario(user, pw)
-        
-        if usuario_encontrado:
-            return jsonify({
-                "status": "success",
-                "message": "Bienvenido al sistema",
-                "user": usuario_encontrado
-            }), 200
-        else:
-            return jsonify({
-                "status": "error", 
-                "message": "Este usuario no está registrado. ¿Deseas crear una cuenta nueva?"
-            }), 401
+        if not data: return jsonify({"status": "error", "message": "No hay datos"}), 400
+        user = validar_usuario(data.get('username'), data.get('password'))
+        if user:
+            return jsonify({"status": "success", "message": "Bienvenido", "user": user}), 200
+        return jsonify({"status": "error", "message": "Credenciales inválidas"}), 401
 
     @app.route('/registro', methods=['POST'])
     def registro():
         data = request.json
-        if not data:
-            return jsonify({"status": "error", "message": "No se enviaron datos"}), 400
-
-        usuario = data.get('usuario')
-        email = data.get('email')
-        password = data.get('password')
-        
-        if not usuario or not email or not password:
-            return jsonify({"status": "error", "message": "Todos los campos son obligatorios"}), 400
-            
-        resultado = registrar_usuario(usuario, email, password)
-        
-        if resultado["status"] == "success":
-            return jsonify(resultado), 201
-        else:
-            return jsonify(resultado), 400
+        res = registrar_usuario(data.get('usuario'), data.get('email'), data.get('password'))
+        return jsonify(res), (201 if res["status"] == "success" else 400)
 
     @app.route('/registro_cliente', methods=['POST'])
     def registro_cliente():
         data = request.json
-        if not data:
-            return jsonify({"status": "error", "message": "No se enviaron datos"}), 400
-
-        nombre = data.get('nombre')
-        direccion = data.get('direccion_residencia')
-        gmail = data.get('gmail_corporativo')
-        celular = data.get('celular')
-        imagen = data.get('imagen', '')
-        
-        if not nombre or not direccion or not gmail or not celular:
-            return jsonify({"status": "error", "message": "Todos los campos excepto imagen son obligatorios"}), 400
-            
-        resultado = registrar_cliente(nombre, direccion, gmail, celular, imagen)
-        
-        if resultado["status"] == "success":
-            return jsonify(resultado), 201
-        else:
-            return jsonify(resultado), 400
+        res = registrar_cliente(data.get('nombre'), data.get('direccion_residencia'), 
+                                data.get('gmail_corporativo'), data.get('celular'), data.get('imagen', ''))
+        return jsonify(res), (201 if res["status"] == "success" else 400)
         
     @app.route('/productos', methods=['GET'])
     def listar_productos():
         productos = obtener_productos()
-        if productos is not None:
-            return jsonify(productos), 200
-        
-        return jsonify({
-            "status": "error", 
-            "message": "No se pudieron obtener los productos"
-        }), 500
-        
+        if productos is not None: return jsonify(productos), 200
+        return jsonify({"status": "error", "message": "Error al obtener productos"}), 500
+
     @app.route('/notificaciones', methods=['GET'])
     def listar_notificaciones():
-        alertas = obtener_notificaciones_db()
-        return jsonify(alertas), 200
+        try:
+            # Usamos la función del database.py directamente
+            alertas = obtener_notificaciones_db()
+            return jsonify(alertas), 200
+        except Exception as e:
+            print(f"Error en ruta notificaciones: {e}")
+            return jsonify({"status": "error", "message": str(e)}), 500
