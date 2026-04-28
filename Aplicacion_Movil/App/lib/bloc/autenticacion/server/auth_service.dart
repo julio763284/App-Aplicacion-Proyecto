@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class AuthService {
   // 1. Asegúrate que la IP sea la de tu PC (la que viste en el error)
   // 2. CAMBIA EL PUERTO A 5000
-  final String baseUrl = "http://10.2.124.104:5000"; 
+  final String baseUrl = "http://10.2.127.40:5000"; 
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/login');
