@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui'; 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
@@ -45,6 +46,89 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     } catch (e) {
       setState(() => _isLoading = false);
     }
+  }
+
+  void _mostrarOpciones(BuildContext context, dynamic producto) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5), 
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent, 
+          insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: nexusCard.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: nexusCyan.withOpacity(0.2), 
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, 
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        producto['nombre'].toString().toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Divider(color: nexusCyan.withOpacity(0.15), height: 1),
+                    
+                    Material( 
+                      color: Colors.transparent,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                            leading: const Icon(Icons.edit_outlined, color: nexusCyan, size: 22),
+                            title: const Text(
+                              "EDITAR PRODUCTO", 
+                              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.5)
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                               
+                            },
+                          ),
+                          ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                            leading: const Icon(Icons.delete_forever_outlined, color: Colors.redAccent, size: 22),
+                            title: const Text(
+                              "ELIMINAR DE INVENTARIO", 
+                              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.5)
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _filterProducts(String query) {
@@ -98,60 +182,63 @@ class _GestionarproductosState extends State<Gestionarproductos> {
       body: _isLoading 
           ? const Center(child: CircularProgressIndicator(color: nexusCyan))
           : GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15), // Más margen lateral
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 0.78,
-                crossAxisSpacing: 18, // Más espacio entre tarjetas
+                crossAxisSpacing: 18,
                 mainAxisSpacing: 18,
               ),
               itemCount: _filteredProducts.length,
               itemBuilder: (context, index) {
                 final producto = _filteredProducts[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: nexusCard,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: nexusBorder, width: 1.2),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))
-                    ]
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Todo a la izquierda
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: producto['imagen'] != null 
-                              ? Image.network(producto['imagen'], fit: BoxFit.cover, width: double.infinity)
-                              : Container(color: Colors.black26, child: const Icon(Icons.inventory, color: nexusBorder, size: 40)),
+                
+                return GestureDetector(
+                  onLongPress: () => _mostrarOpciones(context, producto),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: nexusCard,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: nexusBorder, width: 1.2),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))
+                      ]
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: producto['imagen'] != null 
+                                ? Image.network(producto['imagen'], fit: BoxFit.cover, width: double.infinity)
+                                : Container(color: Colors.black26, child: const Icon(Icons.inventory, color: nexusBorder, size: 40)),
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start, // Alineación izquierda
-                          children: [
-                            Text(
-                              producto['nombre'].toString().toUpperCase(), 
-                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                              maxLines: 1, 
-                              overflow: TextOverflow.ellipsis
-                            ),
-                            const SizedBox(height: 6),
-                            // Precio con espacio/puntos solicitado
-                            Text(
-                              "\$ :  ${producto['precio']}", 
-                              style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
-                            ),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                producto['nombre'].toString().toUpperCase(), 
+                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                                maxLines: 1, 
+                                overflow: TextOverflow.ellipsis
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                "\$ :   ${producto['precio']}", 
+                                style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -201,7 +288,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
             borderRadius: BorderRadius.circular(15), 
             side: const BorderSide(color: nexusCyan, width: 2)
           ),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>  Nuevoproducto())).then((_) => obtenerProductos()),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Nuevoproducto())).then((_) => obtenerProductos()),
           child: const Icon(Icons.add_box_outlined, color: nexusCyan, size: 28),
         ),
       ),
