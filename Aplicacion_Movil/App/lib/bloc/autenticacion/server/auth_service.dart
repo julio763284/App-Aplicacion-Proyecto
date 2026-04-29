@@ -8,6 +8,10 @@ class AuthService {
   final String baseUrl = "http://10.2.124.104:5000"; 
 
   Future<Map<String, dynamic>> login(String username, String password) async {
+    if (username.trim().isEmpty || password.trim().isEmpty) {
+      return {"status": "error", "message": "Por favor, complete todos los campos."};
+    }
+
     final url = Uri.parse(ApiConfig.url('/login'));
     try {
       final response = await http.post(
@@ -50,41 +54,49 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> registrar(String usuario, String email, String password) async {
-    final url = Uri.parse('$baseUrl/registro');
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "usuario": usuario,
-          "email": email,
-          "password": password,
-        }),
-      );
 
-      final data = jsonDecode(response.body);
-
-      switch (response.statusCode) {
-        case 201:
-        case 200:
-          return {
-            "status": "success",
-            "message": "Usuario registrado con éxito.",
-          };
-        case 409:
-          return {
-            "status": "error",
-            "message": "El usuario o correo ya está registrado.",
-          };
-        default:
-          return {
-            "status": "error",
-            "message": data['message'] ?? "Ocurrió un error. Inténtalo de nuevo.",
-          };
-      }
-    } catch (e) {
-      // ESTE ES EL MENSAJE QUE VES EN ROJO
-      return {"status": "error", "message": "Error de conexión: $e"};
-    }
+  // Validación
+  if (usuario.trim().isEmpty || email.trim().isEmpty || password.trim().isEmpty) {
+    return {"status": "error", "message": "Todos los campos son obligatorios."};
   }
+
+  final url = Uri.parse('$baseUrl/registro');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "usuario": usuario,
+        "email": email,
+        "password": password,
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+
+    switch (response.statusCode) {
+      case 201:
+      case 200:
+        return {
+          "status": "success",
+          "message": "Usuario registrado con éxito.",
+        };
+
+      case 409:
+        return {
+          "status": "error",
+          "message": "El usuario o correo ya está registrado.",
+        };
+
+      default:
+        return {
+          "status": "error",
+          "message": data['message'] ?? "Ocurrió un error. Inténtalo de nuevo.",
+        };
+    }
+  } catch (e) {
+    return {"status": "error", "message": "Error de conexión: $e"};
+  }
+}
 }
