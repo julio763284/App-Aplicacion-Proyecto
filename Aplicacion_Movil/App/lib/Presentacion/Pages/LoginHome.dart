@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-// Importaciones de tu proyecto
 import 'package:gestor/HomePage2.dart'; 
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
@@ -29,7 +27,23 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Función para manejar errores de login (Pop-up o SnackBar)
+  // --- NUEVO SISTEMA DE ALERTAS NEXUS (CON SALIDA LENTA) ---
+  void _showNexusAlert(String message, Color color, IconData icon) {
+    OverlayState? overlayState = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => _NexusAlertWidget(
+        message: message,
+        color: color,
+        icon: icon,
+        onDismiss: () => overlayEntry.remove(),
+      ),
+    );
+
+    overlayState.insert(overlayEntry);
+  }
+
   void _manejarErrorLogin(BuildContext context, String mensaje) {
     final bool noRegistrado = mensaje.toLowerCase().contains("registrarse") || 
                                mensaje.toLowerCase().contains("no registrado");
@@ -40,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
         builder: (context) => AlertDialog(
           backgroundColor: const Color(0xFF0D1B1E),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("Aviso del Sistema", style: TextStyle(color: Colors.cyanAccent)),
+          title: const Text("AVISO DE SISTEMA", style: TextStyle(color: Colors.cyanAccent, letterSpacing: 2, fontSize: 16)),
           content: Text(mensaje, style: const TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
@@ -54,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () {
-                Navigator.pop(context); // Cierra el diálogo
+                Navigator.pop(context); 
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
               },
               child: const Text("REGISTRARME", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -63,14 +77,8 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(mensaje),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+      // Aplicamos la alerta Nexus aquí también
+      _showNexusAlert(mensaje.toUpperCase(), Colors.redAccent, Icons.gpp_bad_outlined);
     }
   }
 
@@ -81,14 +89,13 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: const Color(0xFF0D1B1E),
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
-          // Navegaciones directas por eventos
           if (state is Estado_Registrarse) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
           } else if (state is EstadoOlvidarcontrasena) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()));
           } 
-          // Resultado de la petición al servidor
           else if (state is LoginExitoso) {
+            _showNexusAlert("ACCESO CONCEDIDO", Colors.greenAccent, Icons.verified_user_rounded);
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Homepage2()));
           } else if (state is LoginError) {
             _manejarErrorLogin(context, state.mensaje);
@@ -244,6 +251,99 @@ class _LoginPageState extends State<LoginPage> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(color: Colors.cyanAccent),
+        ),
+      ),
+    );
+  }
+}
+
+// --- WIDGET DE ALERTA NEXUS (IGUAL AL DE REGISTRO PARA COHERENCIA) ---
+class _NexusAlertWidget extends StatefulWidget {
+  final String message;
+  final Color color;
+  final IconData icon;
+  final VoidCallback onDismiss;
+
+  const _NexusAlertWidget({required this.message, required this.color, required this.icon, required this.onDismiss});
+
+  @override
+  State<_NexusAlertWidget> createState() => _NexusAlertWidgetState();
+}
+
+class _NexusAlertWidgetState extends State<_NexusAlertWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+      reverseDuration: const Duration(milliseconds: 1200), // Salida lenta
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+      reverseCurve: Curves.easeInBack,
+    );
+
+    _controller.forward();
+
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (mounted) {
+        await _controller.reverse();
+        widget.onDismiss();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 50,
+      left: 30,
+      right: 30,
+      child: Material(
+        color: Colors.transparent,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: FadeTransition(
+            opacity: _controller,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: widget.color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: widget.color.withOpacity(0.5), width: 1.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(widget.icon, color: widget.color, size: 28),
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: Text(
+                          widget.message,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1.2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
