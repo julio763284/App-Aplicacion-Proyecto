@@ -145,7 +145,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             const SizedBox(height: 6),
                             // Precio con espacio/puntos solicitado
                             Text(
-                              "\$ : ${producto['precio']}", 
+                              "\$ :  ${producto['precio']}", 
                               style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
                             ),
                           ],
