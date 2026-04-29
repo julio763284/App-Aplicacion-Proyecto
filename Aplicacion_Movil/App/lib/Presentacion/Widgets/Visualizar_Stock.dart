@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Producto {
@@ -49,7 +50,7 @@ class _VisualizarStockState extends State<VisualizarStock> {
 
   Future<List<Producto>> fetchProductos() async {
     try {
-      final response = await http.get(Uri.parse('http://10.2.127.40:5000/productos'));
+      final response = await http.get(Uri.parse(ApiConfig.url('/productos')));
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
         return jsonData.map((item) => Producto.fromJson(item)).toList();

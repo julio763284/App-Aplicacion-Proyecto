@@ -18,7 +18,7 @@ class InventaryMobile extends StatelessWidget {
       providers: [BlocProvider(create: (context) => AutenticacionBloc())],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Gestionarproductos(),
+        home: LoginPage(),
       ),
     );
   }
