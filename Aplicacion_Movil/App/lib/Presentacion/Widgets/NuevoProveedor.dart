@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
+import 'package:gestor/Presentacion/core/config.dart';
 
 class Nuevoproveedor extends StatelessWidget {
   Nuevoproveedor({super.key});
@@ -13,7 +14,7 @@ class Nuevoproveedor extends StatelessWidget {
   final correoController = TextEditingController();
   final telefonoController = TextEditingController();
 
-  final String url = "http://10.2.124.134:5000/proveedores";
+  final String url = ApiConfig.url('/registro_proveedor');
 
   Future<void> guardarProveedor(BuildContext context) async {
     try {
@@ -23,7 +24,7 @@ class Nuevoproveedor extends StatelessWidget {
         body: jsonEncode({
           "nombre": nombreController.text,
           "direccion": direccionController.text,
-          "correo": correoController.text,
+          "gmail": correoController.text,
           "telefono": telefonoController.text,
         }),
       );

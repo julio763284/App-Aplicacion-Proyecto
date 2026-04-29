@@ -3,11 +3,11 @@ from src.database import (
     validar_usuario, 
     registrar_usuario, 
     registrar_cliente, 
+    registrar_proveedor,
     obtener_productos, 
     obtener_notificaciones_db,
     obtener_clientes_ordenados,
     registrar_producto_db
-
 )
 
 # el archivo routes se comunica con flutter o el fronted //
@@ -35,6 +35,15 @@ def init_routes(app):
         res = registrar_cliente(data.get('nombre'), data.get('direccion_residencia'), 
                                 data.get('gmail_corporativo'), data.get('celular'), data.get('imagen', ''))
         return jsonify(res), (201 if res["status"] == "success" else 400)
+    
+    @app.route('/registro_proveedor', methods=['GET','POST'])
+    def registro_proveedor():
+        data = request.get_json(force=True)
+        print("DATA RECIBIDA:", data)
+        res = registrar_proveedor(data.get('nombre'), data.get('direccion'), 
+                                data.get('gmail'), data.get('telefono'))
+        return jsonify(res), (201 if res["status"] == "success" else 400)
+
         
     @app.route('/productos', methods=['GET'])
     def listar_productos():
