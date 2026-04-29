@@ -1,55 +1,70 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Nuevoproducto extends StatelessWidget {
   Nuevoproducto({super.key});
 
   final _formKey = GlobalKey<FormState>();
-  final nombreproductoController = TextEditingController();
-  final codigodebarrasController = TextEditingController();
-  final descripcionController = TextEditingController();
-  final cantidadController = TextEditingController();
 
-  final String url = "http://10.2.139.243:3000/producto";
+  final nombreController = TextEditingController();
+  final descripcionController = TextEditingController();
+  final precioController = TextEditingController();
+  final cantidadController = TextEditingController();
+  final imagenController = TextEditingController();
+
+  final String url = ApiConfig.url('/producto');
 
   Future<void> guardarProducto(BuildContext context) async {
+    if (nombreController.text.isEmpty || precioController.text.isEmpty) {
+      _notificar(context, 'Nombre y Precio son obligatorios ⚠️', Colors.orangeAccent);
+      return;
+    }
+
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "nombre": nombreproductoController.text,
-          "direccion": codigodebarrasController.text, 
-          "correo": descripcionController.text,
-          "telefono": cantidadController.text,
+          "nombre": nombreController.text,
+          "descripcion": descripcionController.text,
+          "precio": double.tryParse(precioController.text) ?? 0.0,
+          "cantidad": int.tryParse(cantidadController.text) ?? 0,
+          "imagen": imagenController.text,
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         _notificar(context, 'Producto guardado en Nexus ✅', Colors.greenAccent);
         _limpiar();
       } else {
-        _notificar(context, 'Error al guardar productos ❌', Colors.redAccent);
+        final errorData = jsonDecode(response.body);
+        _notificar(context, 'Error: ${errorData["message"] ?? "No se pudo guardar"} ❌', Colors.redAccent);
       }
     } catch (e) {
-      _notificar(context, 'Error de conexión 🌐', Colors.orangeAccent);
+      _notificar(context, 'Error de conexión con el servidor 🌐', Colors.redAccent);
     }
   }
 
   void _limpiar() {
-    nombreproductoController.clear();
-    codigodebarrasController.clear();
+    nombreController.clear();
     descripcionController.clear();
+    precioController.clear();
     cantidadController.clear();
+    imagenController.clear();
   }
 
   void _notificar(BuildContext context, String msg, Color col) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg, style: const TextStyle(color: Color(0xFF0D1B1E), fontWeight: FontWeight.bold)),
+      content: Text(msg, 
+        style: const TextStyle(color: Color(0xFF0D1B1E), fontWeight: FontWeight.bold)
+      ),
       backgroundColor: col,
       behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      duration: const Duration(seconds: 3),
     ));
   }
 
@@ -60,11 +75,16 @@ class Nuevoproducto extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: primaryDark,
-      drawer: const CustomNexusDrawer(),
+      // Usando el drawer que ya tienes configurado
+      drawer: const CustomNexusDrawer(), 
       appBar: AppBar(
         backgroundColor: accentTeal.withOpacity(0.2),
         elevation: 0,
-        title: const Text("NUEVO PRODUCTO", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        title: const Text(
+          "REGISTRAR NUEVO PRODUCTO", 
+          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.2)
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25),
@@ -72,14 +92,28 @@ class Nuevoproducto extends StatelessWidget {
           key: _formKey,
           child: Column(
             children: [
-              const SizedBox(height: 20),
-              const Icon(Icons.add_shopping_cart, size: 60, color: Colors.greenAccent),
+              const SizedBox(height: 10),
+              const Icon(Icons.add_photo_alternate_outlined, size: 70, color: Colors.greenAccent),
               const SizedBox(height: 30),
-              _campoNexus("Nombre del Producto", Icons.inventory_2_outlined, nombreproductoController),
-              _campoNexus("Código de Barras", Icons.qr_code_scanner, codigodebarrasController),
-              _campoNexus("Descripción", Icons.description_outlined, descripcionController),
-              _campoNexus("Cantidad en Stock", Icons.numbers, cantidadController, type: TextInputType.number),
-              const SizedBox(height: 40),
+              
+              _campoNexus("Nombre del Producto", Icons.inventory_2_outlined, nombreController),
+              _campoNexus("Descripción Breve", Icons.description_outlined, descripcionController),
+              
+              Row(
+                children: [
+                  Expanded(
+                    child: _campoNexus("Precio", Icons.attach_money, precioController, type: TextInputType.number),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: _campoNexus("Cantidad", Icons.numbers, cantidadController, type: TextInputType.number),
+                  ),
+                ],
+              ),
+              
+              _campoNexus("URL de la Imagen (Opcional)", Icons.link, imagenController),
+              
+              const SizedBox(height: 30),
               _botonGuardar(context, accentTeal),
             ],
           ),
@@ -97,12 +131,18 @@ class Nuevoproducto extends StatelessWidget {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-          prefixIcon: Icon(icon, color: Colors.greenAccent, size: 22),
+          labelStyle: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14),
+          prefixIcon: Icon(icon, color: Colors.greenAccent, size: 20),
           filled: true,
           fillColor: Colors.white.withOpacity(0.05),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.white.withOpacity(0.1))),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFF017A74))),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15), 
+            borderSide: BorderSide(color: Colors.white.withOpacity(0.1))
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15), 
+            borderSide: const BorderSide(color: Color(0xFF017A74), width: 2)
+          ),
         ),
       ),
     );
@@ -114,12 +154,26 @@ class Nuevoproducto extends StatelessWidget {
       height: 55,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        gradient: LinearGradient(colors: [color, const Color(0xFF00C9B1)]),
+        boxShadow: [
+          BoxShadow(color: color.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))
+        ],
+        gradient: LinearGradient(
+          colors: [color, const Color(0xFF00C9B1)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
       ),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent, 
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
+        ),
         onPressed: () => guardarProducto(context),
-        child: const Text("REGISTRAR PRODUCTO", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        child: const Text(
+          "CONFIRMAR REGISTRO", 
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)
+        ),
       ),
     );
   }
