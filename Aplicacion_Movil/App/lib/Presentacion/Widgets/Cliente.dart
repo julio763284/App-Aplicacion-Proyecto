@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/NuevoCliente.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
@@ -24,7 +25,7 @@ class _ClienteState extends State<Cliente> {
 
   Future<void> fetchClientes() async {
     try {
-      final response = await http.get(Uri.parse('http://10.2.124.134:5000/clientes'));
+      final response = await http.get(Uri.parse(ApiConfig.url('/clientes')));
       if (response.statusCode == 200) {
         setState(() {
           clientes = json.decode(response.body);

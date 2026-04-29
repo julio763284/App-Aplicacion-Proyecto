@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
 
 // ⚠️ IMPORTANTE: Revisa que estas rutas sean las mismas de tu proyecto
-import 'package:gestor/Presentacion/Widgets/Gestionarproducto.dart';
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
@@ -47,7 +47,7 @@ class CustomNexusDrawer extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     children: [
                       _buildSectionTitle("OPERACIONES"),
-                      _drawerItem(context, Icons.inventory_2_outlined, "Productos", const Gestionarproducto()),
+                      _drawerItem(context, Icons.inventory_2_outlined, "Productos", const Gestionarproductos()),
                       _drawerItem(context, Icons.storefront_outlined, "Inventario", const GestionInventarioView()),
                       _drawerItem(context, Icons.people_alt_outlined, "Clientes", const Cliente()),
                       _drawerItem(context, Icons.local_shipping_outlined, "Proveedores", const Proveedores()),
@@ -65,7 +65,7 @@ class CustomNexusDrawer extends StatelessWidget {
                       _buildSectionTitle("SISTEMA"),
                       _drawerItem(context, Icons.settings_outlined, "Configuración", const Configuracion()),
                       const Divider(color: Colors.white10),
-                      _drawerItem(context, Icons.logout_rounded, "Cerrar Sesión", const Gestionarproducto()), // Cambiar por tu logout
+                      _drawerItem(context, Icons.logout_rounded, "Cerrar Sesión", const Gestionarproductos()), // Cambiar por tu logout
                     ],
                   ),
                 ),

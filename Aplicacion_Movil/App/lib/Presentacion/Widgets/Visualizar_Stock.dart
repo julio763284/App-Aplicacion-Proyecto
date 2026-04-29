@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Producto {
@@ -47,17 +48,39 @@ class _VisualizarStockState extends State<VisualizarStock> {
   final cardDark = const Color(0xFF162A2D);
   final accentTeal = const Color(0xFF017A74);
 
-  Future<List<Producto>> fetchProductos() async {
+  List<Producto> _todosLosProductos = [];
+  List<Producto> _productosFiltrados = [];
+  bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProductos();
+  }
+
+  Future<void> _fetchProductos() async {
     try {
-      final response = await http.get(Uri.parse('http://10.2.124.104:5000/productos'));
+      final response = await http.get(Uri.parse(ApiConfig.url('/productos')));
       if (response.statusCode == 200) {
         List<dynamic> jsonData = jsonDecode(response.body);
-        return jsonData.map((item) => Producto.fromJson(item)).toList();
+        setState(() {
+          _todosLosProductos = jsonData.map((item) => Producto.fromJson(item)).toList();
+          _productosFiltrados = _todosLosProductos;
+          _isLoading = false;
+        });
       }
-      return [];
     } catch (e) {
-      return [];
+      setState(() => _isLoading = false);
     }
+  }
+
+  void _filtrarBusqueda(String query) {
+    setState(() {
+      _productosFiltrados = _todosLosProductos
+          .where((prod) => prod.nombre.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -72,105 +95,100 @@ class _VisualizarStockState extends State<VisualizarStock> {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("INVENTARIO GENERAL", 
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-            Text("Sincronizado en tiempo real", 
-              style: TextStyle(color: Colors.grey, fontSize: 14)),
+            Text("INVENTARIO GENERAL",
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+            Text("Sincronizado en tiempo real", style: TextStyle(color: Colors.grey, fontSize: 14)),
           ],
         ),
       ),
-      body: FutureBuilder<List<Producto>>(
-        future: fetchProductos(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFF017A74)));
-          }
-
-          final productos = snapshot.data ?? [];
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-            child: Column(
-              children: [
-                _buildSummaryGrid(productos),
-                const SizedBox(height: 35),
-                
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: cardDark,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search_rounded, color: Colors.white.withOpacity(0.3), size: 28),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: TextField(
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                          decoration: InputDecoration(
-                            hintText: "Buscar en el almacén...",
-                            hintStyle: TextStyle(color: Colors.white30),
-                            border: InputBorder.none,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF017A74)))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+              child: Column(
+                children: [
+                  _buildSummaryGrid(_todosLosProductos),
+                  const SizedBox(height: 35),
+                  
+                  // BARRA DE BÚSQUEDA SIN BOTÓN
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: cardDark,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search_rounded, color: accentTeal, size: 28),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _filtrarBusqueda,
+                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                            decoration: const InputDecoration(
+                              hintText: "Escribe para buscar...",
+                              hintStyle: TextStyle(color: Colors.white30),
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: accentTeal, borderRadius: BorderRadius.circular(15)),
-                        child: const Icon(Icons.search_rounded, color: Colors.white),
-                      ),
-                    ],
+                        if (_searchController.text.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white54),
+                            onPressed: () {
+                              _searchController.clear();
+                              _filtrarBusqueda('');
+                            },
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-                
-                const SizedBox(height: 35),
-
-                Container(
-                  decoration: BoxDecoration(
-                    color: cardDark,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                  
+                  const SizedBox(height: 35),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardDark,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                    ),
+                    child: Column(
+                      children: [
+                        _buildTableHeader(),
+                        if (_productosFiltrados.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.all(50),
+                            child: Text("Sin resultados", style: TextStyle(color: Colors.white24, fontSize: 18)),
+                          )
+                        else
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _productosFiltrados.length,
+                            separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
+                            itemBuilder: (context, index) => _buildProductRow(_productosFiltrados[index]),
+                          ),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      _buildTableHeader(),
-                      if (productos.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(50),
-                          child: Text("No hay datos en la tabla", style: TextStyle(color: Colors.white24, fontSize: 18)),
-                        )
-                      else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: productos.length,
-                          separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
-                          itemBuilder: (context, index) => _buildProductRow(productos[index]),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 50),
-              ],
+                  const SizedBox(height: 50),
+                ],
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 
   Widget _buildSummaryGrid(List<Producto> productos) {
-    final totalConExistencia = productos.where((p) => p.cantidad > 0).length;
-    final bajoStock = productos.where((p) => p.cantidad < 10 && p.cantidad > 0).length;
+    final total = productos.where((p) => p.cantidad > 0).length;
+    final bajo = productos.where((p) => p.cantidad < 10 && p.cantidad > 0).length;
     final agotados = productos.where((p) => p.cantidad <= 0).length;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSummaryCard("TOTAL", totalConExistencia.toString(), Icons.inventory_2, accentTeal),
-        _buildSummaryCard("BAJO", bajoStock.toString(), Icons.bolt, Colors.orangeAccent),
+        _buildSummaryCard("TOTAL", total.toString(), Icons.inventory_2, accentTeal),
+        _buildSummaryCard("BAJO", bajo.toString(), Icons.bolt, Colors.orangeAccent),
         _buildSummaryCard("AGOTADO", agotados.toString(), Icons.block, Colors.redAccent),
       ],
     );
