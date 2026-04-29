@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Nuevoproducto extends StatelessWidget {
@@ -14,7 +15,7 @@ class Nuevoproducto extends StatelessWidget {
   final cantidadController = TextEditingController();
   final imagenController = TextEditingController();
 
-  final String url = "http://10.2.127.40:5000/producto";
+  final String url = ApiConfig.url('/producto');
 
   Future<void> guardarProducto(BuildContext context) async {
     if (nombreController.text.isEmpty || precioController.text.isEmpty) {

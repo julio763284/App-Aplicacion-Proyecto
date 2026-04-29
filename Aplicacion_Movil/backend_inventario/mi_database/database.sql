@@ -8,13 +8,6 @@ CREATE TABLE usuario (
     contrasena VARCHAR(255) NOT NULL
 );
 
-INSERT INTO usuario (id_usuario, usuario, email, contrasena) VALUES (NULL, jholian, jholian@gimail.com, 1010);
-INSERT INTO usuario (id_usuario, usuario, email, contrasena) VALUES (NULL, julio, julio@gimail.com, 1010);
-INSERT INTO usuario (id_usuario, usuario, email, contrasena) VALUES (NULL, jorge, jorge@gimail.com, 1010);
-INSERT INTO usuario (id_usuario, usuario, email, contrasena) VALUES (NULL, juan, juan@gimail.com, 1010);
-INSERT INTO usuario (id_usuario, usuario, email, contrasena) VALUES (NULL, jesu, jesu@gimail.com, 1010);
-
-
 CREATE TABLE producto (
     id_producto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -16,7 +17,7 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  final String url = "http://10.2.127.40:5000/registro";
+  final String url = ApiConfig.url('/registro');
   final Color accentColor = const Color(0xFF00BFA5);
 
   Future<void> registrarUsuario() async {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Nuevocliente extends StatelessWidget {
@@ -13,7 +14,7 @@ class Nuevocliente extends StatelessWidget {
   final correoController = TextEditingController();
   final telefonoController = TextEditingController();
 
-  final String url = "http://10.2.127.40:5000/registro_cliente";
+  final String url = ApiConfig.url('/registro_cliente');
 
   Future<void> guardarCliente(BuildContext context) async {
     try {
