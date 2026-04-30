@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
 import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
@@ -45,6 +46,7 @@ class Homepagebody extends StatelessWidget {
                       nexusFrostedGlassCard(context, "Proveedores", Icons.local_shipping, const Proveedores(), isMobile),
                       nexusFrostedGlassCard(context, "Alertas", Icons.warning, const NotificationView(), isMobile, isAlert: true),
                       nexusFrostedGlassCard(context, "Finanzas", Icons.monetization_on, const Controlar_Gastos(), isMobile),
+                      nexusFrostedGlassCard(context, "Productos", Icons.inventory_2_outlined, const Gestionarproductos(), isMobile),
                     ],
                   ),
                   const SizedBox(height: 15),
