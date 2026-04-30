@@ -34,6 +34,17 @@ CREATE TABLE cliente (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE proveedor (
+    id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    gmail VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255) NOT NULL
+);
+//agregue 30 de abril de 2026//
+ALTER TABLE proveedor ADD UNIQUE (gmail);
+
+
 CREATE TABLE notificaciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     mensaje TEXT NOT NULL,
