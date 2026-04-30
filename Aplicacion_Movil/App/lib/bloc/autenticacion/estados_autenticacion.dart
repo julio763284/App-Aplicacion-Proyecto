@@ -13,6 +13,5 @@ class LoginError extends Autenticacionestados {
   @override
   List<Object> get props => [mensaje];
 }
-// Estados para navegación que usas en tu listener
 class Estado_Registrarse extends Autenticacionestados {}
 class EstadoOlvidarcontrasena extends Autenticacionestados {}

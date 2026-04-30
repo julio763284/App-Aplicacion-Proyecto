@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
-
-// ⚠️ IMPORTANTE: Revisa que estas rutas sean las mismas de tu proyecto
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
@@ -11,15 +10,29 @@ import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 import 'package:gestor/Presentacion/Widgets/Proveedores.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
+import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
 
 class CustomNexusDrawer extends StatelessWidget {
   const CustomNexusDrawer({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); 
+
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: Colors.transparent,
-      width: MediaQuery.of(context).size.width * 0.75, 
+      width: MediaQuery.of(context).size.width * 0.75,
       child: Stack(
         children: [
           ClipRRect(
@@ -35,13 +48,11 @@ class CustomNexusDrawer extends StatelessWidget {
               ),
             ),
           ),
-          
           SafeArea(
             child: Column(
               children: [
-                _buildHeader(), 
+                _buildHeader(),
                 const Divider(color: Colors.white10, thickness: 1, indent: 20, endIndent: 20),
-                
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -65,7 +76,18 @@ class CustomNexusDrawer extends StatelessWidget {
                       _buildSectionTitle("SISTEMA"),
                       _drawerItem(context, Icons.settings_outlined, "Configuración", const Configuracion()),
                       const Divider(color: Colors.white10),
-                      _drawerItem(context, Icons.logout_rounded, "Cerrar Sesión", const Gestionarproductos()), // Cambiar por tu logout
+                      
+                      ListTile(
+                        dense: true,
+                        visualDensity: VisualDensity.compact,
+                        leading: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 22),
+                        title: const Text(
+                          "Cerrar Sesión",
+                          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400),
+                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        onTap: () => _logout(context),
+                      ),
                     ],
                   ),
                 ),
@@ -77,7 +99,6 @@ class CustomNexusDrawer extends StatelessWidget {
     );
   }
 
-  // Título de la sección (Operaciones, Análisis, etc)
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 15, bottom: 8),
@@ -93,7 +114,6 @@ class CustomNexusDrawer extends StatelessWidget {
     );
   }
 
-  // Elemento individual del menú
   Widget _drawerItem(BuildContext context, IconData icon, String title, Widget page) {
     return ListTile(
       dense: true,
@@ -105,13 +125,12 @@ class CustomNexusDrawer extends StatelessWidget {
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onTap: () {
-        Navigator.pop(context); // Cierra el menú antes de navegar
+        Navigator.pop(context); 
         Navigator.push(context, MaterialPageRoute(builder: (context) => page));
       },
     );
   }
 
-  // Logo y Nombre arriba
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(25),

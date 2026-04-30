@@ -3,15 +3,11 @@ import 'package:flutter/material.dart';
 
 class VistaError extends StatelessWidget {
   final VoidCallback? alReintentar;
-
   const VistaError({super.key, this.alReintentar});
-
   @override
   Widget build(BuildContext context) {
-    // Colores del sistema Nexus
     const Color primaryDark = Color(0xFF0D1B1E);
-    const Color neonRed = Color(0xFFFF4B4B); // Rojo neón para errores
-
+    const Color neonRed = Color(0xFFFF4B4B); 
     return Scaffold(
       backgroundColor: primaryDark,
       body: Center(
@@ -20,10 +16,10 @@ class VistaError extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
-              width: 280, // Mantengo tu ancho compacto
+              width: 280, 
               padding: const EdgeInsets.all(25.0),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05), // Efecto cristal oscuro
+                color: Colors.white.withOpacity(0.05), 
                 borderRadius: BorderRadius.circular(25.0),
                 border: Border.all(
                   color: neonRed.withOpacity(0.3), 
@@ -33,7 +29,6 @@ class VistaError extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Icono con resplandor neón
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
