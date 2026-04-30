@@ -2,6 +2,8 @@ import bcrypt
 import mysql.connector 
 from config.db_config import DB_SETTINGS
 
+# el archivo database.py se conecta con la base de datos #
+
 def obtener_conexion():
     try:
         conexion = mysql.connector.connect(
@@ -68,6 +70,43 @@ def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, 
         return {"status": "success", "message": "Cliente registrado"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+    finally:
+        cursor.close()
+        db.close()
+
+def registrar_proveedor(nombre, direccion, gmail, telefono):
+    db = obtener_conexion()
+    if not db:
+        return {"status": "error", "message": "Error de conexion"}
+
+    try:
+        cursor = db.cursor(dictionary=True)
+        #en caso de error esto lo agregue
+        # 🔍 VALIDACIÓN AQUÍ
+        cursor.execute("SELECT id_proveedor FROM proveedor WHERE gmail = %s", (gmail,))
+        existe = cursor.fetchone()
+        #en caso de error esto lo agregue#
+
+        if existe:
+            return {
+                "status": "error",
+                "message": "El correo ya está registrado"
+            }
+
+        # 🟢 INSERT
+        sql = """
+        INSERT INTO proveedor (nombre, direccion, gmail, telefono)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(sql, (nombre, direccion, gmail, telefono))
+        db.commit()
+
+        return {"status": "success", "message": "Proveedor registrado"}
+
+    except Exception as e:
+        print("ERROR:", e)
+        return {"status": "error", "message": "Error interno"}
+
     finally:
         cursor.close()
         db.close()
@@ -139,3 +178,22 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
     finally:
         cursor.close()
         db.close()        
+## funcion agregada en caso de error eliminar codigo##
+def obtener_proveedores_ordenados():
+    db = obtener_conexion()
+    if not db:
+        return []
+    
+    try:
+        cursor = db.cursor(dictionary=True)
+        # 🟢 El secreto está en el "ORDER BY id DESC"
+        # DESC significa "Descendente" (del más grande al más pequeño)
+        cursor.execute("SELECT * FROM proveedor ORDER BY id_proveedor DESC")
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error al listar:", e)
+        return []
+    finally:
+        cursor.close()
+        db.close()
+#### funcion agregada en caso de error eliminar codigo##
