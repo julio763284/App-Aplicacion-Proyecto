@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/nuevoproducto.dart';
+// Importamos tu nuevo AppBar modular
+import 'package:gestor/Presentacion/Widgets/custom_app_bar.dart'; 
 
 class Gestionarproductos extends StatefulWidget {
   const Gestionarproductos({super.key});
@@ -88,7 +90,6 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                       ),
                     ),
                     Divider(color: nexusCyan.withOpacity(0.15), height: 1),
-                    
                     Material( 
                       color: Colors.transparent,
                       child: Column(
@@ -102,7 +103,6 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             ),
                             onTap: () {
                               Navigator.pop(context);
-                               
                             },
                           ),
                           ListTile(
@@ -114,7 +114,6 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             ),
                             onTap: () {
                               Navigator.pop(context);
-                              
                             },
                           ),
                         ],
@@ -144,40 +143,30 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     return Scaffold(
       backgroundColor: nexusBg,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: nexusBg,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: _isSearching
-              ? TextField(
-                  key: const ValueKey('search'),
-                  controller: _searchController,
-                  autofocus: true,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: "BUSCAR RECURSO...",
-                    hintStyle: TextStyle(color: nexusCyan.withOpacity(0.3)),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: _filterProducts,
-                )
-              : const Text("SISTEMA DE INVENTARIO", 
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.5)),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search, color: nexusCyan),
-            onPressed: () => setState(() {
-              _isSearching = !_isSearching;
-              if (!_isSearching) {
-                _searchController.clear();
-                _filteredProducts = _allProducts;
-              }
-            }),
-          ),
-        ],
+      // Aquí está tu nuevo AppBar modularizado manteniendo tu lógica
+      appBar: CustomAppBar(
+        title: "SISTEMA DE INVENTARIO",
+        titleWidget: _isSearching
+            ? TextField(
+                key: const ValueKey('search'),
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: "BUSCAR RECURSO...",
+                  hintStyle: TextStyle(color: nexusCyan.withOpacity(0.3)),
+                  border: InputBorder.none,
+                ),
+                onChanged: _filterProducts,
+              )
+            : null,
+        onSearchPressed: () => setState(() {
+          _isSearching = !_isSearching;
+          if (!_isSearching) {
+            _searchController.clear();
+            _filteredProducts = _allProducts;
+          }
+        }),
       ),
       body: _isLoading 
           ? const Center(child: CircularProgressIndicator(color: nexusCyan))

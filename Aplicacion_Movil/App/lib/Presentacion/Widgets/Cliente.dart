@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/NuevoCliente.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
+import 'package:gestor/Presentacion/Widgets/custom_app_bar.dart'; 
 
 class Cliente extends StatefulWidget {
   const Cliente({super.key});
@@ -14,60 +15,130 @@ class Cliente extends StatefulWidget {
 }
 
 class _ClienteState extends State<Cliente> {
-  List<dynamic> clientes = [];
+  // CLAVE: Inicializar siempre como lista vacía para que .isEmpty no falle
+  List<dynamic> _todosLosClientes = [];
+  List<dynamic> _clientesFiltrados = [];
+  
   bool cargando = true;
+  bool _estaBuscando = false; 
+  int _conteoNotificaciones = 0;
+  
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fetchClientes();
+    _inicializarDatos();
+  }
+
+  Future<void> _inicializarDatos() async {
+    await fetchClientes();
+    await _obtenerNotificaciones();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _obtenerNotificaciones() async {
+    try {
+      final url = Uri.parse(ApiConfig.url('/notificaciones'));
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data is List && mounted) {
+          setState(() {
+            _conteoNotificaciones = data.where((n) => n['leido'] == 0 || n['leido'] == false).length;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error notificaciones: $e");
+    }
   }
 
   Future<void> fetchClientes() async {
     try {
       final response = await http.get(Uri.parse(ApiConfig.url('/clientes')));
       if (response.statusCode == 200) {
-        setState(() {
-          clientes = json.decode(response.body);
-          cargando = false;
-        });
+        final dynamic decodedData = json.decode(response.body);
+        // Validar que los datos recibidos sean una lista
+        final List<dynamic> data = (decodedData is List) ? decodedData : [];
+        
+        if (mounted) {
+          setState(() {
+            _todosLosClientes = data;
+            _clientesFiltrados = data;
+            cargando = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => cargando = false);
       }
     } catch (e) {
-      setState(() => cargando = false);
+      debugPrint("Error fetchClientes: $e");
+      if (mounted) setState(() => cargando = false);
     }
+  }
+
+  void _filtrarClientes(String query) {
+    setState(() {
+      _clientesFiltrados = _todosLosClientes.where((cliente) {
+        final nombre = cliente['nombre']?.toString().toLowerCase() ?? '';
+        return nombre.contains(query.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
 
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
-        elevation: 0,
-        title: const Text("CLIENTES", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: Colors.greenAccent),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: "CLIENTES",
+        titleWidget: _estaBuscando 
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+              decoration: const InputDecoration(
+                hintText: "Buscar cliente...",
+                hintStyle: TextStyle(color: Colors.white30),
+                border: InputBorder.none,
+              ),
+              onChanged: _filtrarClientes,
+            )
+          : null,
+        notificationCount: _conteoNotificaciones,
+        onRefreshNotifications: _obtenerNotificaciones,
+        onSearchPressed: () {
+          setState(() {
+            _estaBuscando = !_estaBuscando;
+            if (!_estaBuscando) {
+              _searchController.clear();
+              _filtrarClientes('');
+            }
+          });
+        },
+        showProfile: true,
       ),
       body: cargando 
         ? const Center(child: CircularProgressIndicator(color: Colors.greenAccent))
-        : clientes.isEmpty 
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              onRefresh: fetchClientes,
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                itemCount: clientes.length,
-                itemBuilder: (context, index) => _buildClienteCard(clientes[index]),
-              ),
-            ),
+        : RefreshIndicator(
+            onRefresh: _inicializarDatos,
+            child: (_clientesFiltrados.isEmpty) 
+              ? _buildEmptyState() 
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  itemCount: _clientesFiltrados.length,
+                  itemBuilder: (context, index) => _buildClienteCard(_clientesFiltrados[index]),
+                ),
+          ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.greenAccent,
         child: const Icon(Icons.add, size: 30, color: primaryDark),
@@ -79,6 +150,7 @@ class _ClienteState extends State<Cliente> {
   Widget _buildClienteCard(Map<String, dynamic> cliente) {
     final String imagen = cliente['imagen'] ?? '';
     final String nombre = cliente['nombre'] ?? 'Sin nombre';
+    final String fecha = cliente['fecha_registro'] ?? 'N/A';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -93,11 +165,12 @@ class _ClienteState extends State<Cliente> {
           radius: 25,
           backgroundImage: imagen.isNotEmpty ? NetworkImage(imagen) : null,
           child: imagen.isEmpty 
-            ? Text(nombre[0].toUpperCase(), style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold))
+            ? Text(nombre.isNotEmpty ? nombre[0].toUpperCase() : '?', 
+                style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold))
             : null,
         ),
         title: Text(nombre, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-        subtitle: Text("Registrado: ${cliente['fecha_registro']}", 
+        subtitle: Text("Registrado: $fecha", 
           style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
         trailing: const Icon(Icons.chevron_right, color: Colors.greenAccent),
       ),
@@ -105,19 +178,31 @@ class _ClienteState extends State<Cliente> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 170, height: 170,
-            decoration: const BoxDecoration(color: Color(0xFF162A2D), shape: BoxShape.circle),
-            child: const Icon(Icons.person_add_alt_1_rounded, size: 80, color: Colors.greenAccent),
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+        Center(
+          child: Column(
+            children: [
+              Container(
+                width: 170, height: 170,
+                decoration: const BoxDecoration(color: Color(0xFF162A2D), shape: BoxShape.circle),
+                child: Icon(
+                  _estaBuscando ? Icons.search_off_rounded : Icons.person_add_alt_1_rounded, 
+                  size: 80, 
+                  color: Colors.greenAccent
+                ),
+              ),
+              const SizedBox(height: 30),
+              Text(
+                _estaBuscando ? "NO HAY COINCIDENCIAS" : "SIN CLIENTES", 
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
+              ),
+            ],
           ),
-          const SizedBox(height: 30),
-          const Text("SIN CLIENTES", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -141,7 +226,10 @@ class _ClienteState extends State<Cliente> {
                 title: const Text("Nuevo Cliente", style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Nuevocliente())).then((_) => fetchClientes());
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(builder: (context) => Nuevocliente())
+                  ).then((_) => _inicializarDatos());
                 },
               ),
             ],

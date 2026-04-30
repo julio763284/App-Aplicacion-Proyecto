@@ -3,17 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
+import 'package:gestor/Presentacion/Widgets/custom_app_bar.dart';
 
+// --- MODELO ---
 class Producto {
   final int idProducto;
   final String nombre;
   final int cantidad;
 
-  Producto({
-    required this.idProducto,
-    required this.nombre,
-    required this.cantidad,
-  });
+  Producto({required this.idProducto, required this.nombre, required this.cantidad});
 
   factory Producto.fromJson(Map<String, dynamic> json) {
     return Producto(
@@ -36,6 +34,7 @@ class Producto {
   }
 }
 
+// --- VISTA ---
 class VisualizarStock extends StatefulWidget {
   const VisualizarStock({super.key});
 
@@ -51,6 +50,7 @@ class _VisualizarStockState extends State<VisualizarStock> {
   List<Producto> _todosLosProductos = [];
   List<Producto> _productosFiltrados = [];
   bool _isLoading = true;
+  bool _estaBuscando = false; 
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -88,18 +88,30 @@ class _VisualizarStockState extends State<VisualizarStock> {
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("INVENTARIO GENERAL",
-                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-            Text("Sincronizado en tiempo real", style: TextStyle(color: Colors.grey, fontSize: 14)),
-          ],
-        ),
+      appBar: CustomAppBar(
+        title: "INVENTARIO",
+        titleWidget: _estaBuscando 
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: "Buscar producto...",
+                hintStyle: TextStyle(color: Colors.white30),
+                border: InputBorder.none,
+              ),
+              onChanged: _filtrarBusqueda,
+            )
+          : null,
+        onSearchPressed: () {
+          setState(() {
+            _estaBuscando = !_estaBuscando;
+            if (!_estaBuscando) {
+              _searchController.clear();
+              _filtrarBusqueda('');
+            }
+          });
+        },
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF017A74)))
@@ -109,49 +121,10 @@ class _VisualizarStockState extends State<VisualizarStock> {
                 children: [
                   _buildSummaryGrid(_todosLosProductos),
                   const SizedBox(height: 35),
-                  
-                  // BARRA DE BÚSQUEDA SIN BOTÓN
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: cardDark,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search_rounded, color: accentTeal, size: 28),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _filtrarBusqueda,
-                            style: const TextStyle(color: Colors.white, fontSize: 18),
-                            decoration: const InputDecoration(
-                              hintText: "Escribe para buscar...",
-                              hintStyle: TextStyle(color: Colors.white30),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        if (_searchController.text.isNotEmpty)
-                          IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white54),
-                            onPressed: () {
-                              _searchController.clear();
-                              _filtrarBusqueda('');
-                            },
-                          ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 35),
                   Container(
                     decoration: BoxDecoration(
                       color: cardDark,
                       borderRadius: BorderRadius.circular(25),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
                     ),
                     child: Column(
                       children: [
@@ -172,18 +145,17 @@ class _VisualizarStockState extends State<VisualizarStock> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 50),
                 ],
               ),
             ),
     );
   }
 
+  // --- MÉTODOS DE SOPORTE IGUALES ---
   Widget _buildSummaryGrid(List<Producto> productos) {
     final total = productos.where((p) => p.cantidad > 0).length;
     final bajo = productos.where((p) => p.cantidad < 10 && p.cantidad > 0).length;
     final agotados = productos.where((p) => p.cantidad <= 0).length;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -199,8 +171,7 @@ class _VisualizarStockState extends State<VisualizarStock> {
       width: MediaQuery.of(context).size.width * 0.28,
       padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 10),
       decoration: BoxDecoration(
-        color: cardDark,
-        borderRadius: BorderRadius.circular(25),
+        color: cardDark, borderRadius: BorderRadius.circular(25),
         border: Border.all(color: color.withOpacity(0.2), width: 2),
       ),
       child: Column(
@@ -217,16 +188,11 @@ class _VisualizarStockState extends State<VisualizarStock> {
   Widget _buildTableHeader() {
     return Container(
       height: 60,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-      ),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: const BorderRadius.vertical(top: Radius.circular(25))),
       child: Row(
         children: [
           Expanded(flex: 1, child: Center(child: Text("PRODUCTO", style: TextStyle(color: accentTeal, fontWeight: FontWeight.w900, fontSize: 13)))),
-          VerticalDivider(color: Colors.white.withOpacity(0.1), thickness: 1, indent: 15, endIndent: 15),
           Expanded(flex: 1, child: Center(child: Text("CANTIDAD", style: TextStyle(color: accentTeal, fontWeight: FontWeight.w900, fontSize: 13)))),
-          VerticalDivider(color: Colors.white.withOpacity(0.1), thickness: 1, indent: 15, endIndent: 15),
           Expanded(flex: 1, child: Center(child: Text("ESTADO", style: TextStyle(color: accentTeal, fontWeight: FontWeight.w900, fontSize: 13)))),
         ],
       ),
@@ -234,34 +200,18 @@ class _VisualizarStockState extends State<VisualizarStock> {
   }
 
   Widget _buildProductRow(Producto prod) {
-    return IntrinsicHeight(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Row(
-          children: [
-            Expanded(flex: 1, child: Center(child: Text(prod.nombre.toUpperCase(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)))),
-            VerticalDivider(color: Colors.white.withOpacity(0.05), thickness: 1, indent: 5, endIndent: 5),
-            Expanded(flex: 1, child: Center(child: Text(prod.cantidad.toString(), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)))),
-            VerticalDivider(color: Colors.white.withOpacity(0.05), thickness: 1, indent: 5, endIndent: 5),
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: prod.colorEstado.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: prod.colorEstado.withOpacity(0.5)),
-                  ),
-                  child: Text(
-                    prod.estado.toUpperCase(),
-                    style: TextStyle(color: prod.colorEstado, fontSize: 10, fontWeight: FontWeight.w900),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        children: [
+          Expanded(flex: 1, child: Center(child: Text(prod.nombre.toUpperCase(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16)))),
+          Expanded(flex: 1, child: Center(child: Text(prod.cantidad.toString(), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)))),
+          Expanded(flex: 1, child: Center(child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: prod.colorEstado.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            child: Text(prod.estado, style: TextStyle(color: prod.colorEstado, fontSize: 10, fontWeight: FontWeight.bold)),
+          ))),
+        ],
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/api.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
+// Importamos tu AppBar modular
+import 'package:gestor/Presentacion/Widgets/custom_app_bar.dart'; 
 
 class GestionInventarioView extends StatelessWidget {
   const GestionInventarioView({super.key});
@@ -15,27 +17,12 @@ class GestionInventarioView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryDark, // 🔹 Fondo oscuro
-      drawer: const CustomNexusDrawer(), // 🔹 Tu Drawer
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.15),
-        elevation: 0,
-        centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: neonGreen), // 🔹 Icono Neón
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "GESTIÓN DE INVENTARIO",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
+      backgroundColor: primaryDark,
+      drawer: const CustomNexusDrawer(),
+      // USAMOS EL CUSTOM APP BAR MODULAR
+      appBar: const CustomAppBar(
+        title: "GESTIÓN DE INVENTARIO",
+        // No pasamos onSearchPressed porque es una vista de gráficos/resumen
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -44,6 +31,17 @@ class GestionInventarioView extends StatelessWidget {
           children: const [
             _ResumenInventario(),
             SizedBox(height: 30),
+            Text(
+              "MOVIMIENTOS MENSUALES",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w300
+              ),
+            ),
+            SizedBox(height: 15),
             _GraficoInventario(),
           ],
         ),
@@ -81,12 +79,12 @@ class _ResumenCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect( // 🔹 Estilo Glassmorphism
+    return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          width: 105,
+          width: MediaQuery.of(context).size.width * 0.28, // Ajuste responsivo
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.05),
@@ -95,17 +93,17 @@ class _ResumenCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(icono, color: GestionInventarioView.neonGreen, size: 24), // 🔹 Icono Neón
+              Icon(icono, color: GestionInventarioView.neonGreen, size: 24),
               const SizedBox(height: 8),
               Text(
                 valor,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
               ),
               const SizedBox(height: 4),
               Text(
                 titulo,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.5)),
+                style: TextStyle(fontSize: 9, color: Colors.white.withOpacity(0.5)),
               ),
             ],
           ),
@@ -135,9 +133,9 @@ class _GraficoInventarioState extends State<_GraficoInventario> {
   Widget build(BuildContext context) {
     return Container(
       height: 350,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.only(top: 20, right: 20, left: 10, bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: const Color(0xFF162A2D),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
@@ -148,11 +146,11 @@ class _GraficoInventarioState extends State<_GraficoInventario> {
             return const Center(child: CircularProgressIndicator(color: GestionInventarioView.neonGreen));
           }
           if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.white30)));
+            return Center(child: Text("Error de conexión", style: TextStyle(color: Colors.white.withOpacity(0.3))));
           }
 
           final movimientos = snapshot.data ?? [];
-          if (movimientos.isEmpty) return const Center(child: Text("No hay datos"));
+          if (movimientos.isEmpty) return const Center(child: Text("No hay datos", style: TextStyle(color: Colors.white30)));
 
           final puntos = movimientos.map((m) => FlSpot((m.mes - 1).toDouble(), m.total)).toList();
 
@@ -167,30 +165,35 @@ class _GraficoInventarioState extends State<_GraficoInventario> {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
+                    reservedSize: 30,
                     getTitlesWidget: (value, meta) {
                       const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
                       if (value.toInt() < 0 || value.toInt() > 11) return const Text('');
-                      return Text(meses[value.toInt()], style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10));
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(meses[value.toInt()], style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10)),
+                      );
                     },
                   ),
                 ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
+                    reservedSize: 40,
                     getTitlesWidget: (value, meta) => Text("${value.toInt()}", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10)),
                   ),
                 ),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               borderData: FlBorderData(show: false),
               lineBarsData: [
                 LineChartBarData(
                   spots: puntos,
                   isCurved: true,
-                  color: GestionInventarioView.neonGreen, // 🔹 Línea Neón
+                  color: GestionInventarioView.neonGreen,
                   barWidth: 3,
-                  dotData: FlDotData(show: false),
+                  dotData: const FlDotData(show: false),
                   belowBarData: BarAreaData(
                     show: true,
                     gradient: LinearGradient(

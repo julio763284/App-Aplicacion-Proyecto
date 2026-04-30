@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
-import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart'; // Asegúrate de que el nombre coincida
+import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart'; 
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
+import 'package:gestor/Presentacion/Widgets/custom_app_bar.dart'; 
 
 class Proveedores extends StatefulWidget {
   const Proveedores({super.key});
@@ -14,24 +15,27 @@ class Proveedores extends StatefulWidget {
 }
 
 class _ProveedoresState extends State<Proveedores> {
-  // COMENTARIO: Lista dinámica para almacenar lo que viene de MySQL
-  List<dynamic> proveedores = [];
+  // Variables para la lógica de búsqueda
+  List<dynamic> _allProveedores = [];
+  List<dynamic> _filteredProveedores = [];
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
   bool cargando = true;
 
   @override
   void initState() {
     super.initState();
-    fetchProveedores(); // Carga inicial
+    fetchProveedores();
   }
 
-  // COMENTARIO: Función para obtener datos. 
-  // Recuerda que en Python debe ser "ORDER BY id DESC" para que el nuevo salga arriba.
   Future<void> fetchProveedores() async {
     try {
       final response = await http.get(Uri.parse(ApiConfig.url('/proveedores')));
       if (response.statusCode == 200) {
+        final data = json.decode(response.body);
         setState(() {
-          proveedores = json.decode(response.body);
+          _allProveedores = data;
+          _filteredProveedores = data;
           cargando = false;
         });
       }
@@ -41,49 +45,72 @@ class _ProveedoresState extends State<Proveedores> {
     }
   }
 
+  // Función para filtrar la lista
+  void _filterProveedores(String query) {
+    setState(() {
+      _filteredProveedores = _allProveedores
+          .where((p) => p['nombre']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
+    const greenAccent = Colors.greenAccent;
 
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
-        elevation: 0,
-        title: const Text("PROVEEDORES", 
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: Colors.greenAccent),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: "PROVEEDORES",
+        titleWidget: _isSearching 
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: "BUSCAR PROVEEDOR...",
+                hintStyle: TextStyle(color: greenAccent.withOpacity(0.3)),
+                border: InputBorder.none,
+              ),
+              onChanged: _filterProveedores,
+            )
+          : null,
+        onSearchPressed: () {
+          setState(() {
+            _isSearching = !_isSearching;
+            if (!_isSearching) {
+              _searchController.clear();
+              _filteredProveedores = _allProveedores;
+            }
+          });
+        },
       ),
-      // COMENTARIO: Lógica de estados (Cargando -> Vacío -> Lista)
       body: cargando 
-        ? const Center(child: CircularProgressIndicator(color: Colors.greenAccent))
-        : proveedores.isEmpty 
+        ? const Center(child: CircularProgressIndicator(color: greenAccent))
+        : _filteredProveedores.isEmpty 
           ? _buildEmptyState()
           : RefreshIndicator(
-              color: Colors.greenAccent,
-              onRefresh: fetchProveedores, // COMENTARIO: Permite actualizar deslizando hacia abajo
+              color: greenAccent,
+              onRefresh: fetchProveedores, 
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                itemCount: proveedores.length,
-                itemBuilder: (context, index) => _buildProveedorCard(proveedores[index]),
+                itemCount: _filteredProveedores.length,
+                itemBuilder: (context, index) => _buildProveedorCard(_filteredProveedores[index]),
               ),
             ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: greenAccent,
         child: const Icon(Icons.add, size: 30, color: primaryDark),
-        onPressed: () => _mostrarMenuOpciones(context), // Abre el menú con estilo
+        onPressed: () => _mostrarMenuOpciones(context), 
       ),
     );
   }
 
-  // COMENTARIO: Diseño de la tarjeta del proveedor (idéntico al de clientes)
   Widget _buildProveedorCard(Map<String, dynamic> proveedor) {
     final String nombre = proveedor['nombre'] ?? 'Sin nombre';
     final String gmail = proveedor['gmail'] ?? 'Sin correo';
@@ -114,7 +141,6 @@ class _ProveedoresState extends State<Proveedores> {
     );
   }
 
-  // COMENTARIO: Estado vacío con el icono de camión de Nexus
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -126,16 +152,15 @@ class _ProveedoresState extends State<Proveedores> {
             child: const Icon(Icons.local_shipping_rounded, size: 80, color: Colors.greenAccent),
           ),
           const SizedBox(height: 30),
-          const Text("SIN PROVEEDORES", 
+          const Text("SIN RESULTADOS", 
             style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          Text("Toca el botón + para registrar uno", 
+          Text(_isSearching ? "No se encontraron coincidencias" : "Toca el botón + para registrar uno", 
             style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14)),
         ],
       ),
     );
   }
 
-  // COMENTARIO: Menú inferior con desenfoque de fondo
   void _mostrarMenuOpciones(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -155,8 +180,7 @@ class _ProveedoresState extends State<Proveedores> {
                 leading: const Icon(Icons.add_business_rounded, color: Colors.greenAccent),
                 title: const Text("Nuevo Proveedor", style: TextStyle(color: Colors.white)),
                 onTap: () {
-                  Navigator.pop(context); // Cierra el menú
-                  // COMENTARIO: Al volver de registrar, refresca la lista automáticamente
+                  Navigator.pop(context); 
                   Navigator.push(
                     context, 
                     MaterialPageRoute(builder: (context) => Nuevoproveedor())
