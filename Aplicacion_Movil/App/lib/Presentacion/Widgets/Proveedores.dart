@@ -28,7 +28,7 @@ class _ProveedoresState extends State<Proveedores> {
   // Recuerda que en Python debe ser "ORDER BY id DESC" para que el nuevo salga arriba.
   Future<void> fetchProveedores() async {
     try {
-      final response = await http.get(Uri.parse(ApiConfig.url('/registro_proveedor')));
+      final response = await http.get(Uri.parse(ApiConfig.url('/proveedores')));
       if (response.statusCode == 200) {
         setState(() {
           proveedores = json.decode(response.body);

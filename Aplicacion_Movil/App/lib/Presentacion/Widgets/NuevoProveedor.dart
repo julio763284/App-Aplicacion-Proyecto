@@ -29,7 +29,7 @@ class Nuevoproveedor extends StatelessWidget {
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         _mensaje(context, 'Proveedor registrado con éxito ✅', Colors.greenAccent);
         nombreController.clear();
         direccionController.clear();

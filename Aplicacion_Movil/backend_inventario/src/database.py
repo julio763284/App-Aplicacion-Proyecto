@@ -83,7 +83,7 @@ def registrar_proveedor(nombre, direccion, gmail, telefono):
         cursor = db.cursor(dictionary=True)
         #en caso de error esto lo agregue
         # 🔍 VALIDACIÓN AQUÍ
-        cursor.execute("SELECT id FROM proveedor WHERE gmail = %s", (gmail,))
+        cursor.execute("SELECT id_proveedor FROM proveedor WHERE gmail = %s", (gmail,))
         existe = cursor.fetchone()
         #en caso de error esto lo agregue#
 
@@ -179,7 +179,7 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
         cursor.close()
         db.close()        
 ## funcion agregada en caso de error eliminar codigo##
-def obtener_proveedores():
+def obtener_proveedores_ordenados():
     db = obtener_conexion()
     if not db:
         return []
