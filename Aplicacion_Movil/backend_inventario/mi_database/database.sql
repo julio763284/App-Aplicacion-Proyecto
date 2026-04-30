@@ -41,7 +41,7 @@ CREATE TABLE proveedor (
     gmail VARCHAR(255) NOT NULL,
     telefono VARCHAR(255) NOT NULL
 );
-//agregue 30 de abril de 2026//
+
 ALTER TABLE proveedor ADD UNIQUE (gmail);
 
 
