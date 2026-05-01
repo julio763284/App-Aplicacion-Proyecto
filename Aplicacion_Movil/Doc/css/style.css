@@ -14,13 +14,6 @@ body{
   padding-top:80px;
 }
 
-body{
-  background-image: url("../images/fondo.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 .logo {
   position: relative;
   transition: transform 0.3s ease;
