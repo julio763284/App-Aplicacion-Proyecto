@@ -39,3 +39,20 @@ behavior: "smooth"
 });
 
 });
+
+const logo = document.getElementById("logo");
+
+document.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", function(e) {
+    if (this.href && !this.href.includes("#")) {
+      e.preventDefault();
+
+      // Activar animación tipo Google
+      logo.classList.add("loading");
+
+      setTimeout(() => {
+        window.location.href = this.href;
+      }, 400);
+    }
+  });
+});
