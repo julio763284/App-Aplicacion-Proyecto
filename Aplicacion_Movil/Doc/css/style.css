@@ -88,37 +88,6 @@ body{
   width:100%;
 }
 
-/* Right */
-.nav-right{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.search{
-  padding:8px 12px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-  background:#101c1f;
-  color:#fff;
-}
-
-.btn-login{
-  padding:8px 14px;
-  border-radius:8px;
-  border:none;
-  background:linear-gradient(135deg,#6c63ff,#4fd1c5);
-  color:#fff;
-  cursor:pointer;
-  transition:.3s;
-}
-
-.btn-login:hover{
-  transform:scale(1.05);
-  opacity:.9;
-}
-
 /* LAYOUT */
 .container{
   width:100%;
