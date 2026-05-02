@@ -14,11 +14,54 @@ body{
   padding-top:80px;
 }
 
-body{
-  background-image: url("../images/fondo.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+.logo {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+/* Logo se hace más pequeño */
+.logo.loading {
+  transform: scale(0.85);
+}
+
+/* Spinner oculto por defecto */
+.loader-mini {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid #08f5e9;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  opacity: 0;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Mostrar spinner */
+.logo.loading .loader-mini {
+  opacity: 1;
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: #08f5e9;
+  transition: width 0.4s ease;
+}
+
+.top-bar.loading {
+  width: 100%;
 }
 
 /* NAVBAR */
@@ -86,37 +129,6 @@ body{
 
 .nav-links a:hover::after{
   width:100%;
-}
-
-/* Right */
-.nav-right{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.search{
-  padding:8px 12px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-  background:#101c1f;
-  color:#fff;
-}
-
-.btn-login{
-  padding:8px 14px;
-  border-radius:8px;
-  border:none;
-  background:linear-gradient(135deg,#6c63ff,#4fd1c5);
-  color:#fff;
-  cursor:pointer;
-  transition:.3s;
-}
-
-.btn-login:hover{
-  transform:scale(1.05);
-  opacity:.9;
 }
 
 /* LAYOUT */

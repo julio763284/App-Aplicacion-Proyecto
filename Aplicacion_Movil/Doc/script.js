@@ -1,41 +1,32 @@
-const botonDoc = document.getElementById("btnDoc");
+document.addEventListener("DOMContentLoaded", function () {
 
-botonDoc.addEventListener("click", function(e){
+  VANTA.NET({
+    el: "#index",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200,
+    minWidth: 200,
+    scale: 1,
+    scaleMobile: 1,
+    color: 0x08f5e9,
+    backgroundColor: 0x0a1517
+  });
 
-e.preventDefault();
+  const logo = document.getElementById("logo");
 
-document.getElementById("documentacion")
-.scrollIntoView({
-behavior: "smooth"
-});
+  document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function(e) {
+      if (this.href && !this.href.includes("#")) {
+        e.preventDefault();
 
-});
+        logo.classList.add("loading");
 
-const botonDiag = document.getElementById("btnDiag");
-
-botonDiag.addEventListener("click", function(e){
-
-e.preventDefault();
-
-document.getElementById("diagramas")
-.scrollIntoView({
-behavior: "smooth"
-});
-
-});
-
-const botonesHome = document.querySelectorAll(".btnHome");
-
-botonesHome.forEach(function(boton){
-
-boton.addEventListener("click", function(e){
-
-e.preventDefault();
-
-document.getElementById("home").scrollIntoView({
-behavior: "smooth"
-});
-
-});
+        setTimeout(() => {
+          window.location.href = this.href;
+        }, 400);
+      }
+    });
+  });
 
 });
