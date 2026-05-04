@@ -1,0 +1,54 @@
+/* LAYOUT */
+.container{
+  width:100%;
+  min-height:100vh;
+  padding:0 2rem;
+  position:relative;
+}
+
+main{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:calc(100vh - 80px);
+  gap:40px;
+}
+
+/* TEXTO */
+.content {
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.content h1{
+  font-size:3rem;
+  margin:2rem 0;
+  line-height:1.1;
+  color:#00fff7;
+}
+
+.content p{
+  color:#00fff7;
+}
+
+/* IMAGEN */
+.phones{
+  width:40%;
+  display:flex;
+  justify-content:center;
+}
+
+.phones{
+  transform: scale(1.2);
+}
+
+.phone{
+  width:100%;
+  max-width:380px;
+  animation:float 4s ease-in-out infinite;
+  filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+}
+
+
+
+

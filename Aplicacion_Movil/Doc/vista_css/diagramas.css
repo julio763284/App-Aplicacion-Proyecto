@@ -1,0 +1,235 @@
+#diagramas{
+
+  min-height:100vh;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  padding:140px 30px 60px;
+}
+
+
+/* CONTENEDOR */
+
+.container-diag{
+
+  width:100%;
+  max-width:1400px;
+}
+
+
+/* TITULO */
+
+.titulo-diag{
+
+  font-size: clamp(2.5rem, 5vw, 4rem);
+
+  font-weight:800;
+
+  margin-bottom:15px;
+
+  text-align:center;
+
+  letter-spacing:-2px;
+
+  color:white;
+}
+
+
+.titulo-diag::after{
+
+  content:"";
+
+  display:block;
+
+  width:90px;
+  height:4px;
+
+  margin:18px auto 50px;
+
+  border-radius:20px;
+
+  background:#08f5e9;
+
+  box-shadow:
+  0 0 20px rgba(8,245,233,.4);
+}
+
+
+
+/* GRID */
+
+.grid-diagramas{
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fit,minmax(320px,1fr));
+
+  gap:28px;
+}
+
+
+
+/* CARD */
+
+.card-diagrama{
+
+  position:relative;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:18px;
+
+  min-height:230px;
+
+  padding:35px;
+
+  text-decoration:none;
+
+  color:white;
+
+  border-radius:24px;
+
+  background:
+  rgba(255,255,255,.04);
+
+  backdrop-filter:blur(18px);
+
+  border:
+  1px solid rgba(255,255,255,.08);
+
+  transition:.35s;
+
+  overflow:hidden;
+}
+
+
+
+/* EFECTO BRILLO */
+
+.card-diagrama::before{
+
+  content:"";
+
+  position:absolute;
+
+  top:0;
+  left:-100%;
+
+  width:100%;
+  height:100%;
+
+  background:
+  linear-gradient(
+  90deg,
+  transparent,
+  rgba(255,255,255,.08),
+  transparent
+  );
+
+  transition:.7s;
+}
+
+
+
+/* HOVER */
+
+.card-diagrama:hover{
+
+  transform:
+  translateY(-10px);
+
+  border-color:
+  rgba(8,245,233,.25);
+
+  box-shadow:
+  0 20px 40px rgba(0,0,0,.25),
+  0 0 25px rgba(8,245,233,.08);
+}
+
+
+.card-diagrama:hover::before{
+
+  left:100%;
+}
+
+
+
+/* TITULO */
+
+.card-diagrama h2{
+
+  font-size:1.4rem;
+
+  font-weight:700;
+
+  color:white;
+}
+
+
+
+/* TEXTO */
+
+.card-diagrama p{
+
+  font-size:1rem;
+
+  line-height:1.7;
+
+  color:#9fb5ba;
+}
+
+
+
+/* DETALLE */
+
+.card-diagrama::after{
+
+  content:"→";
+
+  position:absolute;
+
+  right:30px;
+  bottom:25px;
+
+  font-size:24px;
+
+  color:#08f5e9;
+
+  opacity:.7;
+
+  transition:.3s;
+}
+
+
+.card-diagrama:hover::after{
+
+  transform:translateX(8px);
+
+  opacity:1;
+}
+
+
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+  #diagramas{
+
+    padding-top:120px;
+  }
+
+
+  .card-diagrama{
+
+    min-height:200px;
+
+    padding:28px;
+  }
+
+}
