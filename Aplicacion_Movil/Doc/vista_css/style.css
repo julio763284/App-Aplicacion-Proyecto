@@ -8,6 +8,7 @@ html,
 body{
   width:100%;
   height:100%;
+  overflow-x:hidden;
 }
 
 
@@ -67,39 +68,59 @@ body{
 
   position: fixed;
 
-  top: 18px;
-  left: 50%;
+  top: 0;
+  left: 0;
 
-  transform: translateX(-50%);
+  width: 100%;
 
-  width: calc(100% - 60px);
-  max-width: 1500px;
+  height: 95px;
 
-  height: 92px;
+  padding: 0 70px;
 
-  padding: 0 38px;
+  display:flex;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content:space-between;
 
-  border-radius: 24px;
+  align-items:center;
 
   background:
-  rgba(10,15,23,.58);
+  rgba(10,15,23,.88);
 
-  backdrop-filter: blur(22px);
+  backdrop-filter: blur(20px);
 
-  border:
+  border-bottom:
   1px solid rgba(255,255,255,.08);
 
   box-shadow:
-  0 10px 35px rgba(0,0,0,.25),
-  inset 0 1px 0 rgba(255,255,255,.05);
+  0 4px 20px rgba(0,0,0,.20);
 
-  z-index: 1000;
+  z-index:1000;
+}
 
-  overflow: hidden;
+
+
+/* línea superior elegante */
+
+.navbar::before{
+
+  content:"";
+
+  position:absolute;
+
+  top:0;
+  left:0;
+
+  width:100%;
+
+  height:1px;
+
+  background:
+  linear-gradient(
+    90deg,
+    transparent,
+    rgba(8,245,233,.35),
+    transparent
+  );
 }
 
 
