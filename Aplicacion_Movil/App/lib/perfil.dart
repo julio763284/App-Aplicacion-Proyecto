@@ -1,112 +1,222 @@
 import 'dart:ui';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/login2.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PerfilPage extends StatelessWidget {
-  final String nombre;
-  final String email;
-  final String? urlImagen;
-  
-  final String telefono = "+57 300 123 4567";
-  final String ubicacion = "Barranquilla, Colombia";
-  final String fechaRegistro = "12 de Abril, 2026";
+import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 
-  PerfilPage({
-    super.key, 
-    required this.nombre, 
-    required this.email, 
-    this.urlImagen
-  });
+class PerfilPage extends StatefulWidget {
+  final int userId;
+
+  const PerfilPage({super.key, required this.userId});
+
+  @override
+  State<PerfilPage> createState() => _PerfilPageState();
+}
+
+class _PerfilPageState extends State<PerfilPage> {
+  String nombre = "";
+  String email = "";
+  String? urlImagen;
+
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    obtenerPerfil();
+  }
+
+  // 🔥 OBTENER PERFIL
+  Future<void> obtenerPerfil() async {
+    try {
+      final res = await http.get(
+        Uri.parse("http://10.2.139.37:5000/perfil?id=${widget.userId}"),
+      );
+
+      print("STATUS: ${res.statusCode}");
+      print("BODY: ${res.body}");
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+
+        setState(() {
+          nombre = data['nombre'] ?? "";
+          email = data['correo'] ?? "";
+          urlImagen = data['imagen']; // base64
+          loading = false;
+        });
+      } else {
+        print("❌ Error al cargar perfil");
+        setState(() => loading = false);
+      }
+    } catch (e) {
+      print("🔥 ERROR: $e");
+      setState(() => loading = false);
+    }
+  }
+
+  // 🔥 SUBIR IMAGEN REAL
+  Future<void> subirImagen() async {
+    final picker = ImagePicker();
+
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return;
+
+    File file = File(image.path);
+
+    List<int> bytes = await file.readAsBytes();
+    String base64Image = base64Encode(bytes);
+
+    try {
+      final res = await http.post(
+        Uri.parse("http://10.2.139.37:5000/subir_imagen"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"id": widget.userId, "imagen": base64Image}),
+      );
+
+      if (res.statusCode == 200) {
+        print("✅ Imagen subida");
+
+        obtenerPerfil(); // 🔥 refresca perfil
+      } else {
+        print("❌ Error subiendo imagen");
+      }
+    } catch (e) {
+      print(" ERROR SUBIENDO: $e");
+    }
+  }
+
+  //  LOGOUT REAL
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
+
+  Future<void> _confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Cerrar sesión"),
+        content: const Text("¿Deseas cerrar sesión y volver al login?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text("Cerrar sesión"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await logout();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFF0D1B1E),
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "DETALLES DE CUENTA", 
-          style: TextStyle(color: Colors.white, letterSpacing: 3, fontWeight: FontWeight.bold, fontSize: 14)
-        ),
+        title: const Text("PERFIL", style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
+
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
             colors: [Color(0xFF0D1B1E), Color(0xFF001A18)],
           ),
         ),
+
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
+            padding: const EdgeInsets.all(25),
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                _buildAvatar(),
-                const SizedBox(height: 15),
-                
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      nombre.toUpperCase(),
-                      style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.verified, color: Colors.cyanAccent, size: 18),
-                  ],
-                ),
-                const Text(
-                  "ADMINISTRADOR DE SISTEMA",
-                  style: TextStyle(color: Colors.cyanAccent, fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w400),
-                ),
 
-                const SizedBox(height: 35),
+                // 🔥 FOTO PERFIL
+                GestureDetector(
+                  onTap: subirImagen,
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: const Color(0xFF017A74),
 
-                _buildSectionHeader("INFORMACIÓN DE CONTACTO"),
-                _buildFrostedSection(
-                  child: Column(
-                    children: [
-                      _buildInfoRow(Icons.email_outlined, "CORREO ELECTRÓNICO", email),
-                      const Divider(color: Colors.white10, height: 30),
-                      _buildInfoRow(Icons.phone_android_outlined, "TELÉFONO MÓVIL", telefono),
-                      const Divider(color: Colors.white10, height: 30),
-                      _buildInfoRow(Icons.location_on_outlined, "UBICACIÓN", ubicacion),
-                    ],
+                    backgroundImage: urlImagen != null
+                        ? MemoryImage(base64Decode(urlImagen!)) // 🔥 CLAVE
+                        : null,
+
+                    child: urlImagen == null
+                        ? const Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.white,
+                          )
+                        : null,
                   ),
                 ),
 
-                const SizedBox(height: 25),
+                const SizedBox(height: 20),
 
-                _buildSectionHeader("SEGURIDAD Y SISTEMA"),
-                _buildFrostedSection(
-                  child: Column(
-                    children: [
-                      _buildInfoRow(Icons.calendar_today_outlined, "MIEMBRO DESDE", fechaRegistro),
-                      const Divider(color: Colors.white10, height: 30),
-                      _buildInfoRow(Icons.lan_outlined, "IP DE ACCESO", "192.168.1.105"),
-                      const Divider(color: Colors.white10, height: 30),
-                      _buildInfoRow(Icons.data_thresholding_outlined, "ALMACENAMIENTO DB", "84% Utilizado"),
-                    ],
+                Text(
+                  nombre,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+
+                const SizedBox(height: 5),
+
+                Text(email, style: const TextStyle(color: Colors.white54)),
 
                 const SizedBox(height: 40),
 
-                _buildLogoutButton(context),
-                const SizedBox(height: 20),
-                const Text("Versión de Software 1.1.4", style: TextStyle(color: Colors.white24, fontSize: 10)),
-                const SizedBox(height: 20),
+                _cardInfo(Icons.email, "Correo", email),
+                _cardInfo(Icons.person, "Usuario", nombre),
+
+                const SizedBox(height: 40),
+
+                // 🔥 LOGOUT REAL
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  onPressed: _confirmLogout,
+                  child: const Text("Cerrar sesión"),
+                ),
               ],
             ),
           ),
@@ -115,120 +225,26 @@ class PerfilPage extends StatelessWidget {
     );
   }
 
-
-  Widget _buildSectionHeader(String title) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, bottom: 10),
-        child: Text(
-          title,
-          style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-        ),
+  Widget _cardInfo(IconData icon, String title, String value) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white10,
+        borderRadius: BorderRadius.circular(15),
       ),
-    );
-  }
-
-  Widget _buildAvatar() {
-    return Center(
-      child: Stack(
+      child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.cyanAccent.withOpacity(0.5), width: 2),
-            ),
-            child: CircleAvatar(
-              radius: 55,
-              backgroundColor: const Color(0xFF017A74),
-              backgroundImage: urlImagen != null ? NetworkImage(urlImagen!) : null,
-              child: urlImagen == null 
-                ? const Icon(Icons.person, size: 55, color: Colors.white) 
-                : null,
-            ),
-          ),
-          Positioned(
-            bottom: 5,
-            right: 5,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: Colors.cyanAccent, shape: BoxShape.circle),
-              child: const Icon(Icons.camera_alt, size: 15, color: Colors.black),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFrostedSection({required Widget child}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.cyanAccent.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: Colors.cyanAccent, size: 18),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: Column(
+          Icon(icon, color: Colors.cyanAccent),
+          const SizedBox(width: 15),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 9, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 2),
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400)),
+              Text(title, style: const TextStyle(color: Colors.white54)),
+              Text(value, style: const TextStyle(color: Colors.white)),
             ],
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLogoutButton(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) =>  LoginPage()),
-          (route) => false,
-        );
-      },
-      child: Container(
-        height: 55,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.redAccent.withOpacity(0.1),
-          border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-        ),
-        child: const Center(
-          child: Text(
-            "CERRAR SESIÓN SEGURA",
-            style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.5),
-          ),
-        ),
+        ],
       ),
     );
   }

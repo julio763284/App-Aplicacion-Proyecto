@@ -178,22 +178,3 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
     finally:
         cursor.close()
         db.close()        
-## funcion agregada en caso de error eliminar codigo##
-def obtener_proveedores_ordenados():
-    db = obtener_conexion()
-    if not db:
-        return []
-    
-    try:
-        cursor = db.cursor(dictionary=True)
-        # 🟢 El secreto está en el "ORDER BY id DESC"
-        # DESC significa "Descendente" (del más grande al más pequeño)
-        cursor.execute("SELECT * FROM proveedor ORDER BY id_proveedor DESC")
-        return cursor.fetchall()
-    except Exception as e:
-        print("Error al listar:", e)
-        return []
-    finally:
-        cursor.close()
-        db.close()
-#### funcion agregada en caso de error eliminar codigo##
