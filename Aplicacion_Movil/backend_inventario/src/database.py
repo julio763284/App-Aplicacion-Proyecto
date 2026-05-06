@@ -2,6 +2,8 @@ import bcrypt
 import mysql.connector 
 from config.db_config import DB_SETTINGS
 
+# el archivo database.py se conecta con la base de datos #
+
 def obtener_conexion():
     try:
         conexion = mysql.connector.connect(
@@ -79,8 +81,11 @@ def registrar_proveedor(nombre, direccion, gmail, telefono):
 
     try:
         cursor = db.cursor(dictionary=True)
+        #en caso de error esto lo agregue
+        # 🔍 VALIDACIÓN AQUÍ
         cursor.execute("SELECT id_proveedor FROM proveedor WHERE gmail = %s", (gmail,))
         existe = cursor.fetchone()
+        #en caso de error esto lo agregue#
 
         if existe:
             return {
@@ -88,6 +93,7 @@ def registrar_proveedor(nombre, direccion, gmail, telefono):
                 "message": "El correo ya está registrado"
             }
 
+        # 🟢 INSERT
         sql = """
         INSERT INTO proveedor (nombre, direccion, gmail, telefono)
         VALUES (%s, %s, %s, %s)
@@ -144,8 +150,9 @@ def validar_y_notificar_stock(id_producto):
         
 def obtener_clientes_ordenados():
     try:
-        conn = obtener_conexion() 
+        conn = obtener_conexion() # Tu función de conexión
         cursor = conn.cursor(dictionary=True)
+        # Ordenamos por fecha_registro descendente (los más nuevos primero)
         cursor.execute("SELECT * FROM cliente ORDER BY fecha_registro DESC")
         clientes = cursor.fetchall()
         cursor.close()
@@ -160,6 +167,7 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
     if not db: return {"status": "error", "message": "Error de conexión"}
     try:
         cursor = db.cursor()
+        # El estado se manejará por defecto como 'Agotado' según tu SQL si no se envía
         sql = """INSERT INTO producto (nombre, descripcion, precio, cantidad, imagen, estado) 
                  VALUES (%s, %s, %s, %s, %s, 'Disponible')"""
         cursor.execute(sql, (nombre, descripcion, precio, cantidad, imagen))
@@ -170,7 +178,7 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
     finally:
         cursor.close()
         db.close()        
-
+## funcion agregada en caso de error eliminar codigo##
 def obtener_proveedores_ordenados():
     db = obtener_conexion()
     if not db:
@@ -178,6 +186,8 @@ def obtener_proveedores_ordenados():
     
     try:
         cursor = db.cursor(dictionary=True)
+        # 🟢 El secreto está en el "ORDER BY id DESC"
+        # DESC significa "Descendente" (del más grande al más pequeño)
         cursor.execute("SELECT * FROM proveedor ORDER BY id_proveedor DESC")
         return cursor.fetchall()
     except Exception as e:
@@ -186,16 +196,19 @@ def obtener_proveedores_ordenados():
     finally:
         cursor.close()
         db.close()
+#### funcion agregada en caso de error eliminar codigo##
 
 def eliminar_producto_db(id_producto):
     db = obtener_conexion()
     if not db: return False
     try:
         cursor = db.cursor()
+        # Usamos id_producto porque así está en tu SQL
         cursor.execute("DELETE FROM producto WHERE id_producto = %s", (id_producto,))
         db.commit()
         return True
-    except Exception:
+    except Exception as e:
+        print(f"Error al eliminar: {e}")
         return False
     finally:
         cursor.close()
@@ -206,11 +219,15 @@ def editar_producto_db(id_producto, nombre, descripcion, precio, cantidad):
     if not db: return False
     try:
         cursor = db.cursor()
-        sql = "UPDATE producto SET nombre=%s, descripcion=%s, precio=%s, cantidad=%s WHERE id_producto=%s"
+        # Ajustado a las columnas de tu tabla
+        sql = """UPDATE producto 
+                 SET nombre=%s, descripcion=%s, precio=%s, cantidad=%s 
+                 WHERE id_producto=%s"""
         cursor.execute(sql, (nombre, descripcion, precio, cantidad, id_producto))
         db.commit()
         return True
-    except Exception:
+    except Exception as e:
+        print(f"Error al editar: {e}")
         return False
     finally:
         cursor.close()
