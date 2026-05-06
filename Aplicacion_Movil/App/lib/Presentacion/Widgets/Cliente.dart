@@ -23,7 +23,6 @@ class _ClienteState extends State<Cliente> {
     fetchClientes();
   }
 
-  // --- LÓGICA DE API ---
   Future<void> fetchClientes() async {
     try {
       final response = await http.get(Uri.parse(ApiConfig.url('/clientes')));
@@ -50,8 +49,6 @@ class _ClienteState extends State<Cliente> {
       debugPrint("Error: $e");
     }
   }
-
-  // --- DISEÑO DE LA INTERFAZ ---
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +98,6 @@ class _ClienteState extends State<Cliente> {
     );
   }
 
-  // Card del cliente con soporte para Long Press
   Widget _buildClienteCard(Map<String, dynamic> cliente) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -142,8 +138,6 @@ class _ClienteState extends State<Cliente> {
       ),
     );
   }
-
-  // --- DIÁLOGOS CON TU ESTÉTICA (Captura 1) ---
 
   void _mostrarOpciones(Map<String, dynamic> cliente) {
     showDialog(
@@ -201,8 +195,6 @@ class _ClienteState extends State<Cliente> {
     );
   }
 
-  // --- FORMULARIO DE EDICIÓN (Captura 2) ---
-
   void _abrirEditor(Map<String, dynamic> cliente) {
     final nomCtrl = TextEditingController(text: cliente['nombre']);
     final dirCtrl = TextEditingController(
@@ -226,7 +218,7 @@ class _ClienteState extends State<Cliente> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "EDITAR PRODUCTO", // Mantengo el título de tu captura por estética
+                "EDITAR PRODUCTO",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -288,8 +280,6 @@ class _ClienteState extends State<Cliente> {
       ),
     );
   }
-
-  // --- COMPONENTES VISUALES ---
 
   Widget _buildOptionItem(
     IconData icon,
