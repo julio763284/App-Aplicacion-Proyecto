@@ -1,5 +1,8 @@
+import os
+
 from flask import request, jsonify
 from src.database import (
+    obtener_usuario,
     validar_usuario, 
     registrar_usuario, 
     registrar_cliente, 
@@ -80,10 +83,3 @@ def init_routes(app):
             data.get('imagen', '')
         )
         return jsonify(res), (201 if res["status"] == "success" else 400)   
-    
-    @app.route('/proveedores', methods=['GET'])
-    def listar_proveedores():
-        proveedores = obtener_proveedores_ordenados()
-        if proveedores is not None:
-            return jsonify(proveedores), 200
-        return jsonify({"status": "error", "message": "Error al obtener proveedores"}), 500

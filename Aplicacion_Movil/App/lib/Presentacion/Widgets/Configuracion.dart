@@ -73,7 +73,7 @@ class Configuracion extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>  PerfilPage(nombre: '', email: '',)),
+                    MaterialPageRoute(builder: (context) =>  PerfilPage(userId: 1)),
                   );
                 },
               ),

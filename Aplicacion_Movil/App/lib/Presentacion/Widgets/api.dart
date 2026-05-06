@@ -39,7 +39,7 @@ class Cliente {
 Future<List<Producto>> fetchProductos() async {
   final response = await http.get(
     Uri.parse('http://10.2.125.207:5000/productos'),
-  );
+  );  
 
   if (response.statusCode == 200) {
     List jsonData = jsonDecode(response.body);
@@ -130,5 +130,15 @@ class InventarioService {
     } else {
       throw Exception('Error al cargar movimientos');
     }
+  }
+}
+
+Future<Map<String, dynamic>> obtenerPerfil(int id) async {
+  final res = await http.get(Uri.parse("http:// 10.2.139.37:3000/perfil/$id"));
+
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body);
+  } else {
+    throw Exception("Error cargando perfil");
   }
 }
