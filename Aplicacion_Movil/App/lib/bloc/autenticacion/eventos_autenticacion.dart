@@ -5,3 +5,7 @@ class Ingresar extends AutenticacionEventos {
   final String password;
   Ingresar(this.usuario, this.password);
 }
+
+class RevisarSesion extends AutenticacionEventos {}
+
+class Salir extends AutenticacionEventos {}
