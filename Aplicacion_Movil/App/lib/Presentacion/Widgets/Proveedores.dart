@@ -24,7 +24,7 @@ class _ProveedoresState extends State<Proveedores> {
     fetchProveedores(); // Carga inicial
   }
 
-  // COMENTARIO: Función para obtener datos. 
+  // COMENTARIO: Función para obtener datos.
   // Recuerda que en Python debe ser "ORDER BY id DESC" para que el nuevo salga arriba.
   Future<void> fetchProveedores() async {
     try {
@@ -52,8 +52,14 @@ class _ProveedoresState extends State<Proveedores> {
       appBar: AppBar(
         backgroundColor: accentTeal.withOpacity(0.2),
         elevation: 0,
-        title: const Text("PROVEEDORES", 
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: const Text(
+          "PROVEEDORES",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.sort, color: Colors.greenAccent),
@@ -62,23 +68,28 @@ class _ProveedoresState extends State<Proveedores> {
         ),
       ),
       // COMENTARIO: Lógica de estados (Cargando -> Vacío -> Lista)
-      body: cargando 
-        ? const Center(child: CircularProgressIndicator(color: Colors.greenAccent))
-        : proveedores.isEmpty 
+      body: cargando
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.greenAccent),
+            )
+          : proveedores.isEmpty
           ? _buildEmptyState()
           : RefreshIndicator(
               color: Colors.greenAccent,
-              onRefresh: fetchProveedores, // COMENTARIO: Permite actualizar deslizando hacia abajo
+              onRefresh:
+                  fetchProveedores, // COMENTARIO: Permite actualizar deslizando hacia abajo
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 itemCount: proveedores.length,
-                itemBuilder: (context, index) => _buildProveedorCard(proveedores[index]),
+                itemBuilder: (context, index) =>
+                    _buildProveedorCard(proveedores[index]),
               ),
             ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.greenAccent,
         child: const Icon(Icons.add, size: 30, color: primaryDark),
-        onPressed: () => _mostrarMenuOpciones(context), // Abre el menú con estilo
+        onPressed: () =>
+            _mostrarMenuOpciones(context), // Abre el menú con estilo
       ),
     );
   }
@@ -101,15 +112,29 @@ class _ProveedoresState extends State<Proveedores> {
           backgroundColor: Colors.greenAccent.withOpacity(0.1),
           radius: 25,
           child: Text(
-            nombre[0].toUpperCase(), 
-            style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)
+            nombre[0].toUpperCase(),
+            style: const TextStyle(
+              color: Colors.greenAccent,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        title: Text(nombre, 
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-        subtitle: Text(gmail, 
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
-        trailing: const Icon(Icons.local_shipping_outlined, color: Colors.greenAccent, size: 20),
+        title: Text(
+          nombre,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          gmail,
+          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+        ),
+        trailing: const Icon(
+          Icons.local_shipping_outlined,
+          color: Colors.greenAccent,
+          size: 20,
+        ),
       ),
     );
   }
@@ -121,15 +146,34 @@ class _ProveedoresState extends State<Proveedores> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 170, height: 170,
-            decoration: const BoxDecoration(color: Color(0xFF162A2D), shape: BoxShape.circle),
-            child: const Icon(Icons.local_shipping_rounded, size: 80, color: Colors.greenAccent),
+            width: 170,
+            height: 170,
+            decoration: const BoxDecoration(
+              color: Color(0xFF162A2D),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.local_shipping_rounded,
+              size: 80,
+              color: Colors.greenAccent,
+            ),
           ),
           const SizedBox(height: 30),
-          const Text("SIN PROVEEDORES", 
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          Text("Toca el botón + para registrar uno", 
-            style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14)),
+          const Text(
+            "SIN PROVEEDORES",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            "Toca el botón + para registrar uno",
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.4),
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );
@@ -152,15 +196,21 @@ class _ProveedoresState extends State<Proveedores> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.add_business_rounded, color: Colors.greenAccent),
-                title: const Text("Nuevo Proveedor", style: TextStyle(color: Colors.white)),
+                leading: const Icon(
+                  Icons.add_business_rounded,
+                  color: Colors.greenAccent,
+                ),
+                title: const Text(
+                  "Nuevo Proveedor",
+                  style: TextStyle(color: Colors.white),
+                ),
                 onTap: () {
                   Navigator.pop(context); // Cierra el menú
                   // COMENTARIO: Al volver de registrar, refresca la lista automáticamente
                   Navigator.push(
-                    context, 
-                    MaterialPageRoute(builder: (context) => Nuevoproveedor())
-                  ).then((_) => fetchProveedores()); 
+                    context,
+                    MaterialPageRoute(builder: (context) => Nuevoproveedor()),
+                  ).then((_) => fetchProveedores());
                 },
               ),
               const SizedBox(height: 10),
