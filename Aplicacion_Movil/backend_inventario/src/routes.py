@@ -10,7 +10,11 @@ from src.database import (
     obtener_proveedores_ordenados,
     registrar_producto_db,
     editar_producto_db,
-    eliminar_producto_db
+    eliminar_producto_db,
+    editar_cliente_db,
+    editar_cliente_db,
+    editar_proveedor_db,
+    eliminar_proveedor_db
 )
 
 
@@ -106,3 +110,36 @@ def init_routes(app):
         if editar_producto_db(id, data['nombre'], data['descripcion'], data['precio'], data['cantidad']):
             return jsonify({"status": "success", "message": "Producto actualizado"}), 200
         return jsonify({"status": "error", "message": "Error al actualizar"}), 400
+    
+    @app.route('/cliente/<int:id>', methods=['DELETE'])
+    def eliminar_cliente(id):
+        if eliminar_cliente_db(id):
+            return jsonify({"status": "success", "message": "Cliente eliminado"}), 200
+        return jsonify({"status": "error", "message": "No se pudo eliminar"}), 400
+
+    @app.route('/cliente/<int:id>', methods=['PUT'])
+    def editar_cliente(id):
+        data = request.json
+        if editar_cliente_db(id, data['nombre'], data['direccion_residencia'], 
+                             data['gmail_corporativo'], data['celular']):
+            return jsonify({"status": "success", "message": "Cliente actualizado"}), 200
+        return jsonify({"status": "error", "message": "Error al actualizar"}), 400
+    
+    @app.route('/proveedor/<int:id>', methods=['DELETE', 'OPTIONS'])
+    def eliminar_proveedor(id):
+        if request.method == 'OPTIONS': return jsonify({}), 200
+        
+        if eliminar_proveedor_db(id):
+            return jsonify({"status": "success", "message": "Proveedor eliminado"}), 200
+        return jsonify({"status": "error", "message": "No se pudo eliminar el proveedor"}), 400
+
+    @app.route('/proveedor/<int:id>', methods=['PUT', 'OPTIONS'])
+    def editar_proveedor(id):
+        if request.method == 'OPTIONS': return jsonify({}), 200
+        
+        data = request.json
+        # Ajustamos los campos para que coincidan con el JSON enviado por Flutter
+        if editar_proveedor_db(id, data['nombre'], data.get('direccion', ''), 
+                               data['gmail'], data.get('telefono', '')):
+            return jsonify({"status": "success", "message": "Proveedor actualizado"}), 200
+        return jsonify({"status": "error", "message": "Error al actualizar proveedor"}), 400

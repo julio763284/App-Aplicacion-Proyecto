@@ -232,3 +232,70 @@ def editar_producto_db(id_producto, nombre, descripcion, precio, cantidad):
     finally:
         cursor.close()
         db.close()
+
+def eliminar_cliente_db(id_cliente):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM cliente WHERE id_cliente = %s", (id_cliente,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar cliente: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_cliente_db(id_cliente, nombre, direccion, gmail, celular):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE cliente 
+                 SET nombre=%s, direccion_residencia=%s, gmail_corporativo=%s, celular=%s 
+                 WHERE id_cliente=%s"""
+        cursor.execute(sql, (nombre, direccion, gmail, celular, id_cliente))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar cliente: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def eliminar_proveedor_db(id_proveedor):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        # Usamos id_proveedor para cumplir con tu estructura de tabla
+        cursor.execute("DELETE FROM proveedor WHERE id_proveedor = %s", (id_proveedor,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar proveedor: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_proveedor_db(id_proveedor, nombre, direccion, gmail, telefono):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE proveedor 
+                 SET nombre=%s, direccion=%s, gmail=%s, telefono=%s 
+                 WHERE id_proveedor=%s"""
+        cursor.execute(sql, (nombre, direccion, gmail, telefono, id_proveedor))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar proveedor: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
