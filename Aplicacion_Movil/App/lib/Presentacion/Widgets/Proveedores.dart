@@ -23,7 +23,6 @@ class _ProveedoresState extends State<Proveedores> {
     fetchProveedores();
   }
 
-  // --- LÓGICA DE API ---
   Future<void> fetchProveedores() async {
     try {
       final response = await http.get(Uri.parse(ApiConfig.url('/proveedores')));
@@ -44,31 +43,12 @@ class _ProveedoresState extends State<Proveedores> {
         Uri.parse(ApiConfig.url('/proveedor/$id')),
       );
       if (response.statusCode == 200) {
-        _notificar("Proveedor eliminado ✅", Colors.greenAccent);
         fetchProveedores();
       }
     } catch (e) {
-      _notificar("Error al eliminar", Colors.redAccent);
+      debugPrint("Error: $e");
     }
   }
-
-  void _notificar(String msj, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          msj,
-          style: const TextStyle(
-            color: Color(0xFF0D1B1E),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // --- DISEÑO DE LA INTERFAZ ---
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +62,7 @@ class _ProveedoresState extends State<Proveedores> {
         backgroundColor: accentTeal.withOpacity(0.2),
         elevation: 0,
         title: const Text(
-          "PROVEEDORES NEXUS",
+          "PROVEEDORES",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -104,17 +84,11 @@ class _ProveedoresState extends State<Proveedores> {
                 ? const Center(
                     child: CircularProgressIndicator(color: Colors.cyanAccent),
                   )
-                : proveedores.isEmpty
-                ? _buildEmptyState()
-                : RefreshIndicator(
-                    onRefresh: fetchProveedores,
-                    color: Colors.cyanAccent,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(top: 10),
-                      itemCount: proveedores.length,
-                      itemBuilder: (context, index) =>
-                          _buildProveedorCard(proveedores[index]),
-                    ),
+                : ListView.builder(
+                    padding: const EdgeInsets.only(top: 10),
+                    itemCount: proveedores.length,
+                    itemBuilder: (context, index) =>
+                        _buildProveedorCard(proveedores[index]),
                   ),
           ),
           _buildFooterCounter(),
@@ -133,8 +107,7 @@ class _ProveedoresState extends State<Proveedores> {
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: ListTile(
-        onLongPress: () =>
-            _mostrarOpciones(proveedor), // DETECTA PRESIÓN PROLONGADA
+        onLongPress: () => _mostrarOpciones(proveedor),
         leading: CircleAvatar(
           backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
           child: Text(
@@ -166,8 +139,6 @@ class _ProveedoresState extends State<Proveedores> {
     );
   }
 
-  // --- DIÁLOGOS DE GESTIÓN (ESTÉTICA SAPOO) ---
-
   void _mostrarOpciones(Map<String, dynamic> proveedor) {
     showDialog(
       context: context,
@@ -195,24 +166,43 @@ class _ProveedoresState extends State<Proveedores> {
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
-                  letterSpacing: 1,
                 ),
               ),
             ),
-            _buildOptionItem(
-              Icons.edit_note,
-              "EDITAR PROVEEDOR",
-              Colors.cyanAccent,
-              () {
+            ListTile(
+              leading: const Icon(
+                Icons.edit,
+                color: Colors.cyanAccent,
+                size: 20,
+              ),
+              title: const Text(
+                "EDITAR PROVEEDOR",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
                 Navigator.pop(context);
                 _abrirEditor(proveedor);
               },
             ),
-            _buildOptionItem(
-              Icons.delete_forever,
-              "ELIMINAR PROVEEDOR",
-              Colors.redAccent,
-              () {
+            ListTile(
+              leading: const Icon(
+                Icons.delete_sweep,
+                color: Colors.redAccent,
+                size: 20,
+              ),
+              title: const Text(
+                "ELIMINAR PROVEEDOR",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
                 Navigator.pop(context);
                 _eliminarProveedor(proveedor['id_proveedor']);
               },
@@ -224,10 +214,9 @@ class _ProveedoresState extends State<Proveedores> {
     );
   }
 
-  // --- FORMULARIO DE EDICIÓN MINIMALISTA ---
-
   void _abrirEditor(Map<String, dynamic> proveedor) {
     final nomCtrl = TextEditingController(text: proveedor['nombre']);
+    final dirCtrl = TextEditingController(text: proveedor['direccion']);
     final corCtrl = TextEditingController(text: proveedor['gmail']);
     final telCtrl = TextEditingController(text: proveedor['telefono']);
 
@@ -254,9 +243,10 @@ class _ProveedoresState extends State<Proveedores> {
                 ),
               ),
               const SizedBox(height: 10),
-              _inputMinimal("Nombre Empresa", nomCtrl),
-              _inputMinimal("Correo Electrónico", corCtrl),
-              _inputMinimal("Teléfono / Celular", telCtrl),
+              _inputMinimal("Nombre", nomCtrl),
+              _inputMinimal("Dirección", dirCtrl),
+              _inputMinimal("Correo", corCtrl),
+              _inputMinimal("Teléfono", telCtrl),
               const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -265,10 +255,7 @@ class _ProveedoresState extends State<Proveedores> {
                     onPressed: () => Navigator.pop(context),
                     child: const Text(
                       "CANCELAR",
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.redAccent),
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -283,13 +270,13 @@ class _ProveedoresState extends State<Proveedores> {
                         headers: {"Content-Type": "application/json"},
                         body: jsonEncode({
                           "nombre": nomCtrl.text,
+                          "direccion": dirCtrl.text,
                           "gmail": corCtrl.text,
                           "telefono": telCtrl.text,
                         }),
                       );
                       if (response.statusCode == 200) {
                         Navigator.pop(context);
-                        _notificar("Cambios guardados", Colors.cyanAccent);
                         fetchProveedores();
                       }
                     },
@@ -310,28 +297,6 @@ class _ProveedoresState extends State<Proveedores> {
     );
   }
 
-  // --- WIDGETS AUXILIARES ---
-
-  Widget _buildOptionItem(
-    IconData icon,
-    String text,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return ListTile(
-      onTap: onTap,
-      leading: Icon(icon, color: color, size: 20),
-      title: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
   Widget _inputMinimal(String label, TextEditingController ctrl) {
     return Padding(
       padding: const EdgeInsets.only(top: 15),
@@ -340,18 +305,13 @@ class _ProveedoresState extends State<Proveedores> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.cyanAccent,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
           ),
           TextField(
             controller: ctrl,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: const InputDecoration(
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 8),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.white24),
               ),
@@ -373,35 +333,15 @@ class _ProveedoresState extends State<Proveedores> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFF017A74), width: 1),
+          border: Border.all(color: const Color(0xFF017A74)),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.local_shipping_outlined,
-              color: Colors.cyanAccent,
-              size: 16,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              "TOTAL PROVEEDORES :",
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              "${proveedores.length}",
-              style: const TextStyle(
-                color: Colors.cyanAccent,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        child: Text(
+          "TOTAL PROVEEDORES : ${proveedores.length}",
+          style: const TextStyle(
+            color: Colors.cyanAccent,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -424,28 +364,6 @@ class _ProveedoresState extends State<Proveedores> {
           context,
           MaterialPageRoute(builder: (context) => Nuevoproveedor()),
         ).then((_) => fetchProveedores()),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.no_transport_rounded,
-            size: 80,
-            color: Colors.white.withOpacity(0.05),
-          ),
-          const Text(
-            "SIN PROVEEDORES",
-            style: TextStyle(
-              color: Colors.white24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -195,15 +195,13 @@ def obtener_proveedores_ordenados():
         return []
     finally:
         cursor.close()
-        db.close()
-#### funcion agregada en caso de error eliminar codigo##
+        db.close()#
 
 def eliminar_producto_db(id_producto):
     db = obtener_conexion()
     if not db: return False
     try:
         cursor = db.cursor()
-        # Usamos id_producto porque así está en tu SQL
         cursor.execute("DELETE FROM producto WHERE id_producto = %s", (id_producto,))
         db.commit()
         return True
@@ -219,7 +217,6 @@ def editar_producto_db(id_producto, nombre, descripcion, precio, cantidad):
     if not db: return False
     try:
         cursor = db.cursor()
-        # Ajustado a las columnas de tu tabla
         sql = """UPDATE producto 
                  SET nombre=%s, descripcion=%s, precio=%s, cantidad=%s 
                  WHERE id_producto=%s"""
@@ -271,7 +268,6 @@ def eliminar_proveedor_db(id_proveedor):
     if not db: return False
     try:
         cursor = db.cursor()
-        # Usamos id_proveedor para cumplir con tu estructura de tabla
         cursor.execute("DELETE FROM proveedor WHERE id_proveedor = %s", (id_proveedor,))
         db.commit()
         return True

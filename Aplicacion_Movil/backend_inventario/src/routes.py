@@ -12,7 +12,7 @@ from src.database import (
     editar_producto_db,
     eliminar_producto_db,
     editar_cliente_db,
-    editar_cliente_db,
+    eliminar_cliente_db,
     editar_proveedor_db,
     eliminar_proveedor_db
 )
