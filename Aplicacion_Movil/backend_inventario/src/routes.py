@@ -1,6 +1,12 @@
 import os
-
+import smtplib
+import random
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import request, jsonify
+
+from config.db_config import MAIL_SETTINGS
+
 from src.database import (
     obtener_usuario,
     validar_usuario, 
@@ -17,9 +23,9 @@ from src.database import (
     editar_cliente_db,
     eliminar_cliente_db,
     editar_proveedor_db,
-    eliminar_proveedor_db
+    eliminar_proveedor_db,
+    guardar_codigo_recuperacion
 )
-
 
 def init_routes(app):
     
@@ -149,3 +155,75 @@ def init_routes(app):
         return jsonify({"status": "error", "message": "Error al actualizar proveedor"}), 400
         return jsonify(res), (201 if res["status"] == "success" else 400)   
     
+
+    @app.route('/enviar_codigo', methods=['POST', 'OPTIONS'])
+    def ruta_enviar_codigo():
+        if request.method == 'OPTIONS':
+            return jsonify({"status": "ok"}), 200
+            
+        try:
+            data = request.json
+            email = data.get('email')
+            
+            if not email:
+                return jsonify({"status": "error", "message": "El correo es requerido"}), 400
+            codigo = str(random.randint(100000, 999999))
+            exito_db = guardar_codigo_recuperacion(email, codigo)
+            
+            if exito_db:
+                exito_email = enviar_email_codigo(email, codigo)
+                
+                if exito_email:
+                    print(f"✅ Código {codigo} enviado con éxito a {email}")
+                    return jsonify({
+                        "status": "success", 
+                        "message": "Código enviado correctamente a tu correo"
+                    }), 200
+                else:
+                    return jsonify({
+                        "status": "error", 
+                        "message": "Error al enviar el correo. Revisa tu configuración SMTP."
+                    }), 500
+            else:
+                return jsonify({
+                    "status": "error", 
+                    "message": "El correo no está registrado en el sistema"
+                }), 404
+
+        except Exception as e:
+            print(f"❌ Error crítico en ruta_enviar_codigo: {e}")
+            return jsonify({"status": "error", "message": "Error interno del servidor"}), 500
+
+
+def enviar_email_codigo(destinatario, codigo):
+    msg = MIMEMultipart()
+    msg['From'] = MAIL_SETTINGS['mail_user']
+    msg['To'] = destinatario
+    msg['Subject'] = "Código de Recuperación - Nexus Gestor"
+
+    cuerpo_html = f"""
+    <html>
+        <body style="font-family: sans-serif; background-color: #0D1B1E; color: #FFFFFF; padding: 20px;">
+            <div style="max-width: 400px; margin: auto; background: #162A2D; padding: 20px; border-radius: 15px; border: 1px solid #017A74;">
+                <h2 style="color: #00FFFF; text-align: center;">Nexus Gestor</h2>
+                <p style="text-align: center;">Has solicitado recuperar tu contraseña.</p>
+                <div style="background: #0D1B1E; padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                    <span style="font-size: 32px; font-weight: bold; color: #00FFFF; letter-spacing: 5px;">{codigo}</span>
+                </div>
+                <p style="font-size: 12px; color: #888; text-align: center;">Este código expirará pronto. Si no lo solicitaste, ignora este mensaje.</p>
+            </div>
+        </body>
+    </html>
+    """
+    msg.attach(MIMEText(cuerpo_html, 'html'))
+
+    try:
+        server = smtplib.SMTP(MAIL_SETTINGS['mail_server'], MAIL_SETTINGS['mail_port'])
+        server.starttls()
+        server.login(MAIL_SETTINGS['mail_user'], MAIL_SETTINGS['mail_password'])
+        server.send_message(msg)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"⚠️ Error SMTP: {e}")
+        return False

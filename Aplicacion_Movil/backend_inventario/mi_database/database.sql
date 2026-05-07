@@ -53,6 +53,13 @@ CREATE TABLE notificaciones (
     leido BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE recuperacion_password (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    codigo VARCHAR(6) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 DELIMITER //
 
 CREATE TRIGGER tr_actualizar_stock_y_notificar

@@ -311,3 +311,23 @@ def obtener_usuario(id_usuario):
     finally:
         cursor.close()
         db.close()
+
+def guardar_codigo_recuperacion(email, codigo):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        # Primero borramos códigos viejos de ese email si existen
+        cursor.execute("DELETE FROM recuperacion_password WHERE email = %s", (email,))
+        
+        # Insertamos el nuevo código
+        sql = "INSERT INTO recuperacion_password (email, codigo) VALUES (%s, %s)"
+        cursor.execute(sql, (email, codigo))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error guardando código: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
