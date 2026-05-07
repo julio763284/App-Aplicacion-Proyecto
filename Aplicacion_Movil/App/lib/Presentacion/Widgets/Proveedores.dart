@@ -8,7 +8,6 @@ import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Proveedores extends StatefulWidget {
   const Proveedores({super.key});
-
   @override
   State<Proveedores> createState() => _ProveedoresState();
 }
@@ -42,9 +41,7 @@ class _ProveedoresState extends State<Proveedores> {
       final response = await http.delete(
         Uri.parse(ApiConfig.url('/proveedor/$id')),
       );
-      if (response.statusCode == 200) {
-        fetchProveedores();
-      }
+      if (response.statusCode == 200) fetchProveedores();
     } catch (e) {
       debugPrint("Error: $e");
     }
@@ -52,48 +49,43 @@ class _ProveedoresState extends State<Proveedores> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
-
     return Scaffold(
-      backgroundColor: primaryDark,
+      backgroundColor: const Color(0xFF0D1B1E),
       drawer: const CustomNexusDrawer(),
       appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
+        backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
         elevation: 0,
         title: const Text(
           "PROVEEDORES",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
             fontSize: 14,
           ),
         ),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: Colors.greenAccent),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: cargando
-                ? const Center(
-                    child: CircularProgressIndicator(color: Colors.cyanAccent),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.only(top: 10),
+      body: cargando
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.cyanAccent),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(top: 10, bottom: 20),
                     itemCount: proveedores.length,
-                    itemBuilder: (context, index) =>
-                        _buildProveedorCard(proveedores[index]),
+                    itemBuilder: (context, index) {
+                      // Validación de seguridad para evitar RangeError
+                      if (index >= proveedores.length)
+                        return const SizedBox.shrink();
+                      return _buildProveedorCard(proveedores[index]);
+                    },
                   ),
-          ),
-          _buildFooterCounter(),
-        ],
-      ),
+                ),
+                _buildFooterCounter(),
+              ],
+            ),
       floatingActionButton: _buildFab(),
     );
   }
@@ -111,7 +103,10 @@ class _ProveedoresState extends State<Proveedores> {
         leading: CircleAvatar(
           backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
           child: Text(
-            proveedor['nombre'][0].toString().toUpperCase(),
+            proveedor['nombre'] != null &&
+                    proveedor['nombre'].toString().isNotEmpty
+                ? proveedor['nombre'][0].toString().toUpperCase()
+                : '?',
             style: const TextStyle(
               color: Colors.cyanAccent,
               fontWeight: FontWeight.bold,
@@ -146,42 +141,16 @@ class _ProveedoresState extends State<Proveedores> {
         backgroundColor: const Color(0xFF0D1B1E),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
-          side: const BorderSide(color: Color(0xFF017A74), width: 1.5),
+          side: const BorderSide(color: Color(0xFF017A74)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Color(0xFF017A74), width: 0.8),
-                ),
-              ),
-              child: Text(
-                proveedor['nombre'].toString().toUpperCase(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-            ),
             ListTile(
-              leading: const Icon(
-                Icons.edit,
-                color: Colors.cyanAccent,
-                size: 20,
-              ),
+              leading: const Icon(Icons.edit, color: Colors.cyanAccent),
               title: const Text(
                 "EDITAR PROVEEDOR",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -189,25 +158,16 @@ class _ProveedoresState extends State<Proveedores> {
               },
             ),
             ListTile(
-              leading: const Icon(
-                Icons.delete_sweep,
-                color: Colors.redAccent,
-                size: 20,
-              ),
+              leading: const Icon(Icons.delete_sweep, color: Colors.redAccent),
               title: const Text(
                 "ELIMINAR PROVEEDOR",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               onTap: () {
                 Navigator.pop(context);
                 _eliminarProveedor(proveedor['id_proveedor']);
               },
             ),
-            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -226,28 +186,25 @@ class _ProveedoresState extends State<Proveedores> {
         backgroundColor: const Color(0xFF0D1B1E),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Color(0xFF017A74), width: 1),
+          side: const BorderSide(color: Color(0xFF017A74)),
         ),
-        child: Container(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
                 "EDITAR PROVEEDOR",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
               _inputMinimal("Nombre", nomCtrl),
               _inputMinimal("Dirección", dirCtrl),
               _inputMinimal("Correo", corCtrl),
               _inputMinimal("Teléfono", telCtrl),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -258,7 +215,6 @@ class _ProveedoresState extends State<Proveedores> {
                       style: TextStyle(color: Colors.redAccent),
                     ),
                   ),
-                  const SizedBox(width: 20),
                   TextButton(
                     onPressed: () async {
                       final response = await http.put(
@@ -282,10 +238,7 @@ class _ProveedoresState extends State<Proveedores> {
                     },
                     child: const Text(
                       "GUARDAR",
-                      style: TextStyle(
-                        color: Colors.cyanAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.cyanAccent),
                     ),
                   ),
                 ],
@@ -298,29 +251,15 @@ class _ProveedoresState extends State<Proveedores> {
   }
 
   Widget _inputMinimal(String label, TextEditingController ctrl) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
-          ),
-          TextField(
-            controller: ctrl,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            decoration: const InputDecoration(
-              isDense: true,
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white24),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.cyanAccent),
-              ),
-            ),
-          ),
-        ],
+    return TextField(
+      controller: ctrl,
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white24),
+        ),
       ),
     );
   }
@@ -328,43 +267,27 @@ class _ProveedoresState extends State<Proveedores> {
   Widget _buildFooterCounter() {
     return Container(
       padding: const EdgeInsets.all(20),
+      color: const Color(0xFF0D1B1E),
       alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFF017A74)),
-        ),
-        child: Text(
-          "TOTAL PROVEEDORES : ${proveedores.length}",
-          style: const TextStyle(
-            color: Colors.cyanAccent,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+      child: Text(
+        "TOTAL PROVEEDORES : ${proveedores.length}",
+        style: const TextStyle(
+          color: Colors.cyanAccent,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
   Widget _buildFab() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.cyanAccent.withOpacity(0.5),
-          width: 1.5,
-        ),
-      ),
-      child: FloatingActionButton(
-        backgroundColor: const Color(0xFF0D1B1E),
-        elevation: 0,
-        child: const Icon(Icons.add, color: Colors.cyanAccent),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Nuevoproveedor()),
-        ).then((_) => fetchProveedores()),
-      ),
+    return FloatingActionButton(
+      backgroundColor: const Color(0xFF0D1B1E),
+      child: const Icon(Icons.add, color: Colors.cyanAccent),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Nuevoproveedor()),
+      ).then((_) => fetchProveedores()),
     );
   }
 }

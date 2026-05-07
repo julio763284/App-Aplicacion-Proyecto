@@ -148,3 +148,4 @@ def init_routes(app):
             return jsonify({"status": "success", "message": "Proveedor actualizado"}), 200
         return jsonify({"status": "error", "message": "Error al actualizar proveedor"}), 400
         return jsonify(res), (201 if res["status"] == "success" else 400)   
+    

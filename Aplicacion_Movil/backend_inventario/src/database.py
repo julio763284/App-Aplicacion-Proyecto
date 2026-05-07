@@ -297,3 +297,17 @@ def editar_proveedor_db(id_proveedor, nombre, direccion, gmail, telefono):
         cursor.close()
         db.close()
         db.close()        
+
+def obtener_usuario(id_usuario):
+    db = obtener_conexion()
+    if not db: return None
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT id_usuario, usuario, email FROM usuario WHERE id_usuario = %s", (id_usuario,))
+        return cursor.fetchone()
+    except Exception as e:
+        print(f"Error en obtener_usuario: {e}")
+        return None
+    finally:
+        cursor.close()
+        db.close()
