@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gestor/HomePage2.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
-
+import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
+import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
 
 void main() {
   runApp(const InventaryMobile());
@@ -15,10 +17,26 @@ class InventaryMobile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => AutenticacionBloc())],
-      child: const MaterialApp(
+      providers: [
+        BlocProvider(
+          create: (context) => AutenticacionBloc()..add(RevisarSesion()),
+        ),
+      ],
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        home: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
+          builder: (context, state) {
+            if (state is LoginExitoso) {
+              return const Homepage2();
+            }
+            if (state is Logincargando) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return const LoginPage();
+          },
+        ),
       ),
     );
   }

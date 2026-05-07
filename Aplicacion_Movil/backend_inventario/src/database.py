@@ -177,4 +177,123 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
         return {"status": "error", "message": str(e)}
     finally:
         cursor.close()
+
+        db.close()        
+## funcion agregada en caso de error eliminar codigo##
+def obtener_proveedores_ordenados():
+    db = obtener_conexion()
+    if not db:
+        return []
+    
+    try:
+        cursor = db.cursor(dictionary=True)
+        # 🟢 El secreto está en el "ORDER BY id DESC"
+        # DESC significa "Descendente" (del más grande al más pequeño)
+        cursor.execute("SELECT * FROM proveedor ORDER BY id_proveedor DESC")
+        return cursor.fetchall()
+    except Exception as e:
+        print("Error al listar:", e)
+        return []
+    finally:
+        cursor.close()
+        db.close()#
+
+def eliminar_producto_db(id_producto):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM producto WHERE id_producto = %s", (id_producto,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_producto_db(id_producto, nombre, descripcion, precio, cantidad):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE producto 
+                 SET nombre=%s, descripcion=%s, precio=%s, cantidad=%s 
+                 WHERE id_producto=%s"""
+        cursor.execute(sql, (nombre, descripcion, precio, cantidad, id_producto))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def eliminar_cliente_db(id_cliente):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM cliente WHERE id_cliente = %s", (id_cliente,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar cliente: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_cliente_db(id_cliente, nombre, direccion, gmail, celular):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE cliente 
+                 SET nombre=%s, direccion_residencia=%s, gmail_corporativo=%s, celular=%s 
+                 WHERE id_cliente=%s"""
+        cursor.execute(sql, (nombre, direccion, gmail, celular, id_cliente))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar cliente: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def eliminar_proveedor_db(id_proveedor):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM proveedor WHERE id_proveedor = %s", (id_proveedor,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar proveedor: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_proveedor_db(id_proveedor, nombre, direccion, gmail, telefono):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE proveedor 
+                 SET nombre=%s, direccion=%s, gmail=%s, telefono=%s 
+                 WHERE id_proveedor=%s"""
+        cursor.execute(sql, (nombre, direccion, gmail, telefono, id_proveedor))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar proveedor: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
         db.close()        

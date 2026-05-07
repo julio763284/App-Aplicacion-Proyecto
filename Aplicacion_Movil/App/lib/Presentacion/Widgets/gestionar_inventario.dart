@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Widgets/api.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class GestionInventarioView extends StatelessWidget {
@@ -60,9 +59,21 @@ class _ResumenInventario extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: const [
-        _ResumenCard(titulo: "Productos", valor: "1,245", icono: Icons.inventory_2),
-        _ResumenCard(titulo: "Stock Bajo", valor: "23", icono: Icons.warning_amber),
-        _ResumenCard(titulo: "Valor Total", valor: "\$12.5M", icono: Icons.attach_money),
+        _ResumenCard(
+          titulo: "Productos",
+          valor: "1,245",
+          icono: Icons.inventory_2,
+        ),
+        _ResumenCard(
+          titulo: "Stock Bajo",
+          valor: "23",
+          icono: Icons.warning_amber,
+        ),
+        _ResumenCard(
+          titulo: "Valor Total",
+          valor: "\$12.5M",
+          icono: Icons.attach_money,
+        ),
       ],
     );
   }
@@ -81,7 +92,8 @@ class _ResumenCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect( // 🔹 Estilo Glassmorphism
+    return ClipRRect(
+      // 🔹 Estilo Glassmorphism
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -95,17 +107,28 @@ class _ResumenCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(icono, color: GestionInventarioView.neonGreen, size: 24), // 🔹 Icono Neón
+              Icon(
+                icono,
+                color: GestionInventarioView.neonGreen,
+                size: 24,
+              ), // 🔹 Icono Neón
               const SizedBox(height: 8),
               Text(
                 valor,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 titulo,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.5)),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.white.withOpacity(0.5),
+                ),
               ),
             ],
           ),
@@ -123,12 +146,9 @@ class _GraficoInventario extends StatefulWidget {
 }
 
 class _GraficoInventarioState extends State<_GraficoInventario> {
-  late Future<List<Movimiento>> movimientosFuture;
-
   @override
   void initState() {
     super.initState();
-    movimientosFuture = InventarioService.obtenerMovimientos();
   }
 
   @override
@@ -140,70 +160,6 @@ class _GraficoInventarioState extends State<_GraficoInventario> {
         color: Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: FutureBuilder<List<Movimiento>>(
-        future: movimientosFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: GestionInventarioView.neonGreen));
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.white30)));
-          }
-
-          final movimientos = snapshot.data ?? [];
-          if (movimientos.isEmpty) return const Center(child: Text("No hay datos"));
-
-          final puntos = movimientos.map((m) => FlSpot((m.mes - 1).toDouble(), m.total)).toList();
-
-          return LineChart(
-            LineChartData(
-              gridData: FlGridData(
-                show: true,
-                getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withOpacity(0.05), strokeWidth: 1),
-                drawVerticalLine: false,
-              ),
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-                      if (value.toInt() < 0 || value.toInt() > 11) return const Text('');
-                      return Text(meses[value.toInt()], style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10));
-                    },
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) => Text("${value.toInt()}", style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 10)),
-                  ),
-                ),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              borderData: FlBorderData(show: false),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: puntos,
-                  isCurved: true,
-                  color: GestionInventarioView.neonGreen, // 🔹 Línea Neón
-                  barWidth: 3,
-                  dotData: FlDotData(show: false),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [GestionInventarioView.neonGreen.withOpacity(0.2), Colors.transparent],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }

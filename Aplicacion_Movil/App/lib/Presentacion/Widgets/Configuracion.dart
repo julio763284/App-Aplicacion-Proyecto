@@ -16,7 +16,7 @@ class Configuracion extends StatelessWidget {
     return Scaffold(
       backgroundColor: primaryDark,
       // Usamos un Drawer genérico por ahora para que no de error
-      drawer: const Drawer(child: Center(child: Text("Menú"))), 
+      drawer: const Drawer(child: Center(child: Text("Menú"))),
       appBar: AppBar(
         backgroundColor: accentTeal.withOpacity(0.15),
         elevation: 0,
@@ -53,39 +53,49 @@ class Configuracion extends StatelessWidget {
               const Text(
                 "Preferencias del Sistema",
                 style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 22, 
-                  fontWeight: FontWeight.bold
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 30),
-              
-              const ItemAjusteNexus(icono: Icons.settings_outlined, texto: "General"),
-              const ItemAjusteNexus(icono: Icons.visibility_outlined, texto: "Vista y Tema"),
-              const ItemAjusteNexus(icono: Icons.business_outlined, texto: "Datos de Mi Empresa"),
-              const ItemAjusteNexus(icono: Icons.payments_outlined, texto: "Gestión de Precios"),
-              const ItemAjusteNexus(icono: Icons.qr_code_scanner_outlined, texto: "Escáner de Barras"),
-              
+
+              const ItemAjusteNexus(
+                icono: Icons.settings_outlined,
+                texto: "General",
+              ),
+              const ItemAjusteNexus(
+                icono: Icons.visibility_outlined,
+                texto: "Vista y Tema",
+              ),
+              const ItemAjusteNexus(
+                icono: Icons.business_outlined,
+                texto: "Datos de Mi Empresa",
+              ),
+              const ItemAjusteNexus(
+                icono: Icons.payments_outlined,
+                texto: "Gestión de Precios",
+              ),
+              const ItemAjusteNexus(
+                icono: Icons.qr_code_scanner_outlined,
+                texto: "Escáner de Barras",
+              ),
+
               // REDIRECCIÓN A PERFIL CLIENTE
               ItemAjusteNexus(
-                icono: Icons.person_outline, 
+                icono: Icons.person_outline,
                 texto: "Perfil de Usuario",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  PerfilPage(userId: 1)),
-                  );
-                },
+                onTap: () {},
               ),
-              
+
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: Divider(color: Colors.white10),
               ),
 
               ItemAjusteNexus(
-                icono: Icons.logout_rounded, 
-                texto: "Cerrar Sesión", 
+                icono: Icons.logout_rounded,
+                texto: "Cerrar Sesión",
                 esAlerta: true,
                 onTap: () => print("Cerrando sesión..."),
               ),
@@ -105,11 +115,11 @@ class ItemAjusteNexus extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ItemAjusteNexus({
-    super.key, 
-    required this.icono, 
-    required this.texto, 
+    super.key,
+    required this.icono,
+    required this.texto,
     this.esAlerta = false,
-    this.onTap, 
+    this.onTap,
   });
 
   @override
@@ -125,33 +135,46 @@ class ItemAjusteNexus extends StatelessWidget {
               color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
-                color: esAlerta ? Colors.redAccent.withOpacity(0.2) : Colors.white.withOpacity(0.05)
+                color: esAlerta
+                    ? Colors.redAccent.withOpacity(0.2)
+                    : Colors.white.withOpacity(0.05),
               ),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              onTap: onTap, 
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
+              ),
+              onTap: onTap,
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: esAlerta ? Colors.redAccent.withOpacity(0.1) : const Color(0xFF017A74).withOpacity(0.1),
+                  color: esAlerta
+                      ? Colors.redAccent.withOpacity(0.1)
+                      : const Color(0xFF017A74).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  icono, 
-                  color: esAlerta ? Colors.redAccent : Colors.greenAccent, 
-                  size: 22
+                  icono,
+                  color: esAlerta ? Colors.redAccent : Colors.greenAccent,
+                  size: 22,
                 ),
               ),
               title: Text(
                 texto,
                 style: TextStyle(
-                  color: esAlerta ? Colors.redAccent : Colors.white.withOpacity(0.8),
+                  color: esAlerta
+                      ? Colors.redAccent
+                      : Colors.white.withOpacity(0.8),
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white10, size: 14),
+              trailing: const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.white10,
+                size: 14,
+              ),
             ),
           ),
         ),

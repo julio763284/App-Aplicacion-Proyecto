@@ -19,7 +19,11 @@ class Nuevoproducto extends StatelessWidget {
 
   Future<void> guardarProducto(BuildContext context) async {
     if (nombreController.text.isEmpty || precioController.text.isEmpty) {
-      _notificar(context, 'Nombre y Precio son obligatorios ⚠️', Colors.orangeAccent);
+      _notificar(
+        context,
+        'Nombre y Precio son obligatorios ⚠️',
+        Colors.orangeAccent,
+      );
       return;
     }
 
@@ -41,10 +45,18 @@ class Nuevoproducto extends StatelessWidget {
         _limpiar();
       } else {
         final errorData = jsonDecode(response.body);
-        _notificar(context, 'Error: ${errorData["message"] ?? "No se pudo guardar"} ❌', Colors.redAccent);
+        _notificar(
+          context,
+          'Error: ${errorData["message"] ?? "No se pudo guardar"} ❌',
+          Colors.redAccent,
+        );
       }
     } catch (e) {
-      _notificar(context, 'Error de conexión con el servidor 🌐', Colors.redAccent);
+      _notificar(
+        context,
+        'Error de conexión con el servidor 🌐',
+        Colors.redAccent,
+      );
     }
   }
 
@@ -57,15 +69,21 @@ class Nuevoproducto extends StatelessWidget {
   }
 
   void _notificar(BuildContext context, String msg, Color col) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg, 
-        style: const TextStyle(color: Color(0xFF0D1B1E), fontWeight: FontWeight.bold)
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          msg,
+          style: const TextStyle(
+            color: Color(0xFF0D1B1E),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: col,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
       ),
-      backgroundColor: col,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      duration: const Duration(seconds: 3),
-    ));
+    );
   }
 
   @override
@@ -75,15 +93,19 @@ class Nuevoproducto extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: primaryDark,
-      // Usando el drawer que ya tienes configurado
-      drawer: const CustomNexusDrawer(), 
+      drawer: const CustomNexusDrawer(),
       appBar: AppBar(
         backgroundColor: accentTeal.withOpacity(0.2),
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          "REGISTRAR NUEVO PRODUCTO", 
-          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.2)
+          "REGISTRAR NUEVO PRODUCTO",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -93,26 +115,52 @@ class Nuevoproducto extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              const Icon(Icons.add_photo_alternate_outlined, size: 70, color: Colors.greenAccent),
+              const Icon(
+                Icons.add_photo_alternate_outlined,
+                size: 70,
+                color: Colors.greenAccent,
+              ),
               const SizedBox(height: 30),
-              
-              _campoNexus("Nombre del Producto", Icons.inventory_2_outlined, nombreController),
-              _campoNexus("Descripción Breve", Icons.description_outlined, descripcionController),
-              
+
+              _campoNexus(
+                "Nombre del Producto",
+                Icons.inventory_2_outlined,
+                nombreController,
+              ),
+              _campoNexus(
+                "Descripción Breve",
+                Icons.description_outlined,
+                descripcionController,
+              ),
+
               Row(
                 children: [
                   Expanded(
-                    child: _campoNexus("Precio", Icons.attach_money, precioController, type: TextInputType.number),
+                    child: _campoNexus(
+                      "Precio",
+                      Icons.attach_money,
+                      precioController,
+                      type: TextInputType.number,
+                    ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
-                    child: _campoNexus("Cantidad", Icons.numbers, cantidadController, type: TextInputType.number),
+                    child: _campoNexus(
+                      "Cantidad",
+                      Icons.numbers,
+                      cantidadController,
+                      type: TextInputType.number,
+                    ),
                   ),
                 ],
               ),
-              
-              _campoNexus("URL de la Imagen (Opcional)", Icons.link, imagenController),
-              
+
+              _campoNexus(
+                "URL de la Imagen (Opcional)",
+                Icons.link,
+                imagenController,
+              ),
+
               const SizedBox(height: 30),
               _botonGuardar(context, accentTeal),
             ],
@@ -122,7 +170,12 @@ class Nuevoproducto extends StatelessWidget {
     );
   }
 
-  Widget _campoNexus(String label, IconData icon, TextEditingController ctr, {TextInputType type = TextInputType.text}) {
+  Widget _campoNexus(
+    String label,
+    IconData icon,
+    TextEditingController ctr, {
+    TextInputType type = TextInputType.text,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: TextFormField(
@@ -131,17 +184,20 @@ class Nuevoproducto extends StatelessWidget {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14),
+          labelStyle: TextStyle(
+            color: Colors.white.withOpacity(0.4),
+            fontSize: 14,
+          ),
           prefixIcon: Icon(icon, color: Colors.greenAccent, size: 20),
           filled: true,
           fillColor: Colors.white.withOpacity(0.05),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15), 
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.1))
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15), 
-            borderSide: const BorderSide(color: Color(0xFF017A74), width: 2)
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(color: Color(0xFF017A74), width: 2),
           ),
         ),
       ),
@@ -155,7 +211,11 @@ class Nuevoproducto extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
-          BoxShadow(color: color.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
         ],
         gradient: LinearGradient(
           colors: [color, const Color(0xFF00C9B1)],
@@ -165,14 +225,20 @@ class Nuevoproducto extends StatelessWidget {
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, 
+          backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
         onPressed: () => guardarProducto(context),
         child: const Text(
-          "CONFIRMAR REGISTRO", 
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)
+          "CONFIRMAR REGISTRO",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
         ),
       ),
     );
