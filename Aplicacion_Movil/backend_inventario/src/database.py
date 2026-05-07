@@ -164,22 +164,29 @@ def obtener_clientes_ordenados():
 
 def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
     db = obtener_conexion()
-    if not db: return {"status": "error", "message": "Error de conexión"}
+    if not db: 
+        return {"status": "error", "message": "Error de conexión con la base de datos"}
     try:
         cursor = db.cursor()
-        # El estado se manejará por defecto como 'Agotado' según tu SQL si no se envía
+        # Usamos una consulta preparada para manejar el string largo de la imagen
         sql = """INSERT INTO producto (nombre, descripcion, precio, cantidad, imagen, estado) 
                  VALUES (%s, %s, %s, %s, %s, 'Disponible')"""
-        cursor.execute(sql, (nombre, descripcion, precio, cantidad, imagen))
+        
+        valores = (nombre, descripcion, precio, cantidad, imagen)
+        
+        cursor.execute(sql, valores)
         db.commit()
-        return {"status": "success", "message": "Producto registrado en DB"}
+        return {"status": "success", "message": "Producto registrado con éxito"}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        # ESTO ES VITAL: Revisa tu terminal de Python para ver este mensaje
+        print(f"❌ ERROR EN INSERTAR PRODUCTO: {str(e)}")
+        return {"status": "error", "message": f"Error en base de datos: {str(e)}"}
     finally:
-        cursor.close()
-
-        db.close()        
-## funcion agregada en caso de error eliminar codigo##
+        if 'cursor' in locals():
+            cursor.close()
+        if db:
+            db.close()
+            
 def obtener_proveedores_ordenados():
     db = obtener_conexion()
     if not db:
@@ -317,10 +324,8 @@ def guardar_codigo_recuperacion(email, codigo):
     if not db: return False
     try:
         cursor = db.cursor()
-        # Primero borramos códigos viejos de ese email si existen
         cursor.execute("DELETE FROM recuperacion_password WHERE email = %s", (email,))
         
-        # Insertamos el nuevo código
         sql = "INSERT INTO recuperacion_password (email, codigo) VALUES (%s, %s)"
         cursor.execute(sql, (email, codigo))
         db.commit()
