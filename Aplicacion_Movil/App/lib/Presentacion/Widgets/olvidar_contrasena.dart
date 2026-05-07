@@ -239,7 +239,7 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
 }
 
 class ApiConfig {
-  static String baseUrl = "http://10.57.206.247:5000";
+  static String baseUrl = "http://10.2.126.213:5000";
 
   static String url(String path) {
     if (path.startsWith('/')) {

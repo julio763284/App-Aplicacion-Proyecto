@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:typed_data'; 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
@@ -48,6 +49,32 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     }
   }
 
+  Widget _mostrarImagenNexus(String? base64String) {
+    if (base64String == null || base64String.isEmpty) {
+      return Container(
+        color: Colors.black26,
+        child: const Icon(Icons.inventory, color: nexusBorder, size: 40),
+      );
+    }
+
+    try {
+      String cleanBase64 = base64String.contains(',') 
+          ? base64String.split(',').last 
+          : base64String;
+
+      Uint8List bytes = base64Decode(cleanBase64);
+      
+      return Image.memory(
+        bytes,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.red),
+      );
+    } catch (e) {
+      return const Icon(Icons.error, color: Colors.orange);
+    }
+  }
+
   void _mostrarOpciones(BuildContext context, dynamic producto) {
     showDialog(
       context: context,
@@ -88,54 +115,23 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                       ),
                     ),
                     Divider(color: nexusCyan.withOpacity(0.15), height: 1),
-
                     Material(
                       color: Colors.transparent,
                       child: Column(
                         children: [
                           ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 25,
-                              vertical: 5,
-                            ),
-                            leading: const Icon(
-                              Icons.edit_outlined,
-                              color: nexusCyan,
-                              size: 22,
-                            ),
-                            title: const Text(
-                              "EDITAR PRODUCTO",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                            leading: const Icon(Icons.edit_outlined, color: nexusCyan, size: 22),
+                            title: const Text("EDITAR PRODUCTO", style: TextStyle(color: Colors.white, fontSize: 13)),
                             onTap: () {
                               Navigator.pop(context);
                               _mostrarDialogoEditar(context, producto);
                             },
                           ),
                           ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 25,
-                              vertical: 5,
-                            ),
-                            leading: const Icon(
-                              Icons.delete_forever_outlined,
-                              color: Colors.redAccent,
-                              size: 22,
-                            ),
-                            title: const Text(
-                              "ELIMINAR DE INVENTARIO",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                            leading: const Icon(Icons.delete_forever_outlined, color: Colors.redAccent, size: 22),
+                            title: const Text("ELIMINAR DE INVENTARIO", style: TextStyle(color: Colors.white, fontSize: 13)),
                             onTap: () {
                               Navigator.pop(context);
                               eliminarProducto(producto['id_producto']);
@@ -158,11 +154,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   void _filterProducts(String query) {
     setState(() {
       _filteredProducts = _allProducts
-          .where(
-            (p) => p['nombre'].toString().toLowerCase().contains(
-              query.toLowerCase(),
-            ),
-          )
+          .where((p) => p['nombre'].toString().toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -191,22 +183,11 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                   ),
                   onChanged: _filterProducts,
                 )
-              : const Text(
-                  "SISTEMA DE INVENTARIO",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    letterSpacing: 1.5,
-                  ),
-                ),
+              : const Text("SISTEMA DE INVENTARIO", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.5)),
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
-              color: nexusCyan,
-            ),
+            icon: Icon(_isSearching ? Icons.close : Icons.search, color: nexusCyan),
             onPressed: () => setState(() {
               _isSearching = !_isSearching;
               if (!_isSearching) {
@@ -239,11 +220,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                       borderRadius: BorderRadius.circular(15),
                       border: Border.all(color: nexusBorder, width: 1.2),
                       boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
+                        BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
                       ],
                     ),
                     child: Column(
@@ -254,20 +231,8 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             padding: const EdgeInsets.all(10),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: producto['imagen'] != null
-                                  ? Image.network(
-                                      producto['imagen'],
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                    )
-                                  : Container(
-                                      color: Colors.black26,
-                                      child: const Icon(
-                                        Icons.inventory,
-                                        color: nexusBorder,
-                                        size: 40,
-                                      ),
-                                    ),
+                              // CAMBIADO: Usamos la función de decodificación Base64
+                              child: _mostrarImagenNexus(producto['imagen']),
                             ),
                           ),
                         ),
@@ -278,25 +243,12 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             children: [
                               Text(
                                 producto['nombre'].toString().toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 6),
-                              Text(
-                                "\$ :   ${producto['precio']}",
-                                style: const TextStyle(
-                                  color: nexusCyan,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1,
-                                ),
-                              ),
+                              Text("\$ :   ${producto['precio']}", style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -308,17 +260,10 @@ class _GestionarproductosState extends State<Gestionarproductos> {
             ),
       bottomNavigationBar: BottomAppBar(
         color: nexusCard,
-        elevation: 0,
         child: Container(
           height: 65,
           padding: const EdgeInsets.symmetric(horizontal: 25),
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: nexusCyan.withOpacity(0.2), width: 0.5),
-            ),
-          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
@@ -329,30 +274,9 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.analytics_outlined,
-                      color: nexusCyan,
-                      size: 16,
-                    ),
+                    const Icon(Icons.analytics_outlined, color: nexusCyan, size: 16),
                     const SizedBox(width: 10),
-                    const Text(
-                      "TOTAL PRODUCTOS :",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      "${_filteredProducts.length}",
-                      style: const TextStyle(
-                        color: nexusCyan,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
+                    Text("TOTAL: ${_filteredProducts.length}", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -360,22 +284,11 @@ class _GestionarproductosState extends State<Gestionarproductos> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: FloatingActionButton(
-          backgroundColor: nexusBg,
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            side: const BorderSide(color: nexusCyan, width: 2),
-          ),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Nuevoproducto()),
-          ).then((_) => obtenerProductos()),
-          child: const Icon(Icons.add_box_outlined, color: nexusCyan, size: 28),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: nexusBg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: nexusCyan, width: 2)),
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Nuevoproducto())).then((_) => obtenerProductos()),
+        child: const Icon(Icons.add_box_outlined, color: nexusCyan),
       ),
     );
   }
@@ -384,90 +297,39 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     try {
       final String url = ApiConfig.url('/producto/$id');
       final response = await http.delete(Uri.parse(url));
-      if (response.statusCode == 200) {
-        obtenerProductos();
-      }
+      if (response.statusCode == 200) obtenerProductos();
     } catch (e) {}
   }
 
   void _mostrarDialogoEditar(BuildContext context, dynamic producto) {
-    final nombreCtrl = TextEditingController(
-      text: producto['nombre'].toString(),
-    );
-    final descCtrl = TextEditingController(
-      text: producto['descripcion']?.toString() ?? '',
-    );
-    final precioCtrl = TextEditingController(
-      text: producto['precio'].toString(),
-    );
-    final cantCtrl = TextEditingController(
-      text: producto['cantidad'].toString(),
-    );
+    final nombreCtrl = TextEditingController(text: producto['nombre'].toString());
+    final descCtrl = TextEditingController(text: producto['descripcion']?.toString() ?? '');
+    final precioCtrl = TextEditingController(text: producto['precio'].toString());
+    final cantCtrl = TextEditingController(text: producto['cantidad'].toString());
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: nexusCard,
-        title: const Text(
-          "EDITAR PRODUCTO",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("EDITAR PRODUCTO", style: TextStyle(color: Colors.white)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: nombreCtrl,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: "Nombre",
-                  labelStyle: TextStyle(color: nexusCyan),
-                ),
-              ),
-              TextField(
-                controller: descCtrl,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: "Descripción",
-                  labelStyle: TextStyle(color: nexusCyan),
-                ),
-              ),
-              TextField(
-                controller: precioCtrl,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: "Precio",
-                  labelStyle: TextStyle(color: nexusCyan),
-                ),
-              ),
-              TextField(
-                controller: cantCtrl,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: "Cantidad",
-                  labelStyle: TextStyle(color: nexusCyan),
-                ),
-              ),
+              TextField(controller: nombreCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Nombre", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: descCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Descripción", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: precioCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Precio", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: cantCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Cantidad", labelStyle: TextStyle(color: nexusCyan))),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              "CANCELAR",
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCELAR", style: TextStyle(color: Colors.redAccent))),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               try {
-                final url = ApiConfig.url(
-                  '/producto/${producto['id_producto']}',
-                );
+                final url = ApiConfig.url('/producto/${producto['id_producto']}');
                 final res = await http.put(
                   Uri.parse(url),
                   headers: {"Content-Type": "application/json"},
@@ -478,9 +340,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                     "cantidad": int.tryParse(cantCtrl.text) ?? 0,
                   }),
                 );
-                if (res.statusCode == 200) {
-                  obtenerProductos();
-                }
+                if (res.statusCode == 200) obtenerProductos();
               } catch (e) {}
             },
             child: const Text("GUARDAR", style: TextStyle(color: nexusCyan)),

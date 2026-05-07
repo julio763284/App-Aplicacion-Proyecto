@@ -1,3 +1,5 @@
+SET GLOBAL max_allowed_packet = 104857600;
+
 CREATE DATABASE IF NOT EXISTS db_inventario;
 USE db_inventario;
 
@@ -6,7 +8,7 @@ CREATE TABLE usuario (
     usuario VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     contrasena VARCHAR(255) NOT NULL,
-    imagen VARCHAR(255)
+    imagen LONGTEXT 
 );
 
 CREATE TABLE producto (
@@ -16,7 +18,7 @@ CREATE TABLE producto (
     precio DECIMAL(10, 2) NOT NULL,
     cantidad INT NOT NULL DEFAULT 0, 
     estado ENUM('Disponible', 'Stock Bajo', 'Agotado') DEFAULT 'Agotado',
-    imagen VARCHAR(255) 
+    imagen LONGTEXT 
 );
 
 CREATE TABLE pedido (
@@ -31,7 +33,7 @@ CREATE TABLE cliente (
     direccion_residencia VARCHAR(255) NOT NULL,
     gmail_corporativo VARCHAR(255) NOT NULL UNIQUE,
     celular VARCHAR(20) NOT NULL,
-    imagen VARCHAR(255),
+    imagen LONGTEXT, 
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
