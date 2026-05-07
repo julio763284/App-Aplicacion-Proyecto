@@ -31,11 +31,10 @@ class _PerfilPageState extends State<PerfilPage> {
     obtenerPerfil();
   }
 
-  // 🔥 OBTENER PERFIL
   Future<void> obtenerPerfil() async {
     try {
       final res = await http.get(
-        Uri.parse("http://10.2.139.37:5000/perfil?id=${widget.userId}"),
+        Uri.parse("http://10.2.126.213:5000/perfil?id=${widget.userId}"),
       );
 
       print("STATUS: ${res.statusCode}");
@@ -47,7 +46,7 @@ class _PerfilPageState extends State<PerfilPage> {
         setState(() {
           nombre = data['nombre'] ?? "";
           email = data['correo'] ?? "";
-          urlImagen = data['imagen']; // base64
+          urlImagen = data['imagen'];
           loading = false;
         });
       } else {
@@ -60,7 +59,6 @@ class _PerfilPageState extends State<PerfilPage> {
     }
   }
 
-  // 🔥 SUBIR IMAGEN REAL
   Future<void> subirImagen() async {
     final picker = ImagePicker();
 
@@ -75,7 +73,7 @@ class _PerfilPageState extends State<PerfilPage> {
 
     try {
       final res = await http.post(
-        Uri.parse("http://10.2.139.37:5000/subir_imagen"),
+        Uri.parse("http://10.2.126.213:5000/subir_imagen"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"id": widget.userId, "imagen": base64Image}),
       );
@@ -83,7 +81,7 @@ class _PerfilPageState extends State<PerfilPage> {
       if (res.statusCode == 200) {
         print("✅ Imagen subida");
 
-        obtenerPerfil(); // 🔥 refresca perfil
+        obtenerPerfil();
       } else {
         print("❌ Error subiendo imagen");
       }
@@ -92,7 +90,6 @@ class _PerfilPageState extends State<PerfilPage> {
     }
   }
 
-  //  LOGOUT REAL
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -165,7 +162,6 @@ class _PerfilPageState extends State<PerfilPage> {
               children: [
                 const SizedBox(height: 20),
 
-                // 🔥 FOTO PERFIL
                 GestureDetector(
                   onTap: subirImagen,
                   child: CircleAvatar(
@@ -173,7 +169,7 @@ class _PerfilPageState extends State<PerfilPage> {
                     backgroundColor: const Color(0xFF017A74),
 
                     backgroundImage: urlImagen != null
-                        ? MemoryImage(base64Decode(urlImagen!)) // 🔥 CLAVE
+                        ? MemoryImage(base64Decode(urlImagen!))
                         : null,
 
                     child: urlImagen == null
@@ -208,7 +204,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
                 const SizedBox(height: 40),
 
-                // 🔥 LOGOUT REAL
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,

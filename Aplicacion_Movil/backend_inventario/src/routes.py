@@ -148,12 +148,10 @@ def init_routes(app):
         if request.method == 'OPTIONS': return jsonify({}), 200
         
         data = request.json
-        # Ajustamos los campos para que coincidan con el JSON enviado por Flutter
         if editar_proveedor_db(id, data['nombre'], data.get('direccion', ''), 
                                data['gmail'], data.get('telefono', '')):
             return jsonify({"status": "success", "message": "Proveedor actualizado"}), 200
         return jsonify({"status": "error", "message": "Error al actualizar proveedor"}), 400
-        return jsonify(res), (201 if res["status"] == "success" else 400)   
     
 
     @app.route('/enviar_codigo', methods=['POST', 'OPTIONS'])

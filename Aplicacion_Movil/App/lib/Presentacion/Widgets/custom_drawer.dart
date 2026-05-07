@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
-
-// ⚠️ IMPORTANTE: Revisa que estas rutas sean las mismas de tu proyecto
 import 'package:gestor/Presentacion/Widgets/gestionar_inventario.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 import 'package:gestor/Presentacion/Widgets/Configuracion.dart';
@@ -65,7 +63,7 @@ class CustomNexusDrawer extends StatelessWidget {
                       _buildSectionTitle("SISTEMA"),
                       _drawerItem(context, Icons.settings_outlined, "Configuración", const Configuracion()),
                       const Divider(color: Colors.white10),
-                      _drawerItem(context, Icons.logout_rounded, "Cerrar Sesión", const Gestionarproductos()), // Cambiar por tu logout
+                      _drawerItem(context, Icons.logout_rounded, "Cerrar Sesión", const Gestionarproductos()), 
                     ],
                   ),
                 ),
@@ -77,7 +75,6 @@ class CustomNexusDrawer extends StatelessWidget {
     );
   }
 
-  // Título de la sección (Operaciones, Análisis, etc)
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 15, bottom: 8),
@@ -93,7 +90,6 @@ class CustomNexusDrawer extends StatelessWidget {
     );
   }
 
-  // Elemento individual del menú
   Widget _drawerItem(BuildContext context, IconData icon, String title, Widget page) {
     return ListTile(
       dense: true,
@@ -105,13 +101,12 @@ class CustomNexusDrawer extends StatelessWidget {
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onTap: () {
-        Navigator.pop(context); // Cierra el menú antes de navegar
+        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context) => page));
       },
     );
   }
 
-  // Logo y Nombre arriba
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(25),
