@@ -85,17 +85,7 @@ class Configuracion extends StatelessWidget {
               ItemAjusteNexus(
                 icono: Icons.person_outline,
                 texto: "Perfil de Usuario",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PerfilPage(
-                        nombre: 'jholian',
-                        email: 'jholian@gamil,com',
-                      ),
-                    ),
-                  );
-                },
+                onTap: () {},
               ),
 
               const Padding(

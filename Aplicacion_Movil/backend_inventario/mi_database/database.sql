@@ -5,7 +5,8 @@ CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     usuario VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    contrasena VARCHAR(255) NOT NULL
+    contrasena VARCHAR(255) NOT NULL,
+    imagen VARCHAR(255)
 );
 
 CREATE TABLE producto (

@@ -177,6 +177,7 @@ def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
         return {"status": "error", "message": str(e)}
     finally:
         cursor.close()
+
         db.close()        
 ## funcion agregada en caso de error eliminar codigo##
 def obtener_proveedores_ordenados():
@@ -295,3 +296,4 @@ def editar_proveedor_db(id_proveedor, nombre, direccion, gmail, telefono):
     finally:
         cursor.close()
         db.close()
+        db.close()        

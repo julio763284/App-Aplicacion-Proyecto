@@ -1,5 +1,8 @@
+import os
+
 from flask import request, jsonify
 from src.database import (
+    obtener_usuario,
     validar_usuario, 
     registrar_usuario, 
     registrar_cliente, 
@@ -84,6 +87,7 @@ def init_routes(app):
             data.get('cantidad'),
             data.get('imagen', '')
         )
+
         return jsonify(res), (201 if res["status"] == "success" else 400)   
     
     @app.route('/proveedores', methods=['GET'])
@@ -143,3 +147,4 @@ def init_routes(app):
                                data['gmail'], data.get('telefono', '')):
             return jsonify({"status": "success", "message": "Proveedor actualizado"}), 200
         return jsonify({"status": "error", "message": "Error al actualizar proveedor"}), 400
+        return jsonify(res), (201 if res["status"] == "success" else 400)   
