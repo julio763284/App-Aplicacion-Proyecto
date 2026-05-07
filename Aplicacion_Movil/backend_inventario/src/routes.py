@@ -24,7 +24,8 @@ from src.database import (
     eliminar_cliente_db,
     editar_proveedor_db,
     eliminar_proveedor_db,
-    guardar_codigo_recuperacion
+    guardar_codigo_recuperacion,
+    actualizar_imagen_usuario
 )
 
 def init_routes(app):
@@ -191,6 +192,35 @@ def init_routes(app):
         except Exception as e:
             print(f"❌ Error crítico en ruta_enviar_codigo: {e}")
             return jsonify({"status": "error", "message": "Error interno del servidor"}), 500
+        
+    @app.route('/perfil', methods=['GET'])
+    def perfil():
+        user_id = request.args.get('id')
+        if not user_id:
+            return jsonify({"status": "error", "message": "ID requerido"}), 400
+        
+        user = obtener_usuario(user_id)
+        if user:
+            return jsonify({
+                "nombre": user['usuario'],
+                "correo": user['email'],
+                "imagen": user['imagen']
+            }), 200
+        return jsonify({"status": "error", "message": "Usuario no encontrado"}), 404
+
+    @app.route('/subir_imagen', methods=['POST'])
+    def subir_imagen():
+        data = request.json
+        user_id = data.get('id')
+        base64_imagen = data.get('imagen')
+
+        if not user_id or not base64_imagen:
+            return jsonify({"status": "error", "message": "Datos incompletos"}), 400
+
+        if actualizar_imagen_usuario(user_id, base64_imagen):
+            return jsonify({"status": "success", "message": "Imagen actualizada"}), 200
+        
+        return jsonify({"status": "error", "message": "No se pudo guardar la imagen"}), 500
 
 
 def enviar_email_codigo(destinatario, codigo):
@@ -225,3 +255,5 @@ def enviar_email_codigo(destinatario, codigo):
     except Exception as e:
         print(f"⚠️ Error SMTP: {e}")
         return False
+    
+    
