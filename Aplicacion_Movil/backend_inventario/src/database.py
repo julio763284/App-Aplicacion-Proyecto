@@ -354,3 +354,41 @@ def guardar_codigo_recuperacion(email, codigo):
     finally:
         cursor.close()
         db.close()
+
+def verificar_codigo_db(email, codigo):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor(dictionary=True)
+        # Verificamos si existe el par email-codigo
+        sql = "SELECT * FROM recuperacion_password WHERE email = %s AND codigo = %s"
+        cursor.execute(sql, (email, codigo))
+        resultado = cursor.fetchone()
+        return resultado is not None
+    except Exception as e:
+        print(f"Error verificando código: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def actualizar_password_db(email, nueva_password_plana):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        hash_pw = bcrypt.hashpw(nueva_password_plana.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        sql = "UPDATE usuario SET contrasena = %s WHERE email = %s"
+        cursor.execute(sql, (hash_pw, email))
+
+        cursor.execute("DELETE FROM recuperacion_password WHERE email = %s", (email,))
+        
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error actualizando password: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()

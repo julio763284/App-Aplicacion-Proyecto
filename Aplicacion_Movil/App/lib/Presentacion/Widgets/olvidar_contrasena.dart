@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena2.dart';
 
@@ -14,6 +15,7 @@ class OlvidarContrasenaPage extends StatefulWidget {
 class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
   final TextEditingController emailController = TextEditingController();
   bool _estaCargando = false;
+
   bool _esCorreoValido(String email) {
     final regex = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
@@ -50,7 +52,9 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
         if (!mounted) return;
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const OlvidarContrasena2()),
+          MaterialPageRoute(
+            builder: (context) => OlvidarContrasena2(email: email),
+          ),
         );
       } else {
         _mostrarMensaje(data['message'] ?? "Error al enviar", esError: true);
@@ -209,11 +213,9 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
                     style: TextStyle(
                       color: Colors.cyanAccent,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(
@@ -235,20 +237,5 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
         ),
       ),
     );
-  }
-}
-
-class ApiConfig {
-  static String baseUrl = "http://10.2.126.213:5000";
-
-  static String url(String path) {
-    if (path.startsWith('/')) {
-      return '$baseUrl$path';
-    }
-    return '$baseUrl/$path';
-  }
-
-  static void updateBaseUrl(String newBaseUrl) {
-    baseUrl = newBaseUrl;
   }
 }
