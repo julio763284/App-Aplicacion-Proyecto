@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gestor/HomePage2.dart';
+import 'package:gestor/Presentacion/Widgets/LogoNexusCustomPainter.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
@@ -27,7 +28,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // --- NUEVO SISTEMA DE ALERTAS NEXUS (CON SALIDA LENTA) ---
   void _showNexusAlert(String message, Color color, IconData icon) {
     OverlayState? overlayState = Overlay.of(context);
     late OverlayEntry overlayEntry;
@@ -98,7 +98,6 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      // Aplicamos la alerta Nexus aquí también
       _showNexusAlert(
         mensaje.toUpperCase(),
         Colors.redAccent,
@@ -164,21 +163,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.security,
-                size: 80,
-                color: Colors.cyanAccent.withOpacity(0.8),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "ACCESO AL SISTEMA",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 3,
-                ),
-              ),
+              const NexusLogoWidget(),
               const SizedBox(height: 40),
               ClipRRect(
                 borderRadius: BorderRadius.circular(25),
@@ -193,6 +178,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: [
+                        const Text(
+                          "INICIA SESIÓN EN NEXUS",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.cyanAccent,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 4,
+                          ),
+                        ),
+                        const SizedBox(height: 25),
                         _buildStyledField(
                           userController,
                           "Usuario o Correo",
@@ -243,11 +239,11 @@ class _LoginPageState extends State<LoginPage> {
                                 ? null
                                 : () {
                                     context.read<AutenticacionBloc>().add(
-                                      Ingresar(
-                                        userController.text,
-                                        passController.text,
-                                      ),
-                                    );
+                                          Ingresar(
+                                            userController.text,
+                                            passController.text,
+                                          ),
+                                        );
                                   },
                             child: state is Logincargando
                                 ? const SizedBox(
@@ -340,7 +336,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// --- WIDGET DE ALERTA NEXUS (IGUAL AL DE REGISTRO PARA COHERENCIA) ---
 class _NexusAlertWidget extends StatefulWidget {
   final String message;
   final Color color;
@@ -369,7 +364,7 @@ class _NexusAlertWidgetState extends State<_NexusAlertWidget>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
-      reverseDuration: const Duration(milliseconds: 1200), // Salida lenta
+      reverseDuration: const Duration(milliseconds: 1200),
     );
 
     _scaleAnimation = CurvedAnimation(
