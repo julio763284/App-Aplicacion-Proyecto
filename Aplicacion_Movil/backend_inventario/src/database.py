@@ -305,12 +305,14 @@ def editar_proveedor_db(id_proveedor, nombre, direccion, gmail, telefono):
         db.close()
         db.close()        
 
+# Busca la función obtener_usuario existente y reemplázala por esta:
 def obtener_usuario(id_usuario):
     db = obtener_conexion()
     if not db: return None
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT id_usuario, usuario, email FROM usuario WHERE id_usuario = %s", (id_usuario,))
+        # 🟢 Agregamos 'imagen' al SELECT para que Flutter la reciba
+        cursor.execute("SELECT id_usuario, usuario, email, imagen FROM usuario WHERE id_usuario = %s", (id_usuario,))
         return cursor.fetchone()
     except Exception as e:
         print(f"Error en obtener_usuario: {e}")
@@ -319,6 +321,22 @@ def obtener_usuario(id_usuario):
         cursor.close()
         db.close()
 
+def actualizar_imagen_usuario(id_usuario, base64_imagen):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET imagen = %s WHERE id_usuario = %s"
+        cursor.execute(sql, (base64_imagen, id_usuario))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"❌ Error al actualizar imagen en DB: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+        
 def guardar_codigo_recuperacion(email, codigo):
     db = obtener_conexion()
     if not db: return False
@@ -332,6 +350,44 @@ def guardar_codigo_recuperacion(email, codigo):
         return True
     except Exception as e:
         print(f"Error guardando código: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def verificar_codigo_db(email, codigo):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor(dictionary=True)
+        # Verificamos si existe el par email-codigo
+        sql = "SELECT * FROM recuperacion_password WHERE email = %s AND codigo = %s"
+        cursor.execute(sql, (email, codigo))
+        resultado = cursor.fetchone()
+        return resultado is not None
+    except Exception as e:
+        print(f"Error verificando código: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def actualizar_password_db(email, nueva_password_plana):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        hash_pw = bcrypt.hashpw(nueva_password_plana.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        sql = "UPDATE usuario SET contrasena = %s WHERE email = %s"
+        cursor.execute(sql, (hash_pw, email))
+
+        cursor.execute("DELETE FROM recuperacion_password WHERE email = %s", (email,))
+        
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error actualizando password: {e}")
         return False
     finally:
         cursor.close()

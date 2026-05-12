@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/HomePage2.dart'; 
+import 'package:gestor/HomePage2.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
@@ -45,40 +45,65 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _manejarErrorLogin(BuildContext context, String mensaje) {
-    final bool noRegistrado = mensaje.toLowerCase().contains("registrarse") || 
-                               mensaje.toLowerCase().contains("no registrado");
+    final bool noRegistrado =
+        mensaje.toLowerCase().contains("registrarse") ||
+        mensaje.toLowerCase().contains("no registrado");
 
     if (noRegistrado) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: const Color(0xFF0D1B1E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("AVISO DE SISTEMA", style: TextStyle(color: Colors.cyanAccent, letterSpacing: 2, fontSize: 16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            "AVISO DE SISTEMA",
+            style: TextStyle(
+              color: Colors.cyanAccent,
+              letterSpacing: 2,
+              fontSize: 16,
+            ),
+          ),
           content: Text(mensaje, style: const TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("CANCELAR", style: TextStyle(color: Colors.white38)),
+              child: const Text(
+                "CANCELAR",
+                style: TextStyle(color: Colors.white38),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyanAccent,
                 foregroundColor: const Color(0xFF0D1B1E),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               onPressed: () {
-                Navigator.pop(context); 
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegisterView()),
+                );
               },
-              child: const Text("REGISTRARME", style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                "REGISTRARME",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
       );
     } else {
       // Aplicamos la alerta Nexus aquí también
-      _showNexusAlert(mensaje.toUpperCase(), Colors.redAccent, Icons.gpp_bad_outlined);
+      _showNexusAlert(
+        mensaje.toUpperCase(),
+        Colors.redAccent,
+        Icons.gpp_bad_outlined,
+      );
     }
   }
 
@@ -90,13 +115,25 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
           if (state is Estado_Registrarse) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterView()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const RegisterView()),
+            );
           } else if (state is EstadoOlvidarcontrasena) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()));
-          } 
-          else if (state is LoginExitoso) {
-            _showNexusAlert("ACCESO CONCEDIDO", Colors.greenAccent, Icons.verified_user_rounded);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const Homepage2()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const OlvidarContrasenaPage()),
+            );
+          } else if (state is LoginExitoso) {
+            _showNexusAlert(
+              "ACCESO CONCEDIDO",
+              Colors.greenAccent,
+              Icons.verified_user_rounded,
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const Homepage2()),
+            );
           } else if (state is LoginError) {
             _manejarErrorLogin(context, state.mensaje);
           }
@@ -127,15 +164,19 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.security, size: 80, color: Colors.cyanAccent.withOpacity(0.8)),
+              Icon(
+                Icons.security,
+                size: 80,
+                color: Colors.cyanAccent.withOpacity(0.8),
+              ),
               const SizedBox(height: 20),
               const Text(
                 "ACCESO AL SISTEMA",
                 style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 22, 
-                  fontWeight: FontWeight.bold, 
-                  letterSpacing: 3
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 3,
                 ),
               ),
               const SizedBox(height: 40),
@@ -152,18 +193,36 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: [
-                        _buildStyledField(userController, "Usuario o Correo", Icons.person_outline),
+                        _buildStyledField(
+                          userController,
+                          "Usuario o Correo",
+                          Icons.person_outline,
+                        ),
                         const SizedBox(height: 20),
-                        _buildStyledField(passController, "Contraseña", Icons.lock_outline, isPass: true),
+                        _buildStyledField(
+                          passController,
+                          "Contraseña",
+                          Icons.lock_outline,
+                          isPass: true,
+                        ),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const OlvidarContrasenaPage()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const OlvidarContrasenaPage(),
+                                ),
+                              );
                             },
                             child: Text(
                               "¿Olvidaste tu contraseña?",
-                              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ),
@@ -175,16 +234,21 @@ class _LoginPageState extends State<LoginPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.cyanAccent,
                               foregroundColor: const Color(0xFF0D1B1E),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                               elevation: 5,
                             ),
-                            onPressed: state is Logincargando 
-                              ? null 
-                              : () {
-                                  context.read<AutenticacionBloc>().add(
-                                    Ingresar(userController.text, passController.text)
-                                  );
-                                },
+                            onPressed: state is Logincargando
+                                ? null
+                                : () {
+                                    context.read<AutenticacionBloc>().add(
+                                      Ingresar(
+                                        userController.text,
+                                        passController.text,
+                                      ),
+                                    );
+                                  },
                             child: state is Logincargando
                                 ? const SizedBox(
                                     height: 20,
@@ -194,7 +258,13 @@ class _LoginPageState extends State<LoginPage> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text("INGRESAR", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                : const Text(
+                                    "INGRESAR",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -205,11 +275,19 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 25),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterView()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterView(),
+                    ),
+                  );
                 },
                 child: const Text(
-                  "¿No tienes cuenta? Regístrate", 
-                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold)
+                  "¿No tienes cuenta? Regístrate",
+                  style: TextStyle(
+                    color: Colors.cyanAccent,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -219,27 +297,32 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildStyledField(TextEditingController controller, String hint, IconData icon, {bool isPass = false}) {
+  Widget _buildStyledField(
+    TextEditingController controller,
+    String hint,
+    IconData icon, {
+    bool isPass = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPass ? _obscureText : false,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.cyanAccent, size: 20),
-        suffixIcon: isPass 
-          ? IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-                color: Colors.cyanAccent.withOpacity(0.5),
-                size: 20,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            )
-          : null,
+        suffixIcon: isPass
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.cyanAccent.withOpacity(0.5),
+                  size: 20,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              )
+            : null,
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
         filled: true,
@@ -264,13 +347,19 @@ class _NexusAlertWidget extends StatefulWidget {
   final IconData icon;
   final VoidCallback onDismiss;
 
-  const _NexusAlertWidget({required this.message, required this.color, required this.icon, required this.onDismiss});
+  const _NexusAlertWidget({
+    required this.message,
+    required this.color,
+    required this.icon,
+    required this.onDismiss,
+  });
 
   @override
   State<_NexusAlertWidget> createState() => _NexusAlertWidgetState();
 }
 
-class _NexusAlertWidgetState extends State<_NexusAlertWidget> with SingleTickerProviderStateMixin {
+class _NexusAlertWidgetState extends State<_NexusAlertWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -322,11 +411,17 @@ class _NexusAlertWidgetState extends State<_NexusAlertWidget> with SingleTickerP
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                    horizontal: 20,
+                  ),
                   decoration: BoxDecoration(
                     color: widget.color.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: widget.color.withOpacity(0.5), width: 1.5),
+                    border: Border.all(
+                      color: widget.color.withOpacity(0.5),
+                      width: 1.5,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -335,7 +430,12 @@ class _NexusAlertWidgetState extends State<_NexusAlertWidget> with SingleTickerP
                       Expanded(
                         child: Text(
                           widget.message,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1.2),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            letterSpacing: 1.2,
+                          ),
                         ),
                       ),
                     ],

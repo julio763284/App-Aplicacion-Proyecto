@@ -1,5 +1,5 @@
 class ApiConfig {
-  static String baseUrl = "http://10.2.126.213:5000";
+  static String baseUrl = "http://10.255.36.247:5000";
 
   static String url(String path) {
     if (path.startsWith('/')) {
