@@ -11,7 +11,6 @@ body{
   overflow-x:hidden;
 }
 
-
 .logo {
   position: relative;
   transition: transform 0.3s ease;
@@ -71,7 +70,7 @@ body{
   top: 0;
   left: 0;
 
-  width: 100%;
+  right: 15px;
 
   height: 95px;
 
@@ -336,4 +335,19 @@ body{
     padding:10px 12px;
   }
 
+}
+ /* Fondo de la barra */
+::-webkit-scrollbar-track {
+  background: #222;
+}
+
+/* Scroll (la parte que se mueve) */
+::-webkit-scrollbar-thumb {
+  background: #08f5e9;
+  border-radius: 10px;
+}
+
+/* Firefox */
+html {
+  scrollbar-color: #08f5e9 #222;
 }
