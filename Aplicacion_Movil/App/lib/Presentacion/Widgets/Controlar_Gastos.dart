@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
 
 class Controlar_Gastos extends StatelessWidget {
   const Controlar_Gastos({super.key});
@@ -12,20 +13,9 @@ class Controlar_Gastos extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: primaryDark,
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.15),
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: neonGreen),
-        title: const Text(
-          "CONTROL DE GASTOS",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
