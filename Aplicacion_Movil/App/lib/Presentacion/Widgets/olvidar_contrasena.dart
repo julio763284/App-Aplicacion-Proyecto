@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/core/config.dart';
+import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/Widgets/olvidar_contrasena2.dart';
 
 class OlvidarContrasenaPage extends StatefulWidget {
@@ -11,18 +14,63 @@ class OlvidarContrasenaPage extends StatefulWidget {
 
 class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
   final TextEditingController emailController = TextEditingController();
+  bool _estaCargando = false;
 
-  // Función para validar el formato del correo
   bool _esCorreoValido(String email) {
-    final regex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+    final regex = RegExp(
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    );
     return regex.hasMatch(email);
+  }
+
+  Future<void> _enviarCodigoAlServidor() async {
+    String email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      _mostrarMensaje("Ingresa tu correo electrónico", esError: true);
+      return;
+    }
+    if (!_esCorreoValido(email)) {
+      _mostrarMensaje("Ingresa un correo válido", esError: true);
+      return;
+    }
+
+    setState(() => _estaCargando = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.url('/enviar_codigo')),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email}),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        _mostrarMensaje("Código enviado a $email");
+
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OlvidarContrasena2(email: email),
+          ),
+        );
+      } else {
+        _mostrarMensaje(data['message'] ?? "Error al enviar", esError: true);
+      }
+    } catch (e) {
+      _mostrarMensaje("No se pudo conectar con el servidor", esError: true);
+    } finally {
+      setState(() => _estaCargando = false);
+    }
   }
 
   void _mostrarMensaje(String mensaje, {bool esError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(mensaje, style: const TextStyle(color: Colors.white)),
-        backgroundColor: esError ? Colors.redAccent : Colors.green,
+        backgroundColor: esError ? Colors.redAccent : const Color(0xFF017A74),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
@@ -56,12 +104,21 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.lock_reset, size: 80, color: Colors.cyanAccent.withOpacity(0.8)),
+                Icon(
+                  Icons.lock_reset,
+                  size: 80,
+                  color: Colors.cyanAccent.withOpacity(0.8),
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   "RECUPERAR CONTRASEÑA",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 3),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 3,
+                  ),
                 ),
                 const SizedBox(height: 40),
                 ClipRRect(
@@ -73,7 +130,9 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -82,18 +141,29 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
                             keyboardType: TextInputType.emailAddress,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.mail_outline, color: Colors.cyanAccent, size: 20),
+                              prefixIcon: const Icon(
+                                Icons.mail_outline,
+                                color: Colors.cyanAccent,
+                                size: 20,
+                              ),
                               hintText: "Correo electrónico",
-                              hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
+                              hintStyle: const TextStyle(
+                                color: Colors.white24,
+                                fontSize: 14,
+                              ),
                               filled: true,
                               fillColor: Colors.black.withOpacity(0.2),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
-                                borderSide: const BorderSide(color: Colors.white10),
+                                borderSide: const BorderSide(
+                                  color: Colors.white10,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
-                                borderSide: const BorderSide(color: Colors.cyanAccent),
+                                borderSide: const BorderSide(
+                                  color: Colors.cyanAccent,
+                                ),
                               ),
                             ),
                           ),
@@ -105,24 +175,24 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.cyanAccent,
                                 foregroundColor: const Color(0xFF0D1B1E),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
                               ),
-                              onPressed: () {
-                                String email = emailController.text.trim();
-                                if (email.isEmpty) {
-                                  _mostrarMensaje("Ingresa tu correo electrónico", esError: true);
-                                } else if (!_esCorreoValido(email)) {
-                                  _mostrarMensaje("Ingresa un correo válido", esError: true);
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const OlvidarContrasena2(),
+                              onPressed: _estaCargando
+                                  ? null
+                                  : _enviarCodigoAlServidor,
+                              child: _estaCargando
+                                  ? const CircularProgressIndicator(
+                                      color: Color(0xFF0D1B1E),
+                                    )
+                                  : const Text(
+                                      "ENVIAR CÓDIGO",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 2,
+                                      ),
                                     ),
-                                  );
-                                }
-                              },
-                              child: const Text("ENVIAR CÓDIGO", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
                             ),
                           ),
                         ],
@@ -130,38 +200,35 @@ class _OlvidarContrasenaPageState extends State<OlvidarContrasenaPage> {
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 35),
-                
-                // Botones inferiores con mejor estilo e iconos
                 TextButton.icon(
-                  onPressed: () {
-                    String email = emailController.text.trim();
-                    if (email.isEmpty) {
-                      _mostrarMensaje("Ingresa tu correo para reenviar el código", esError: true);
-                    } else if (!_esCorreoValido(email)) {
-                      _mostrarMensaje("Ingresa un correo válido", esError: true);
-                    } else {
-                      _mostrarMensaje("Código reenviado correctamente");
-                    }
-                  },
-                  icon: const Icon(Icons.refresh, color: Colors.cyanAccent, size: 18),
+                  onPressed: _estaCargando ? null : _enviarCodigoAlServidor,
+                  icon: const Icon(
+                    Icons.refresh,
+                    color: Colors.cyanAccent,
+                    size: 18,
+                  ),
                   label: const Text(
                     "Reenviar código",
-                    style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    style: TextStyle(
+                      color: Colors.cyanAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                
-                const SizedBox(height: 10),
-                
                 TextButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.5), size: 18),
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.white.withOpacity(0.5),
+                    size: 18,
+                  ),
                   label: Text(
                     "Volver al Login",
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

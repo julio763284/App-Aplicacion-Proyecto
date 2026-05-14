@@ -111,9 +111,8 @@ class _Homepage2State extends State<Homepage2> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PerfilPage(
-                    nombre: 'JHOLIAN MANUEL',
-                    email: 'jholianmanuel@gmail.com',
-                    urlImagen: 'https://avatars.githubusercontent.com/u/12345678?v=4',
+                    userId: 1, // Aquí deberías pasar el ID real del usuario
+                    
                   ),
                 ),
               );

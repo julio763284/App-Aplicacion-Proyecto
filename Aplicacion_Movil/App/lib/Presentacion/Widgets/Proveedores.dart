@@ -3,29 +3,25 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
-import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart'; // Asegúrate de que el nombre coincida
+import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Proveedores extends StatefulWidget {
   const Proveedores({super.key});
-
   @override
   State<Proveedores> createState() => _ProveedoresState();
 }
 
 class _ProveedoresState extends State<Proveedores> {
-  // COMENTARIO: Lista dinámica para almacenar lo que viene de MySQL
   List<dynamic> proveedores = [];
   bool cargando = true;
 
   @override
   void initState() {
     super.initState();
-    fetchProveedores(); // Carga inicial
+    fetchProveedores();
   }
 
-  // COMENTARIO: Función para obtener datos.
-  // Recuerda que en Python debe ser "ORDER BY id DESC" para que el nuevo salga arriba.
   Future<void> fetchProveedores() async {
     try {
       final response = await http.get(Uri.parse(ApiConfig.url('/proveedores')));
@@ -37,187 +33,261 @@ class _ProveedoresState extends State<Proveedores> {
       }
     } catch (e) {
       setState(() => cargando = false);
-      debugPrint("Error en Nexus Proveedores: $e");
+    }
+  }
+
+  Future<void> _eliminarProveedor(int id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse(ApiConfig.url('/proveedor/$id')),
+      );
+      if (response.statusCode == 200) fetchProveedores();
+    } catch (e) {
+      debugPrint("Error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
-
     return Scaffold(
-      backgroundColor: primaryDark,
+      backgroundColor: const Color(0xFF0D1B1E),
       drawer: const CustomNexusDrawer(),
       appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
+        backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
         elevation: 0,
         title: const Text(
           "PROVEEDORES",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: Colors.greenAccent),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+            fontSize: 14,
           ),
         ),
       ),
-      // COMENTARIO: Lógica de estados (Cargando -> Vacío -> Lista)
       body: cargando
           ? const Center(
-              child: CircularProgressIndicator(color: Colors.greenAccent),
+              child: CircularProgressIndicator(color: Colors.cyanAccent),
             )
-          : proveedores.isEmpty
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              color: Colors.greenAccent,
-              onRefresh:
-                  fetchProveedores, // COMENTARIO: Permite actualizar deslizando hacia abajo
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                itemCount: proveedores.length,
-                itemBuilder: (context, index) =>
-                    _buildProveedorCard(proveedores[index]),
-              ),
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(top: 10, bottom: 20),
+                    itemCount: proveedores.length,
+                    itemBuilder: (context, index) {
+                      // Validación de seguridad para evitar RangeError
+                      if (index >= proveedores.length)
+                        return const SizedBox.shrink();
+                      return _buildProveedorCard(proveedores[index]);
+                    },
+                  ),
+                ),
+                _buildFooterCounter(),
+              ],
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.greenAccent,
-        child: const Icon(Icons.add, size: 30, color: primaryDark),
-        onPressed: () =>
-            _mostrarMenuOpciones(context), // Abre el menú con estilo
-      ),
+      floatingActionButton: _buildFab(),
     );
   }
 
-  // COMENTARIO: Diseño de la tarjeta del proveedor (idéntico al de clientes)
   Widget _buildProveedorCard(Map<String, dynamic> proveedor) {
-    final String nombre = proveedor['nombre'] ?? 'Sin nombre';
-    final String gmail = proveedor['gmail'] ?? 'Sin correo';
-
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFF162A2D),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        onLongPress: () => _mostrarOpciones(proveedor),
         leading: CircleAvatar(
-          backgroundColor: Colors.greenAccent.withOpacity(0.1),
-          radius: 25,
+          backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
           child: Text(
-            nombre[0].toUpperCase(),
+            proveedor['nombre'] != null &&
+                    proveedor['nombre'].toString().isNotEmpty
+                ? proveedor['nombre'][0].toString().toUpperCase()
+                : '?',
             style: const TextStyle(
-              color: Colors.greenAccent,
+              color: Colors.cyanAccent,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
         title: Text(
-          nombre,
+          proveedor['nombre'].toString().toUpperCase(),
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w600,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Text(
-          gmail,
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+          proveedor['gmail'] ?? 'SIN CORREO',
+          style: const TextStyle(color: Colors.white38, fontSize: 11),
         ),
         trailing: const Icon(
           Icons.local_shipping_outlined,
-          color: Colors.greenAccent,
-          size: 20,
+          color: Color(0xFF017A74),
+          size: 18,
         ),
       ),
     );
   }
 
-  // COMENTARIO: Estado vacío con el icono de camión de Nexus
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 170,
-            height: 170,
-            decoration: const BoxDecoration(
-              color: Color(0xFF162A2D),
-              shape: BoxShape.circle,
+  void _mostrarOpciones(Map<String, dynamic> proveedor) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1B1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: const BorderSide(color: Color(0xFF017A74)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.cyanAccent),
+              title: const Text(
+                "EDITAR PROVEEDOR",
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _abrirEditor(proveedor);
+              },
             ),
-            child: const Icon(
-              Icons.local_shipping_rounded,
-              size: 80,
-              color: Colors.greenAccent,
+            ListTile(
+              leading: const Icon(Icons.delete_sweep, color: Colors.redAccent),
+              title: const Text(
+                "ELIMINAR PROVEEDOR",
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _eliminarProveedor(proveedor['id_proveedor']);
+              },
             ),
-          ),
-          const SizedBox(height: 30),
-          const Text(
-            "SIN PROVEEDORES",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            "Toca el botón + para registrar uno",
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.4),
-              fontSize: 14,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // COMENTARIO: Menú inferior con desenfoque de fondo
-  void _mostrarMenuOpciones(BuildContext context) {
-    showModalBottomSheet(
+  void _abrirEditor(Map<String, dynamic> proveedor) {
+    final nomCtrl = TextEditingController(text: proveedor['nombre']);
+    final dirCtrl = TextEditingController(text: proveedor['direccion']);
+    final corCtrl = TextEditingController(text: proveedor['gmail']);
+    final telCtrl = TextEditingController(text: proveedor['telefono']);
+
+    showDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Color(0xFF162A2D),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-          ),
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1B1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF017A74)),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: const Icon(
-                  Icons.add_business_rounded,
-                  color: Colors.greenAccent,
+              const Text(
+                "EDITAR PROVEEDOR",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-                title: const Text(
-                  "Nuevo Proveedor",
-                  style: TextStyle(color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.pop(context); // Cierra el menú
-                  // COMENTARIO: Al volver de registrar, refresca la lista automáticamente
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Nuevoproveedor()),
-                  ).then((_) => fetchProveedores());
-                },
               ),
-              const SizedBox(height: 10),
+              _inputMinimal("Nombre", nomCtrl),
+              _inputMinimal("Dirección", dirCtrl),
+              _inputMinimal("Correo", corCtrl),
+              _inputMinimal("Teléfono", telCtrl),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      "CANCELAR",
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final response = await http.put(
+                        Uri.parse(
+                          ApiConfig.url(
+                            '/proveedor/${proveedor['id_proveedor']}',
+                          ),
+                        ),
+                        headers: {"Content-Type": "application/json"},
+                        body: jsonEncode({
+                          "nombre": nomCtrl.text,
+                          "direccion": dirCtrl.text,
+                          "gmail": corCtrl.text,
+                          "telefono": telCtrl.text,
+                        }),
+                      );
+                      if (response.statusCode == 200) {
+                        Navigator.pop(context);
+                        fetchProveedores();
+                      }
+                    },
+                    child: const Text(
+                      "GUARDAR",
+                      style: TextStyle(color: Colors.cyanAccent),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _inputMinimal(String label, TextEditingController ctrl) {
+    return TextField(
+      controller: ctrl,
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white24),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooterCounter() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: const Color(0xFF0D1B1E),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        "TOTAL PROVEEDORES : ${proveedores.length}",
+        style: const TextStyle(
+          color: Colors.cyanAccent,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFab() {
+    return FloatingActionButton(
+      backgroundColor: const Color(0xFF0D1B1E),
+      child: const Icon(Icons.add, color: Colors.cyanAccent),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Nuevoproveedor()),
+      ).then((_) => fetchProveedores()),
     );
   }
 }

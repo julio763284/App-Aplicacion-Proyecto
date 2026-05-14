@@ -164,21 +164,29 @@ def obtener_clientes_ordenados():
 
 def registrar_producto_db(nombre, descripcion, precio, cantidad, imagen):
     db = obtener_conexion()
-    if not db: return {"status": "error", "message": "Error de conexión"}
+    if not db: 
+        return {"status": "error", "message": "Error de conexión con la base de datos"}
     try:
         cursor = db.cursor()
-        # El estado se manejará por defecto como 'Agotado' según tu SQL si no se envía
+        # Usamos una consulta preparada para manejar el string largo de la imagen
         sql = """INSERT INTO producto (nombre, descripcion, precio, cantidad, imagen, estado) 
                  VALUES (%s, %s, %s, %s, %s, 'Disponible')"""
-        cursor.execute(sql, (nombre, descripcion, precio, cantidad, imagen))
+        
+        valores = (nombre, descripcion, precio, cantidad, imagen)
+        
+        cursor.execute(sql, valores)
         db.commit()
-        return {"status": "success", "message": "Producto registrado en DB"}
+        return {"status": "success", "message": "Producto registrado con éxito"}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        # ESTO ES VITAL: Revisa tu terminal de Python para ver este mensaje
+        print(f"❌ ERROR EN INSERTAR PRODUCTO: {str(e)}")
+        return {"status": "error", "message": f"Error en base de datos: {str(e)}"}
     finally:
-        cursor.close()
-        db.close()        
-## funcion agregada en caso de error eliminar codigo##
+        if 'cursor' in locals():
+            cursor.close()
+        if db:
+            db.close()
+            
 def obtener_proveedores_ordenados():
     db = obtener_conexion()
     if not db:
@@ -195,5 +203,192 @@ def obtener_proveedores_ordenados():
         return []
     finally:
         cursor.close()
+        db.close()#
+
+def eliminar_producto_db(id_producto):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM producto WHERE id_producto = %s", (id_producto,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar: {e}")
+        return False
+    finally:
+        cursor.close()
         db.close()
-#### funcion agregada en caso de error eliminar codigo##
+
+def editar_producto_db(id_producto, nombre, descripcion, precio, cantidad):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE producto 
+                 SET nombre=%s, descripcion=%s, precio=%s, cantidad=%s 
+                 WHERE id_producto=%s"""
+        cursor.execute(sql, (nombre, descripcion, precio, cantidad, id_producto))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def eliminar_cliente_db(id_cliente):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM cliente WHERE id_cliente = %s", (id_cliente,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar cliente: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_cliente_db(id_cliente, nombre, direccion, gmail, celular):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE cliente 
+                 SET nombre=%s, direccion_residencia=%s, gmail_corporativo=%s, celular=%s 
+                 WHERE id_cliente=%s"""
+        cursor.execute(sql, (nombre, direccion, gmail, celular, id_cliente))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar cliente: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def eliminar_proveedor_db(id_proveedor):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM proveedor WHERE id_proveedor = %s", (id_proveedor,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar proveedor: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_proveedor_db(id_proveedor, nombre, direccion, gmail, telefono):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE proveedor 
+                 SET nombre=%s, direccion=%s, gmail=%s, telefono=%s 
+                 WHERE id_proveedor=%s"""
+        cursor.execute(sql, (nombre, direccion, gmail, telefono, id_proveedor))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar proveedor: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+        db.close()        
+
+# Busca la función obtener_usuario existente y reemplázala por esta:
+def obtener_usuario(id_usuario):
+    db = obtener_conexion()
+    if not db: return None
+    try:
+        cursor = db.cursor(dictionary=True)
+        # 🟢 Agregamos 'imagen' al SELECT para que Flutter la reciba
+        cursor.execute("SELECT id_usuario, usuario, email, imagen FROM usuario WHERE id_usuario = %s", (id_usuario,))
+        return cursor.fetchone()
+    except Exception as e:
+        print(f"Error en obtener_usuario: {e}")
+        return None
+    finally:
+        cursor.close()
+        db.close()
+
+def actualizar_imagen_usuario(id_usuario, base64_imagen):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET imagen = %s WHERE id_usuario = %s"
+        cursor.execute(sql, (base64_imagen, id_usuario))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"❌ Error al actualizar imagen en DB: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+        
+def guardar_codigo_recuperacion(email, codigo):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM recuperacion_password WHERE email = %s", (email,))
+        
+        sql = "INSERT INTO recuperacion_password (email, codigo) VALUES (%s, %s)"
+        cursor.execute(sql, (email, codigo))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error guardando código: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def verificar_codigo_db(email, codigo):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor(dictionary=True)
+        # Verificamos si existe el par email-codigo
+        sql = "SELECT * FROM recuperacion_password WHERE email = %s AND codigo = %s"
+        cursor.execute(sql, (email, codigo))
+        resultado = cursor.fetchone()
+        return resultado is not None
+    except Exception as e:
+        print(f"Error verificando código: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def actualizar_password_db(email, nueva_password_plana):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        hash_pw = bcrypt.hashpw(nueva_password_plana.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        sql = "UPDATE usuario SET contrasena = %s WHERE email = %s"
+        cursor.execute(sql, (hash_pw, email))
+
+        cursor.execute("DELETE FROM recuperacion_password WHERE email = %s", (email,))
+        
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error actualizando password: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()

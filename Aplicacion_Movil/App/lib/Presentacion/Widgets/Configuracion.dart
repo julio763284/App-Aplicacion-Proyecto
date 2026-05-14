@@ -1,10 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:gestor/perfil.dart';
-import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
-
-// He comentado esta línea para evitar el error de "Library not defined"
-// import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Configuracion extends StatelessWidget {
   const Configuracion({super.key});
@@ -16,8 +11,7 @@ class Configuracion extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: primaryDark,
-      // Usamos un Drawer genérico por ahora para que no de error
-      drawer: const CustomNexusDrawer(),
+      drawer: const Drawer(child: Center(child: Text("Menú"))),
       appBar: AppBar(
         backgroundColor: accentTeal.withOpacity(0.15),
         elevation: 0,
@@ -81,19 +75,10 @@ class Configuracion extends StatelessWidget {
                 icono: Icons.qr_code_scanner_outlined,
                 texto: "Escáner de Barras",
               ),
-
-              // REDIRECCIÓN A PERFIL CLIENTE
               ItemAjusteNexus(
                 icono: Icons.person_outline,
                 texto: "Perfil de Usuario",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PerfilPage(nombre: '', email: ''),
-                    ),
-                  );
-                },
+                onTap: () {},
               ),
 
               const Padding(
@@ -115,7 +100,6 @@ class Configuracion extends StatelessWidget {
   }
 }
 
-// Widget de los botones de ajuste
 class ItemAjusteNexus extends StatelessWidget {
   final IconData icono;
   final String texto;
