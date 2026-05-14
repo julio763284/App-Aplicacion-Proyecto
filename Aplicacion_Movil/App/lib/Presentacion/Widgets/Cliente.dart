@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/NuevoCliente.dart';
@@ -58,24 +59,9 @@ class _ClienteState extends State<Cliente> {
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
-        elevation: 0,
-        title: const Text(
-          "LISTA DE CLIENTES",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-            fontSize: 14,
-          ),
-        ),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: Colors.greenAccent),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       body: Column(
         children: [

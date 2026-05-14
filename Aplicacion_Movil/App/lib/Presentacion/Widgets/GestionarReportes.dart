@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:gestor/Presentacion/Models/modelo.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
+import 'package:gestor/Presentacion/Diseño/appbar.dart';
 
 class GestionarReportes extends StatefulWidget {
   const GestionarReportes({super.key});
@@ -177,31 +178,9 @@ class _InformesViewState extends State<GestionarReportes> {
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.2),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        title: const Text(
-          "GESTIONAR REPORTES",
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month, color: Colors.greenAccent),
-            onPressed: seleccionarFecha,
-          ),
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.sort, color: Colors.white70),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-        ],
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.greenAccent,

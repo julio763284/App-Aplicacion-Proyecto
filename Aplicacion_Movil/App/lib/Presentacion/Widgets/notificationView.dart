@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
 import 'dart:ui';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -74,25 +75,9 @@ class _NotificationViewState extends State<NotificationView> {
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white, size: 28),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        centerTitle: true,
-        title: const Text(
-          "NOTIFICACIONES",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2.0,
-          ),
-        ),
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       body: Stack(
         children: [

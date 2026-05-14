@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/NuevoProveedor.dart';
@@ -52,17 +53,9 @@ class _ProveedoresState extends State<Proveedores> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D1B1E),
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
-        elevation: 0,
-        title: const Text(
-          "PROVEEDORES",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       body: cargando
           ? const Center(
