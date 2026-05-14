@@ -405,6 +405,11 @@ main{
   opacity: .92;
 }
 
+.publicidad .contenedor_texto{
+  display:flex;
+  flex-direction:column;
+}
+
 
 /* ===== VIDEO ===== */
 
@@ -483,4 +488,31 @@ main{
     max-width: 500px;
   }
 
+}
+
+.imag_celular{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap; /* para móviles */
+    margin: 80px 0;
+}
+
+.imag_celular img{
+    width: 250px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+
+    /* animación inicial */
+    opacity: 0;
+    transform: translateY(50px);
+
+    transition: opacity .8s ease,
+                transform .8s ease;
+}
+
+.imag_celular img.show{
+    opacity: 1;
+    transform: translateY(0);
 }
