@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/HomePage2.dart';
-import 'package:gestor/Presentacion/Widgets/Loading.dart';
 import 'package:gestor/Presentacion/Widgets/vistaDeRegistrarse.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
@@ -31,17 +29,6 @@ class LoginPage extends StatelessWidget {
             );
           }
         },
-        child: BlocBuilder<AutenticacionBloc, Autenticacionestados>(
-          builder: (context, state) {
-            if (state is Logincargando) {
-              return const LoadingView();
-            } else if (state is LoginExitoso) {
-              return Homepage2();
-            } else {
-              return Homepage2();
-            }
-          },
-        ),
       ),
     );
   }
