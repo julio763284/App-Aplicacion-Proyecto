@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
@@ -88,18 +89,9 @@ class _VisualizarStockState extends State<VisualizarStock> {
     return Scaffold(
       backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 80,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("INVENTARIO GENERAL",
-                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-            Text("Sincronizado en tiempo real", style: TextStyle(color: Colors.grey, fontSize: 14)),
-          ],
-        ),
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF017A74)))

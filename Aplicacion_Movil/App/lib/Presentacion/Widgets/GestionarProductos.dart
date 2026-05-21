@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:typed_data'; 
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
@@ -164,39 +165,9 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     return Scaffold(
       backgroundColor: nexusBg,
       drawer: const CustomNexusDrawer(),
-      appBar: AppBar(
-        backgroundColor: nexusBg,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: _isSearching
-              ? TextField(
-                  key: const ValueKey('search'),
-                  controller: _searchController,
-                  autofocus: true,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: "BUSCAR RECURSO...",
-                    hintStyle: TextStyle(color: nexusCyan.withOpacity(0.3)),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: _filterProducts,
-                )
-              : const Text("SISTEMA DE INVENTARIO", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.5)),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search, color: nexusCyan),
-            onPressed: () => setState(() {
-              _isSearching = !_isSearching;
-              if (!_isSearching) {
-                _searchController.clear();
-                _filteredProducts = _allProducts;
-              }
-            }),
-          ),
-        ],
+      appBar: CustomAppBar(
+        conteoNotificaciones: 0,
+        onActualizarNotificaciones: () {},
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: nexusCyan))

@@ -1,8 +1,13 @@
 import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/core/config.dart';
+import 'package:http/http.dart' as http;
 
 class OlvidarContrasena2 extends StatefulWidget {
-  const OlvidarContrasena2({super.key});
+  final String email; // Recibimos el email de la pantalla anterior
+
+  const OlvidarContrasena2({super.key, required this.email});
 
   @override
   State<OlvidarContrasena2> createState() => _OlvidarContrasena2State();
@@ -12,6 +17,57 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController newPassController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
+
+  bool _estaCargando = false;
+  bool _obscureText = true;
+
+  Future<void> _restablecerContrasena() async {
+    final String codigo = codeController.text.trim();
+    final String password = newPassController.text.trim();
+    final String confirmPassword = confirmPassController.text.trim();
+
+    if (codigo.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      _mostrarMensaje("Por favor, completa todos los campos", esError: true);
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _mostrarMensaje("Las contraseñas no coinciden", esError: true);
+      return;
+    }
+
+    setState(() => _estaCargando = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.url('/verificar_y_cambiar_password')),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": widget.email,
+          "codigo": codigo,
+          "nuevo_password": password,
+        }),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        _mostrarMensaje("Contraseña actualizada con éxito");
+        if (!mounted) return;
+        // Regresa al Login (primera pantalla)
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } else {
+        _mostrarMensaje(
+          data['message'] ?? "Error al actualizar",
+          esError: true,
+        );
+      }
+    } catch (e) {
+      _mostrarMensaje("Error de conexión", esError: true);
+    } finally {
+      setState(() => _estaCargando = false);
+    }
+  }
 
   void _mostrarMensaje(String mensaje, {bool esError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -35,7 +91,7 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Permite que suba al abrir el teclado
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFF0D1B1E),
       body: Container(
         width: double.infinity,
@@ -53,14 +109,28 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.security_update_good, size: 80, color: Colors.cyanAccent.withOpacity(0.8)),
+                Icon(
+                  Icons.security_update_good,
+                  size: 80,
+                  color: Colors.cyanAccent.withOpacity(0.8),
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   "RESTABLECER CONTRASEÑA",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 3),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 3,
+                  ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 10),
+                Text(
+                  "Enviamos un código a ${widget.email}",
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+                const SizedBox(height: 30),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(25),
                   child: BackdropFilter(
@@ -70,15 +140,31 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
                       ),
                       child: Column(
                         children: [
-                          _buildStyledField(codeController, "Código recibido", Icons.verified_user_outlined),
+                          _buildStyledField(
+                            codeController,
+                            "Código recibido",
+                            Icons.verified_user_outlined,
+                          ),
                           const SizedBox(height: 20),
-                          _buildStyledField(newPassController, "Nueva contraseña", Icons.lock_outline, isPass: true),
+                          _buildStyledField(
+                            newPassController,
+                            "Nueva contraseña",
+                            Icons.lock_outline,
+                            isPass: true,
+                          ),
                           const SizedBox(height: 20),
-                          _buildStyledField(confirmPassController, "Confirmar contraseña", Icons.lock_reset_outlined, isPass: true),
+                          _buildStyledField(
+                            confirmPassController,
+                            "Confirmar contraseña",
+                            Icons.lock_reset_outlined,
+                            isPass: true,
+                          ),
                           const SizedBox(height: 30),
                           SizedBox(
                             width: double.infinity,
@@ -87,22 +173,24 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.cyanAccent,
                                 foregroundColor: const Color(0xFF0D1B1E),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
                               ),
-                              onPressed: () {
-                                if (codeController.text.isEmpty || 
-                                    newPassController.text.isEmpty || 
-                                    confirmPassController.text.isEmpty) {
-                                  _mostrarMensaje("Por favor, completa todos los campos", esError: true);
-                                } else if (newPassController.text != confirmPassController.text) {
-                                  _mostrarMensaje("Las contraseñas no coinciden", esError: true);
-                                } else {
-                                  _mostrarMensaje("Contraseña actualizada con éxito");
-                                  // Volver al inicio del Login
-                                  Navigator.popUntil(context, (route) => route.isFirst);
-                                }
-                              },
-                              child: const Text("ACTUALIZAR", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2)),
+                              onPressed: _estaCargando
+                                  ? null
+                                  : _restablecerContrasena,
+                              child: _estaCargando
+                                  ? const CircularProgressIndicator(
+                                      color: Color(0xFF0D1B1E),
+                                    )
+                                  : const Text(
+                                      "ACTUALIZAR",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 2,
+                                      ),
+                                    ),
                             ),
                           ),
                         ],
@@ -113,10 +201,17 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
                 const SizedBox(height: 25),
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.arrow_back, color: Colors.white.withOpacity(0.5), size: 18),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.white.withOpacity(0.5),
+                    size: 18,
+                  ),
                   label: Text(
                     "Regresar",
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -127,13 +222,27 @@ class _OlvidarContrasena2State extends State<OlvidarContrasena2> {
     );
   }
 
-  Widget _buildStyledField(TextEditingController controller, String hint, IconData icon, {bool isPass = false}) {
+  Widget _buildStyledField(
+    TextEditingController controller,
+    String hint,
+    IconData icon, {
+    bool isPass = false,
+  }) {
     return TextField(
       controller: controller,
-      obscureText: isPass,
+      obscureText: isPass ? _obscureText : false,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.cyanAccent, size: 20),
+        suffixIcon: isPass
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.white24,
+                ),
+                onPressed: () => setState(() => _obscureText = !_obscureText),
+              )
+            : null,
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
         filled: true,
