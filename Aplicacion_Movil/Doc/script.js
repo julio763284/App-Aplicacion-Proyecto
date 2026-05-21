@@ -30,3 +30,29 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const imagenes = document.querySelectorAll(".imag_celular img");
+
+    const observer = new IntersectionObserver((entries) => {
+
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+                entry.target.classList.add("show");
+            } else {
+                entry.target.classList.remove("show");
+            }
+
+        });
+
+    }, {
+        threshold: 0.2
+    });
+
+    imagenes.forEach(img => {
+        observer.observe(img);
+    });
+
+});
