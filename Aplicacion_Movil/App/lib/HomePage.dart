@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gestor/Presentacion/Pages/Home2Page.dart';
+import 'package:gestor/HomePage2.dart';
 
 class HomepageBodyLayout extends StatelessWidget {
   const HomepageBodyLayout({super.key});
@@ -18,7 +18,7 @@ class HomepageBodyLayout extends StatelessWidget {
           ),
         ),
         child: const SafeArea(
-          child: Homepagebody(),
+          child: Homepage2(),
         ),
       ),
     );
