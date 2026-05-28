@@ -1,9 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:gestor/Presentacion/core/config.dart';
-import 'package:gestor/HomePage.dart'; // Asumo que aquí está HomepageBodyLayout
-import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
 import 'package:gestor/perfil.dart';
 
@@ -16,7 +11,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const CustomAppBar({
     super.key,
-    required this.titulo,
+    this.titulo = "NEXUS INVENTORY",
     required this.conteoNotificaciones,
     this.alActualizarNotificaciones,
     this.mostrarNotificaciones = true,
@@ -93,6 +88,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               }
             },
           ),
+
         if (mostrarPerfil)
           IconButton(
             icon: const Icon(
@@ -116,58 +112,4 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class Homepage2 extends StatefulWidget {
-  const Homepage2({super.key});
-
-  @override
-  State<Homepage2> createState() => _Homepage2State();
-}
-
-class _Homepage2State extends State<Homepage2> {
-  int _conteoNotificaciones = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _obtenerNotificaciones();
-  }
-
-  Future<void> _obtenerNotificaciones() async {
-    final url = Uri.parse(ApiConfig.url('/notificaciones'));
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        List data = jsonDecode(response.body);
-        int noLeidas = data
-            .where((n) => n['leido'] == 0 || n['leido'] == false)
-            .length;
-        setState(() {
-          _conteoNotificaciones = noLeidas;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error: $e");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF0D1B1E),
-      drawer: const CustomNexusDrawer(),
-
-      appBar: CustomAppBar(
-        titulo: "NEXUS INVENTORY",
-        conteoNotificaciones: _conteoNotificaciones,
-        alActualizarNotificaciones: _obtenerNotificaciones,
-        mostrarNotificaciones: true,
-        mostrarPerfil: true,
-      ),
-
-      body: const HomepageBodyLayout(),
-    );
-  }
 }
