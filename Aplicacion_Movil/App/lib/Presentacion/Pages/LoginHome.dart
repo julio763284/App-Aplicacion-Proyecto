@@ -109,7 +109,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFF0D1B1E),
       body: BlocListener<AutenticacionBloc, Autenticacionestados>(
         listener: (context, state) {
@@ -239,11 +238,11 @@ class _LoginPageState extends State<LoginPage> {
                                 ? null
                                 : () {
                                     context.read<AutenticacionBloc>().add(
-                                          Ingresar(
-                                            userController.text,
-                                            passController.text,
-                                          ),
-                                        );
+                                      Ingresar(
+                                        userController.text,
+                                        passController.text,
+                                      ),
+                                    );
                                   },
                             child: state is Logincargando
                                 ? const SizedBox(
