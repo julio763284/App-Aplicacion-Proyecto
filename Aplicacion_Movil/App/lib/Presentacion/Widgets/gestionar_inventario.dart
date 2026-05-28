@@ -1,171 +1,192 @@
-import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:fl_chart/fl_chart.dart';
+import 'package:gestor/Presentacion/Widgets/CustomAppBar.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
-class GestionInventarioView extends StatelessWidget {
+class ApiConfig {
+  static String baseUrl = "http://192.168.1.9:5000";
+  static String url(String path) =>
+      path.startsWith('/') ? '$baseUrl$path' : '$baseUrl/$path';
+}
+
+class GestionInventarioView extends StatefulWidget {
   const GestionInventarioView({super.key});
-
-  // Colores del Estilo Nexus
   static const Color primaryDark = Color(0xFF0D1B1E);
-  static const Color accentTeal = Color(0xFF017A74);
-  static const Color neonGreen = Color(0xFF00FFC2);
+  static const List<Color> chartColors = [
+    Color(0xFF00FFC2),
+    Color(0xFFFFD700),
+    Color(0xFFFF6384),
+    Color(0xFF36A2EB),
+    Color(0xFF9966FF),
+    Color(0xFF4BC0C0),
+    Color(0xFFFF9F40),
+  ];
 
   @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context);
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: primaryDark,
-        drawer: const CustomNexusDrawer(),
-        appBar: AppBar(
-          backgroundColor: accentTeal.withOpacity(0.15),
-          elevation: 0,
-          centerTitle: true,
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.sort, color: neonGreen),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-          title: const Text(
-            "GESTIÓN DE INVENTARIO",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            children: const [
-              _ResumenInventario(),
-              SizedBox(height: 30),
-              _GraficoInventario(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  State<GestionInventarioView> createState() => _GestionInventarioViewState();
 }
 
-class _ResumenInventario extends StatelessWidget {
-  const _ResumenInventario();
+class _GestionInventarioViewState extends State<GestionInventarioView> {
+  late Future<List<dynamic>> _futureProductos;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        _ResumenCard(
-          titulo: "Productos",
-          valor: "1,245",
-          icono: Icons.inventory_2,
-        ),
-        _ResumenCard(
-          titulo: "Stock Bajo",
-          valor: "23",
-          icono: Icons.warning_amber,
-        ),
-        _ResumenCard(
-          titulo: "Valor Total",
-          valor: "\$12.5M",
-          icono: Icons.attach_money,
-        ),
-      ],
-    );
-  }
-}
-
-class _ResumenCard extends StatelessWidget {
-  final String titulo;
-  final String valor;
-  final IconData icono;
-
-  const _ResumenCard({
-    required this.titulo,
-    required this.valor,
-    required this.icono,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      // 🔹 Estilo Glassmorphism
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: 105,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
-          ),
-          child: Column(
-            children: [
-              Icon(
-                icono,
-                color: GestionInventarioView.neonGreen,
-                size: 24,
-              ), // 🔹 Icono Neón
-              const SizedBox(height: 8),
-              Text(
-                valor,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                titulo,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white.withOpacity(0.5),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GraficoInventario extends StatefulWidget {
-  const _GraficoInventario();
-
-  @override
-  State<_GraficoInventario> createState() => _GraficoInventarioState();
-}
-
-class _GraficoInventarioState extends State<_GraficoInventario> {
   @override
   void initState() {
     super.initState();
+    _futureProductos = _fetchProductos();
+  }
+
+  Future<List<dynamic>> _fetchProductos() async {
+    final response = await http.get(Uri.parse(ApiConfig.url('/productos')));
+    return response.statusCode == 200 ? json.decode(response.body) : [];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 350,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+    return Scaffold(
+      backgroundColor: GestionInventarioView.primaryDark,
+      drawer: const CustomNexusDrawer(),
+      appBar: const CustomAppBar(
+        titulo: "PANEL DE CONTROL",
+        conteoNotificaciones: 0,
+      ),
+      body: FutureBuilder<List<dynamic>>(
+        future: _futureProductos,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData)
+            return const Center(child: CircularProgressIndicator());
+          final productos = snapshot.data!;
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              SizedBox(
+                height: 300,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildCard("DISTRIBUCIÓN", _buildDonut(productos)),
+                      _buildCard("STOCK", _buildBar(productos)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "LISTA DE PRODUCTOS",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ...productos.asMap().entries.map(
+                (e) => _buildLeyendaCard(
+                  e.value,
+                  GestionInventarioView.chartColors[e.key %
+                      GestionInventarioView.chartColors.length],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
+
+  Widget _buildCard(String title, Widget child) => Container(
+    width: 300,
+    margin: const EdgeInsets.only(right: 15),
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Expanded(child: child),
+      ],
+    ),
+  );
+
+  Widget _buildDonut(List productos) {
+    if (productos.isEmpty) return const SizedBox();
+    return PieChart(
+      PieChartData(
+        sections: productos.asMap().entries.map((e) {
+          final cantidad = (e.value['cantidad'] ?? 0) is num
+              ? (e.value['cantidad'] as num).toDouble()
+              : 0.0;
+          return PieChartSectionData(
+            value: cantidad,
+            color: GestionInventarioView
+                .chartColors[e.key % GestionInventarioView.chartColors.length],
+            radius: 50,
+            title: "",
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildBar(List productos) {
+    if (productos.isEmpty) return const SizedBox();
+    return BarChart(
+      BarChartData(
+        barGroups: productos.asMap().entries.map((e) {
+          final cantidad = (e.value['cantidad'] ?? 0) is num
+              ? (e.value['cantidad'] as num).toDouble()
+              : 0.0;
+          return BarChartGroupData(
+            x: e.key,
+            barRods: [
+              BarChartRodData(
+                toY: cantidad,
+                color:
+                    GestionInventarioView.chartColors[e.key %
+                        GestionInventarioView.chartColors.length],
+                width: 15,
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildLeyendaCard(Map p, Color color) => Container(
+    margin: const EdgeInsets.symmetric(vertical: 5),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 15,
+          height: 15,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 15),
+        Text(p['nombre'], style: const TextStyle(color: Colors.white)),
+        const Spacer(),
+        Text(
+          "Stock: ${p['cantidad']}",
+          style: TextStyle(color: color, fontWeight: FontWeight.bold),
+        ),
+      ],
+    ),
+  );
 }

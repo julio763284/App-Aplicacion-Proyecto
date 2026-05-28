@@ -86,12 +86,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   builder: (context) => const NotificationView(),
                 ),
               );
-              if (alActualizarNotificaciones != null) {
+              if (alActualizarNotificaciones != null)
                 alActualizarNotificaciones!();
-              }
             },
           ),
-
         if (mostrarPerfil)
           IconButton(
             icon: const Icon(
@@ -106,33 +104,25 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               if (userData != null) {
                 try {
                   final Map<String, dynamic> u = jsonDecode(userData);
-                  userId = (u['id_usuario'] ?? u['id'] ?? u['userId']) is int
-                      ? (u['id_usuario'] ?? u['id'] ?? u['userId']) as int
-                      : int.tryParse(
-                              (u['id_usuario'] ?? u['id'] ?? u['userId'])
-                                  .toString(),
-                            ) ??
-                            0;
+                  userId =
+                      int.tryParse(
+                        (u['id_usuario'] ?? u['id'] ?? u['userId']).toString(),
+                      ) ??
+                      0;
                 } catch (_) {
                   userId = 0;
                 }
               }
-              if (userId == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PerfilPage(userId: userId),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => userId == 0
+                      ? const LoginPage()
+                      : PerfilPage(userId: userId),
+                ),
+              );
             },
           ),
-        const SizedBox(width: 5),
       ],
     );
   }
