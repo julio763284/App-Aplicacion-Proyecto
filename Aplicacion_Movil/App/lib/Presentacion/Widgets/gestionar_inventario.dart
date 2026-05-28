@@ -1,15 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/core/config.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:gestor/Presentacion/Widgets/CustomAppBar.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
-class ApiConfig {
-  static String baseUrl = "http://192.168.1.9:5000";
-  static String url(String path) =>
-      path.startsWith('/') ? '$baseUrl$path' : '$baseUrl/$path';
-}
 
 class GestionInventarioView extends StatefulWidget {
   const GestionInventarioView({super.key});

@@ -56,14 +56,12 @@ class CustomNexusDrawer extends StatelessWidget {
                       _drawerItem(context, Icons.analytics_outlined, "Reportes", const GestionarReportes()),
                       _drawerItem(context, Icons.warehouse_outlined, "Stock", const VisualizarStock()),
                       _drawerItem(context, Icons.notifications_active_outlined, "Alertas", const NotificationView()),
-                      _drawerItem(context, Icons.payments_outlined, "Finanzas", const Controlar_Gastos()),
                       
                       const SizedBox(height: 15),
                       
                       _buildSectionTitle("SISTEMA"),
                       _drawerItem(context, Icons.settings_outlined, "Configuración", const Configuracion()),
-                      const Divider(color: Colors.white10),
-                      _drawerItem(context, Icons.logout_rounded, "Cerrar Sesión", const Gestionarproductos()), 
+                      const Divider(color: Colors.white10), 
                     ],
                   ),
                 ),

@@ -62,6 +62,14 @@ CREATE TABLE recuperacion_password (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE reporte_venta (
+    id_reporte INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    monto DECIMAL(10, 2) NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 DELIMITER //
 
 CREATE TRIGGER tr_actualizar_stock_y_notificar
