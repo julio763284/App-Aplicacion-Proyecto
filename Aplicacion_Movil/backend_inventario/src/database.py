@@ -2,7 +2,6 @@ import bcrypt
 import mysql.connector 
 from config.db_config import DB_SETTINGS
 
-# el archivo database.py se conecta con la base de datos #
 
 def obtener_conexion():
     try:
@@ -337,6 +336,38 @@ def actualizar_imagen_usuario(id_usuario, base64_imagen):
         cursor.close()
         db.close()
         
+def actualizar_email_db(id_usuario, nuevo_email):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET email = %s WHERE id_usuario = %s"
+        cursor.execute(sql, (nuevo_email, id_usuario))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al actualizar email: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def actualizar_nombre_usuario(id_usuario, nuevo_nombre):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET usuario = %s WHERE id_usuario = %s"
+        cursor.execute(sql, (nuevo_nombre, id_usuario))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al actualizar nombre: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+        
 def guardar_codigo_recuperacion(email, codigo):
     db = obtener_conexion()
     if not db: return False
@@ -388,6 +419,22 @@ def actualizar_password_db(email, nueva_password_plana):
         return True
     except Exception as e:
         print(f"Error actualizando password: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def eliminar_imagen_usuario(id_usuario):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET imagen = NULL WHERE id_usuario = %s"
+        cursor.execute(sql, (id_usuario,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"❌ Error al eliminar imagen en DB: {e}")
         return False
     finally:
         cursor.close()

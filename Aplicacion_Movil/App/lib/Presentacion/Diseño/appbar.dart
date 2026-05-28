@@ -1,13 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
-import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/perfil.dart';
-import 'package:http/http.dart' as http;
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-
   final int conteoNotificaciones;
   final VoidCallback onActualizarNotificaciones;
 
@@ -44,7 +39,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
 
       actions: [
-
         // BOTÓN NOTIFICACIONES
         IconButton(
           icon: Stack(
@@ -87,9 +81,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () async {
             await Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationView(),
-              ),
+              MaterialPageRoute(builder: (context) => const NotificationView()),
             );
             onActualizarNotificaciones();
           },
@@ -106,11 +98,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => PerfilPage(
-                  userId: 1,
-                ),
-              ),
+              MaterialPageRoute(builder: (context) => PerfilPage(userId: 1)),
             );
           },
         ),

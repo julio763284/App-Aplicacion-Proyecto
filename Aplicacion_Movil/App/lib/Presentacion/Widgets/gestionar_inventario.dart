@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
@@ -13,38 +12,44 @@ class GestionInventarioView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primaryDark, // 🔹 Fondo oscuro
-      drawer: const CustomNexusDrawer(), // 🔹 Tu Drawer
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.15),
-        elevation: 0,
-        centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: neonGreen), // 🔹 Icono Neón
-            onPressed: () => Scaffold.of(context).openDrawer(),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: primaryDark,
+        drawer: const CustomNexusDrawer(),
+        appBar: AppBar(
+          backgroundColor: accentTeal.withOpacity(0.15),
+          elevation: 0,
+          centerTitle: true,
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.sort, color: neonGreen),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          title: const Text(
+            "GESTIÓN DE INVENTARIO",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
-        title: const Text(
-          "GESTIÓN DE INVENTARIO",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            children: const [
+              _ResumenInventario(),
+              SizedBox(height: 30),
+              _GraficoInventario(),
+            ],
           ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
-          children: const [
-            _ResumenInventario(),
-            SizedBox(height: 30),
-            _GraficoInventario(),
-          ],
         ),
       ),
     );
