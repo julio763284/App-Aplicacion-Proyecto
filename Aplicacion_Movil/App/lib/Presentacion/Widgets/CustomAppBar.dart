@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
 import 'package:gestor/perfil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String titulo;
@@ -96,13 +99,37 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               color: Colors.greenAccent,
               size: 28,
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PerfilPage(userId: 1),
-                ),
-              );
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              final String? userData = prefs.getString('user_data');
+              int userId = 0;
+              if (userData != null) {
+                try {
+                  final Map<String, dynamic> u = jsonDecode(userData);
+                  userId = (u['id_usuario'] ?? u['id'] ?? u['userId']) is int
+                      ? (u['id_usuario'] ?? u['id'] ?? u['userId']) as int
+                      : int.tryParse(
+                              (u['id_usuario'] ?? u['id'] ?? u['userId'])
+                                  .toString(),
+                            ) ??
+                            0;
+                } catch (_) {
+                  userId = 0;
+                }
+              }
+              if (userId == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PerfilPage(userId: userId),
+                  ),
+                );
+              }
             },
           ),
         const SizedBox(width: 5),
