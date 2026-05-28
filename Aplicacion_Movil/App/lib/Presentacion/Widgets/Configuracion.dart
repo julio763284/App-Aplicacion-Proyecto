@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:gestor/perfil.dart';
 
 class Configuracion extends StatelessWidget {
   const Configuracion({super.key});
@@ -78,7 +79,14 @@ class Configuracion extends StatelessWidget {
               ItemAjusteNexus(
                 icono: Icons.person_outline,
                 texto: "Perfil de Usuario",
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PerfilPage(userId: 1),
+                    ),
+                  );
+                },
               ),
 
               const Padding(
