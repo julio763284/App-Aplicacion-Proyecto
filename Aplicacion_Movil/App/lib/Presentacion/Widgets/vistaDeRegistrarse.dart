@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gestor/Presentacion/Widgets/login2.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
@@ -18,7 +19,22 @@ class _RegisterViewState extends State<RegisterView> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  bool arePasswordsVisible = false;
+  bool hasUpper = false;
+  bool hasLower = false;
+  bool hasSpecial = false;
+  bool hasMinLength = false;
+
   final Color accentColor = const Color(0xFF00FBFF);
+
+  void _validatePassword(String value) {
+    setState(() {
+      hasUpper = value.contains(RegExp(r'[A-Z]'));
+      hasLower = value.contains(RegExp(r'[a-z]'));
+      hasSpecial = value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+      hasMinLength = value.length >= 6;
+    });
+  }
 
   void validarYRegistrar() {
     if (nombreController.text.isEmpty ||
@@ -41,6 +57,15 @@ class _RegisterViewState extends State<RegisterView> {
         "EL FORMATO DE CORREO NO ES VÁLIDO",
         Colors.redAccent,
         Icons.email_outlined,
+      );
+      return;
+    }
+
+    if (!(hasUpper && hasLower && hasSpecial && hasMinLength)) {
+      _showNexusAlert(
+        "LA CONTRASEÑA NO CUMPLE LOS REQUISITOS",
+        Colors.redAccent,
+        Icons.lock_outline,
       );
       return;
     }
@@ -77,6 +102,29 @@ class _RegisterViewState extends State<RegisterView> {
     );
 
     overlayState.insert(overlayEntry);
+  }
+
+  Widget _validationRow(String text, bool isValid) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(
+            isValid ? Icons.check_circle : Icons.cancel,
+            color: isValid ? Colors.green : Colors.red,
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              color: isValid ? Colors.green : Colors.white54,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -166,6 +214,12 @@ class _RegisterViewState extends State<RegisterView> {
                                   "Contraseña",
                                   Icons.lock_outline,
                                   isPass: true,
+                                  obscure: !arePasswordsVisible,
+                                  onToggleVisibility: () => setState(
+                                    () => arePasswordsVisible =
+                                        !arePasswordsVisible,
+                                  ),
+                                  onChanged: _validatePassword,
                                 ),
                                 const SizedBox(height: 20),
                                 _field(
@@ -173,6 +227,37 @@ class _RegisterViewState extends State<RegisterView> {
                                   "Confirmar",
                                   Icons.shield_outlined,
                                   isPass: true,
+                                  obscure: !arePasswordsVisible,
+                                  onToggleVisibility: () => setState(
+                                    () => arePasswordsVisible =
+                                        !arePasswordsVisible,
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _validationRow(
+                                        "Mínimo 1 mayúscula",
+                                        hasUpper,
+                                      ),
+                                      _validationRow(
+                                        "Mínimo 1 minúscula",
+                                        hasLower,
+                                      ),
+                                      _validationRow(
+                                        "Mínimo 1 carácter especial",
+                                        hasSpecial,
+                                      ),
+                                      _validationRow(
+                                        "Mínimo 6 caracteres",
+                                        hasMinLength,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 const SizedBox(height: 35),
                                 ElevatedButton(
@@ -210,6 +295,37 @@ class _RegisterViewState extends State<RegisterView> {
                                           ),
                                         ),
                                 ),
+                                const SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "¿Ya tienes cuenta? ",
+                                      style: TextStyle(color: Colors.white54),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => BlocProvider.value(
+                                              value: context
+                                                  .read<AutenticacionBloc>(),
+                                              child: LoginPage(),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        "Iniciar sesión",
+                                        style: TextStyle(
+                                          color: accentColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -231,17 +347,30 @@ class _RegisterViewState extends State<RegisterView> {
     String h,
     IconData i, {
     bool isPass = false,
+    bool obscure = true,
     TextInputType type = TextInputType.text,
+    Function(String)? onChanged,
+    VoidCallback? onToggleVisibility,
   }) {
     return TextField(
       controller: c,
-      obscureText: isPass,
+      obscureText: isPass ? obscure : false,
       keyboardType: type,
+      onChanged: onChanged,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: h,
         hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
         prefixIcon: Icon(i, color: accentColor, size: 20),
+        suffixIcon: isPass
+            ? IconButton(
+                icon: Icon(
+                  obscure ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.white38,
+                ),
+                onPressed: onToggleVisibility,
+              )
+            : null,
         filled: true,
         fillColor: Colors.black26,
         border: OutlineInputBorder(
@@ -284,21 +413,17 @@ class _NexusAlertWidgetState extends State<_NexusAlertWidget>
       duration: const Duration(milliseconds: 600),
       reverseDuration: const Duration(milliseconds: 1200),
     );
-
     _scaleAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.elasticOut,
       reverseCurve: Curves.easeInBack,
     );
-
     _fadeAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeIn,
       reverseCurve: Curves.easeOut,
     );
-
     _controller.forward();
-
     Future.delayed(const Duration(seconds: 3), () async {
       if (mounted) {
         await _controller.reverse();
