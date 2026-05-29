@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gestor/Presentacion/Widgets/login2.dart';
 import 'package:gestor/bloc/autenticacion/bloc_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/eventos_autenticacion.dart';
 import 'package:gestor/bloc/autenticacion/estados_autenticacion.dart';
@@ -304,18 +303,7 @@ class _RegisterViewState extends State<RegisterView> {
                                       style: TextStyle(color: Colors.white54),
                                     ),
                                     GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => BlocProvider.value(
-                                              value: context
-                                                  .read<AutenticacionBloc>(),
-                                              child: LoginPage(),
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      onTap: () => Navigator.pop(context),
                                       child: Text(
                                         "Iniciar sesión",
                                         style: TextStyle(
@@ -387,14 +375,12 @@ class _NexusAlertWidget extends StatefulWidget {
   final Color color;
   final IconData icon;
   final VoidCallback onDismiss;
-
   const _NexusAlertWidget({
     required this.message,
     required this.color,
     required this.icon,
     required this.onDismiss,
   });
-
   @override
   State<_NexusAlertWidget> createState() => _NexusAlertWidgetState();
 }
@@ -404,7 +390,6 @@ class _NexusAlertWidgetState extends State<_NexusAlertWidget>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-
   @override
   void initState() {
     super.initState();
