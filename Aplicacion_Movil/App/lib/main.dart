@@ -28,11 +28,6 @@ class InventaryMobile extends StatelessWidget {
             if (state is LoginExitoso) {
               return const Homepage2();
             }
-            if (state is Logincargando) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
             return const LoginPage();
           },
         ),

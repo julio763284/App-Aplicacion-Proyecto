@@ -4,6 +4,10 @@ class AutenticacionInicial extends Autenticacionestados {}
 
 class Logincargando extends Autenticacionestados {}
 
+class Registrocargando extends Autenticacionestados {}
+
+class RegistroExitoso extends Autenticacionestados {}
+
 class LoginExitoso extends Autenticacionestados {
   final Map user;
   LoginExitoso(this.user);

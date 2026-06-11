@@ -1,5 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gestor/Presentacion/Pages/LoginHome.dart';
+import 'package:gestor/Presentacion/Widgets/CustomAppBar.dart';
+import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
 class Configuracion extends StatelessWidget {
   const Configuracion({super.key});
@@ -7,92 +11,56 @@ class Configuracion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
 
     return Scaffold(
       backgroundColor: primaryDark,
-      drawer: const Drawer(child: Center(child: Text("Menú"))),
-      appBar: AppBar(
-        backgroundColor: accentTeal.withOpacity(0.15),
-        elevation: 0,
-        centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.sort, color: Colors.greenAccent),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: const Text(
-          "AJUSTES",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
+      drawer: const CustomNexusDrawer(),
+      appBar: const CustomAppBar(
+        titulo: "AJUSTES",
+        conteoNotificaciones: 0,
+        mostrarNotificaciones: true,
+        mostrarPerfil: true,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Positioned(
-            top: 100,
-            left: -50,
-            child: CircleAvatar(
-              radius: 100,
-              backgroundColor: accentTeal.withOpacity(0.03),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              children: [
+                const Text(
+                  "Preferencias del Sistema",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                const ItemAjusteNexus(icono: Icons.settings_outlined, texto: "General"),
+                const ItemAjusteNexus(icono: Icons.visibility_outlined, texto: "Vista y Tema"),
+                const ItemAjusteNexus(icono: Icons.business_outlined, texto: "Datos de Mi Empresa"),
+                const ItemAjusteNexus(icono: Icons.qr_code_scanner_outlined, texto: "Escáner de Barras"),
+              ],
             ),
           ),
-          ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            children: [
-              const Text(
-                "Preferencias del Sistema",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              const ItemAjusteNexus(
-                icono: Icons.settings_outlined,
-                texto: "General",
-              ),
-              const ItemAjusteNexus(
-                icono: Icons.visibility_outlined,
-                texto: "Vista y Tema",
-              ),
-              const ItemAjusteNexus(
-                icono: Icons.business_outlined,
-                texto: "Datos de Mi Empresa",
-              ),
-              const ItemAjusteNexus(
-                icono: Icons.payments_outlined,
-                texto: "Gestión de Precios",
-              ),
-              const ItemAjusteNexus(
-                icono: Icons.qr_code_scanner_outlined,
-                texto: "Escáner de Barras",
-              ),
-              ItemAjusteNexus(
-                icono: Icons.person_outline,
-                texto: "Perfil de Usuario",
-                onTap: () {},
-              ),
-
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Divider(color: Colors.white10),
-              ),
-
-              ItemAjusteNexus(
-                icono: Icons.logout_rounded,
-                texto: "Cerrar Sesión",
-                esAlerta: true,
-                onTap: () => print("Cerrando sesión..."),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ItemAjusteNexus(
+              icono: Icons.logout_rounded,
+              texto: "Cerrar Sesión",
+              esAlerta: true,
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),
@@ -127,46 +95,29 @@ class ItemAjusteNexus extends StatelessWidget {
               color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
-                color: esAlerta
-                    ? Colors.redAccent.withOpacity(0.2)
-                    : Colors.white.withOpacity(0.05),
+                color: esAlerta ? Colors.redAccent.withOpacity(0.2) : Colors.white.withOpacity(0.05),
               ),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 5,
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               onTap: onTap,
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: esAlerta
-                      ? Colors.redAccent.withOpacity(0.1)
-                      : const Color(0xFF017A74).withOpacity(0.1),
+                  color: esAlerta ? Colors.redAccent.withOpacity(0.1) : const Color(0xFF017A74).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icono,
-                  color: esAlerta ? Colors.redAccent : Colors.greenAccent,
-                  size: 22,
-                ),
+                child: Icon(icono, color: esAlerta ? Colors.redAccent : Colors.greenAccent, size: 22),
               ),
               title: Text(
                 texto,
                 style: TextStyle(
-                  color: esAlerta
-                      ? Colors.redAccent
-                      : Colors.white.withOpacity(0.8),
+                  color: esAlerta ? Colors.redAccent : Colors.white.withOpacity(0.8),
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios_rounded,
-                color: Colors.white10,
-                size: 14,
-              ),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white10, size: 14),
             ),
           ),
         ),

@@ -1,9 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:gestor/Presentacion/core/config.dart';
-import 'package:gestor/HomePage.dart'; // Asumo que aquí está HomepageBodyLayout
-import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/NotificationView.dart';
 import 'package:gestor/perfil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const CustomAppBar({
     super.key,
-    required this.titulo,
+    this.titulo = "NEXUS INVENTORY",
     required this.conteoNotificaciones,
     this.alActualizarNotificaciones,
     this.mostrarNotificaciones = true,
@@ -90,9 +86,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   builder: (context) => const NotificationView(),
                 ),
               );
-              if (alActualizarNotificaciones != null) {
+              if (alActualizarNotificaciones != null)
                 alActualizarNotificaciones!();
-              }
             },
           ),
         if (mostrarPerfil)
@@ -109,91 +104,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               if (userData != null) {
                 try {
                   final Map<String, dynamic> u = jsonDecode(userData);
-                  userId = (u['id_usuario'] ?? u['id'] ?? u['userId']) is int
-                      ? (u['id_usuario'] ?? u['id'] ?? u['userId']) as int
-                      : int.tryParse(
-                              (u['id_usuario'] ?? u['id'] ?? u['userId'])
-                                  .toString(),
-                            ) ??
-                            0;
+                  userId =
+                      int.tryParse(
+                        (u['id_usuario'] ?? u['id'] ?? u['userId']).toString(),
+                      ) ??
+                      0;
                 } catch (_) {
                   userId = 0;
                 }
               }
-              if (userId == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PerfilPage(userId: userId),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => userId == 0
+                      ? const LoginPage()
+                      : PerfilPage(userId: userId),
+                ),
+              );
             },
           ),
-        const SizedBox(width: 5),
       ],
     );
   }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class Homepage2 extends StatefulWidget {
-  const Homepage2({super.key});
-
-  @override
-  State<Homepage2> createState() => _Homepage2State();
-}
-
-class _Homepage2State extends State<Homepage2> {
-  int _conteoNotificaciones = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _obtenerNotificaciones();
-  }
-
-  Future<void> _obtenerNotificaciones() async {
-    final url = Uri.parse(ApiConfig.url('/notificaciones'));
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        List data = jsonDecode(response.body);
-        int noLeidas = data
-            .where((n) => n['leido'] == 0 || n['leido'] == false)
-            .length;
-        setState(() {
-          _conteoNotificaciones = noLeidas;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error: $e");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF0D1B1E),
-      drawer: const CustomNexusDrawer(),
-
-      appBar: CustomAppBar(
-        titulo: "NEXUS INVENTORY",
-        conteoNotificaciones: _conteoNotificaciones,
-        alActualizarNotificaciones: _obtenerNotificaciones,
-        mostrarNotificaciones: true,
-        mostrarPerfil: true,
-      ),
-
-      body: const HomepageBodyLayout(),
-    );
-  }
 }

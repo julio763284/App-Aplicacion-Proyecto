@@ -2,7 +2,6 @@ import bcrypt
 import mysql.connector 
 from config.db_config import DB_SETTINGS
 
-# el archivo database.py se conecta con la base de datos #
 
 def obtener_conexion():
     try:
@@ -337,6 +336,38 @@ def actualizar_imagen_usuario(id_usuario, base64_imagen):
         cursor.close()
         db.close()
         
+def actualizar_email_db(id_usuario, nuevo_email):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET email = %s WHERE id_usuario = %s"
+        cursor.execute(sql, (nuevo_email, id_usuario))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al actualizar email: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def actualizar_nombre_usuario(id_usuario, nuevo_nombre):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET usuario = %s WHERE id_usuario = %s"
+        cursor.execute(sql, (nuevo_nombre, id_usuario))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al actualizar nombre: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+        
 def guardar_codigo_recuperacion(email, codigo):
     db = obtener_conexion()
     if not db: return False
@@ -392,3 +423,73 @@ def actualizar_password_db(email, nueva_password_plana):
     finally:
         cursor.close()
         db.close()
+
+def eliminar_imagen_usuario(id_usuario):
+    db = obtener_conexion()
+    if not db: return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE usuario SET imagen = NULL WHERE id_usuario = %s"
+        cursor.execute(sql, (id_usuario,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"❌ Error al eliminar imagen en DB: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+
+def obtener_reportes_db():
+    db = obtener_conexion()
+    if not db: return []
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM reporte_venta ORDER BY id_reporte DESC")
+        reportes = cursor.fetchall()
+        
+        for r in reportes:
+            if r.get('fecha'):
+                if hasattr(r['fecha'], 'strftime'):
+                    r['fecha'] = r['fecha'].strftime('%Y-%m-%d %H:%M:%S')
+        return reportes
+    except Exception as e:
+        print(f"Error al listar reportes: {e}")
+        return []
+    finally:
+        if 'cursor' in locals(): cursor.close()
+        db.close()
+
+def registrar_reporte_db(titulo, descripcion, monto):
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor()
+        sql = "INSERT INTO reporte_venta (titulo, descripcion, monto, fecha) VALUES (%s, %s, %s, CURRENT_TIMESTAMP)"
+        
+        cursor.execute(sql, (titulo, descripcion, monto))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al registrar: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+def editar_reporte_db(id_reporte, titulo, descripcion, monto):
+    db = obtener_conexion()
+    cursor = db.cursor()
+    cursor.execute("UPDATE reporte_venta SET titulo=%s, descripcion=%s, monto=%s WHERE id_reporte=%s", 
+                   (titulo, descripcion, monto, id_reporte))
+    db.commit()
+    return True
+
+def eliminar_reporte_db(id_reporte):
+    db = obtener_conexion()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM reporte_venta WHERE id_reporte = %s", (id_reporte,))
+    db.commit()
+    return True

@@ -30,6 +30,18 @@ class AutenticacionBloc
       }
     });
 
+    on<RegistrarUsuario>((event, emit) async {
+      emit(Registrocargando());
+
+      final res = await authService.registrar(event.usuario, event.email, event.password);
+
+      if (res['status'] == 'success' || res['status'] == 201) {
+        emit(RegistroExitoso());
+      } else {
+        emit(LoginError(res['message'] ?? "Error en el registro"));
+      }
+    });
+
     on<Salir>((event, emit) async {
       await authService.cerrarSesion();
       emit(AutenticacionInicial());
