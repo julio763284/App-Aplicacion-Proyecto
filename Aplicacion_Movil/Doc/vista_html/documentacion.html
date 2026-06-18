@@ -1,56 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Docs</title>
-    <link rel="icon" href="/Aplicacion_Movil/Doc/favicon_io/favicon.ico" id="logo" class="logo-img" class="loader-mini" class="top-bar" id="topBar">
-    <link rel="stylesheet" href="../vista_css/style.css">
-    <link rel="stylesheet" href="../vista_css/documentacion.css">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus | Documentación</title>
+  <link rel="icon" href="/Aplicacion_Movil/Doc/favicon_io/favicon.ico" id="logo" class="logo-img" class="loader-mini" class="top-bar" id="topBar">
+  <link rel="stylesheet" href="../vista_css/style.css">
+  <link rel="stylesheet" href="../vista_css/documentacion.css">
 </head>
-<body>
+  <body>
 
-      <div id="index" class="container">
-    <header class="navbar">
-      <div class="nav-left">
-        <h2 class="logo">NEXUS <span>DOCS</span></h2>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div id="index" class="container">
 
-        <nav class="nav-links">
-          <a href="../vista_html/index.html">Inicio</a>
-          <a href="../vista_html/documentacion.html">Documentación</a>
-          <a href="../vista_html/diagramas.html">Diagramas</a>
-          <a href="../vista_html/descargar_app.html">Descargar App</a>
-        </nav>
-        
-     </div>
-    </header>
-    
-    <section id="documentacion">
-        <div class="container-doc">
+        <!-- NAVBAR SUPERIOR -->
+        <header class="navbar">
+            <div class="nav-left">
 
-            <div class="card">
-                <h2>Descripción del Proyecto</h2>
-                <p>Esta aplicación móvil está diseñada para facilitar la gestión y visualización de información
-                   de manera rápida e intuitiva, ofreciendo una interfaz moderna, dinámica y fácil de usar para todo 
-                   ipo de usuarios. Además, permite optimizar procesos, mejorar la organización de datos y acceder a la 
-                   información de forma segura y eficiente desde cualquier dispositivo móvil.
+                <h2 class="logo">
+                    NEXUS <span>DOCS</span>
+                </h2>
+
+                <nav class="nav-links">
+                    <a href="../vista_html/index.html">Inicio</a>
+                    <a href="../vista_html/documentacion.html">Documentación</a>
+                    <a href="../vista_html/diagramas.html">Diagramas</a>
+                    <a href="../vista_html/descargar_app.html">Descargar App</a>
+                </nav>
+
+            </div>
+        </header>
+
+        <nav class="sidebar-docs">
+    <h3>Contenido</h3>
+
+    <ul>
+        <li><a href="#introduccion">Introducción</a></li>
+        <li><a href="#requerimientos">Requerimientos</a></li>
+        <li><a href="#arquitectura">Arquitectura</a></li>
+        <li><a href="#pruebas">Pruebas QA</a></li>
+        <li><a href="#despliegue">Despliegue</a></li>
+        <li><a href="#simulador">Simulador API</a></li>
+    </ul>
+</nav>
+
+        <!-- CONTENIDO -->
+        <main>
+
+            <!-- INTRODUCCIÓN -->
+            <section id="introduccion">
+
+                <h1>Documentación Técnica Oficial del Sistema NEXUS</h1>
+
+                <div class="meta-info">
+                    <p><strong>Versión:</strong> 1.0.0</p>
+                    <p><strong>Fecha:</strong> 11 de junio de 2026</p>
+                    <p><strong>Estado:</strong> Documento Base Homologado</p>
+                </div>
+
+                <p class="parrafo">
+                    Este documento constituye la especificación técnica
+                    integral de la plataforma NEXUS.
                 </p>
+
+            </section>
+
+
+            <!-- REQUERIMIENTOS -->
+            <section id="requerimientos" class="card-documentacion">
+
+                <h2>1. Especificación de Requerimientos Completa</h2>
+
+                <p class="parrafo">La base fundamental del sistema NEXUS se divide en capacidades funcionales explícitas que el sistema debe ejecutar, y restricciones arquitectónicas y operativas de carácter no funcional que garantizan su viabilidad en producción.</p>
+
+            <h3>1.1 Requerimientos Funcionales (RF)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Requerimiento</th>
+                            <th>Descripción Detallada</th>
+                            <th>Prioridad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>RF-001</strong></td>
+                            <td>Autenticación con Roles y Privilegios (RBAC)</td>
+                            <td>El sistema debe validar el acceso de usuarios mediante correo institucional y contraseña. Adicionalmente, asignará perfiles estrictos: Administrador, Supervisor y Operador.</td>
+                            <td><span class="badge badge-alta">Alta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RF-002</strong></td>
+                            <td>Sincronización de Panel en Tiempo Real</td>
+                            <td>El panel de control principal (Dashboard) debe actualizar de forma automática los indicadores gráficos de rendimiento operativo cada vez que ocurra una mutación de estado en la persistencia central sin refresco manual.</td>
+                            <td><span class="badge badge-alta">Alta</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RF-003</strong></td>
+                            <td>Exportación de Datos Analíticos</td>
+                            <td>El sistema proveerá filtros por rango de fechas y módulos de negocio que permitan a los roles autorizados exportar reportes tabulares directamente a formatos abiertos estructurados (CSV y PDF).</td>
+                            <td><span class="badge badge-media">Media</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RF-004</strong></td>
+                            <td>Centro de Notificaciones Críticas</td>
+                            <td>Despacho automatizado de alertas de sistema mediante WebSockets e integraciones de correo electrónico cuando las métricas superen los umbrales de tolerancia preestablecidos.</td>
+                            <td><span class="badge badge-media">Media</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="card">
-                <h2>Arquitectura del Sistema</h2>
-                <p>La aplicación está construida bajo una arquitectura moderna
-                 y escalable. El frontend se desarrolla en Flutter y el backend
-                 maneja la lógica del negocio.
-                </p>
+            <h3>1.2 Requerimientos No Funcionales (RNF)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Categoría</th>
+                            <th>Especificación Técnica e Indicador Objetivo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>RNF-001</strong></td>
+                            <td>Seguridad de la Información</td>
+                            <td>Todo el intercambio de información en tránsito implementará cifrado SSL/TLS 1.3. Las credenciales y datos sensibles en reposo dentro de la base de datos se almacenarán encriptados bajo el estándar AES-256.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RNF-002</strong></td>
+                            <td>Rendimiento y Latencia</td>
+                            <td>Las solicitudes HTTP procesadas por el backend deben retornar una respuesta en un tiempo inferior a 250 milisegundos bajo condiciones de carga estándar de la red interna.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RNF-003</strong></td>
+                            <td>Escalabilidad Concurrente</td>
+                            <td>La arquitectura base debe estar preparada para mantener de forma simultánea un volumen de hasta 5,000 conexiones por sockets activas sin evidenciar degradación en los tiempos de respuesta.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RNF-004</strong></td>
+                            <td>Disponibilidad del Servicio</td>
+                            <td>La infraestructura desplegada en los entornos Cloud garantizará un acuerdo de nivel de servicio (SLA) de disponibilidad operativa anual del 99.95%.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-         </div>
-    </section>
 
+                <!-- AQUÍ VA TU TABLA -->
+
+            </section>
+
+            <!-- ARQUITECTURA -->
+            <section id="arquitectura" class="card-documentacion">
+
+                <h2>2. Arquitectura del Sistema y Stack Tecnológico</h2>
+
+                            <p class="parrafo">La topología arquitectónica de NEXUS se rige por un esquema desacoplado y modular, optimizado para garantizar alta disponibilidad de servicios y flujos continuos de datos en tiempo real.</p>
+            
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h4>Capa Cliente (Frontend)</h4>
+                    <p>Desarrollado sobre <strong>Flutter</strong>, permitiendo una interfaz unificada multiplataforma (Web/Mobile), gestionando estados mediante el patrón empresarial <strong>BLoC</strong>.</p>
+                </div>
+                <div class="tech-card">
+                    <h4>Capa de Servicios (Backend)</h4>
+                    <p>Construido con Node.js empleando el framework estructurado <strong>NestJS</strong> basado en TypeScript, controladores REST y pasarelas dinámicas de WebSockets.</p>
+                </div>
+                <div class="tech-card">
+                    <h4>Persistencia de Datos</h4>
+                    <p>Motor Relacional <strong>PostgreSQL 15</strong> enfocado en resguardar el modelo transaccional rígido y los históricos de auditoría de la plataforma.</p>
+                </div>
+                <div class="tech-card">
+                    <h4>Capa de Caché y Memoria</h4>
+                    <p><strong>Redis Enterprise</strong> para la administración de sesiones activas, mecanismos de caché distribuido y colas intermediates de mensajería rápida.</p>
+                </div>
+            </div>
+        </section>
+
+                <!-- AQUÍ VA EL TECH GRID -->
+
+            </section>
+
+            <!-- PRUEBAS -->
+            <section id="pruebas" class="card-documentacion">
+
+                <h2>3. Plan de Pruebas (QA)</h2>
+            <h2>3. Plan de Pruebas (QA) y Criterios de Aceptación</h2>
+            <p>A fin de garantizar que el software responda de forma predecible ante las especificaciones del negocio, se ha establecido un entorno formalizado de pruebas unitarias, funcionales y de integración.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Caso</th>
+                            <th>Componente Evaluado</th>
+                            <th>Acción / Payload de Entrada</th>
+                            <th>Resultado Esperado Técnico</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>CP-AUTH-01</strong></td>
+                            <td>Validación de Credenciales JWT</td>
+                            <td>Petición POST a <code>/api/v1/auth/login</code> incluyendo usuario y clave válidos en el body JSON.</td>
+                            <td>El backend debe retornar código HTTP 200 OK y la estructura cifrada del token JWT con expiración estricta de 60 minutos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CP-AUTH-02</strong></td>
+                            <td>Control de Accesos por Rol</td>
+                            <td>Usuario autenticado con rol "Operador" ejecuta llamada DELETE a la ruta restringida <code>/api/v1/admin/users</code>.</td>
+                            <td>El interceptor bloquea la petición inmediatamente y devuelve código HTTP 403 Forbidden sin afectar la base de datos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CP-SOCK-01</strong></td>
+                            <td>Reconexión de Canal de Sockets</td>
+                            <td>Desconexión artificial del adaptador de red del terminal cliente durante un lapso controlado de 5 segundos.</td>
+                            <td>El frontend activa una política de reconexión exponencial. Al reestablecer el enlace, recupera el flujo de datos sin interrupciones.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+                <!-- AQUÍ VA LA TABLA QA -->
+
+            </section>
+
+            <!-- DESPLIEGUE -->
+            <section id="despliegue" class="card-documentacion">
+
+                <h2>4. Guía de Despliegue y Mantenimiento</h2>
+
+                            <p>Instrucciones operativas orientadas a la inicialización y aprovisionamiento local rápido del entorno de desarrollo mediante contenedores aislados.</p>
+
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                <pre><code># 1. Clonar el repositorio oficial de la plataforma NEXUS
+git clone https://github.com/organizacion/nexus-core.git
+cd nexus-core
+
+# 2. Instanciar el entorno de variables de entorno seguras
+cp .env.example .env
+
+# Modificar las variables del archivo .env con credenciales seguras de desarrollo
+nano .env
+
+# 3. Compilar imágenes base y levantar la suite de contenedores en segundo plano
+docker-compose up --build -d
+
+# 4. Validar el estado operativo y salud de los contenedores locales
+docker-compose ps</code></pre>
+            </div>
+
+                <!-- AQUÍ VA EL BLOQUE DE CÓDIGO -->
+
+            </section>
+
+        </main>
+
+    </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  <script src="/Aplicacion_Movil/Doc/script.js"></script>
+  <script src="../script.js"></script>
 
 </body>
 </html>
