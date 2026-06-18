@@ -31,19 +31,6 @@
             </div>
         </header>
 
-        <nav class="sidebar-docs">
-    <h3>Contenido</h3>
-
-    <ul>
-        <li><a href="#introduccion">Introducción</a></li>
-        <li><a href="#requerimientos">Requerimientos</a></li>
-        <li><a href="#arquitectura">Arquitectura</a></li>
-        <li><a href="#pruebas">Pruebas QA</a></li>
-        <li><a href="#despliegue">Despliegue</a></li>
-        <li><a href="#simulador">Simulador API</a></li>
-    </ul>
-</nav>
-
         <!-- CONTENIDO -->
         <main>
 
@@ -88,25 +75,20 @@
                         <tr>
                             <td><strong>RF-001</strong></td>
                             <td>Autenticación con Roles y Privilegios (RBAC)</td>
-                            <td>El sistema debe validar el acceso de usuarios mediante correo institucional y contraseña. Adicionalmente, asignará perfiles estrictos: Administrador, Supervisor y Operador.</td>
+                            <td>El sistema debe validar el acceso mediante un correo electrónico y una contraseña. Debido a que la aplicación contará con un único usuario administrador, este tendrá acceso completo a toda la información y a todas las funcionalidades del sistema.</td>
                             <td><span class="badge badge-alta">Alta</span></td>
                         </tr>
                         <tr>
                             <td><strong>RF-002</strong></td>
                             <td>Sincronización de Panel en Tiempo Real</td>
-                            <td>El panel de control principal (Dashboard) debe actualizar de forma automática los indicadores gráficos de rendimiento operativo cada vez que ocurra una mutación de estado en la persistencia central sin refresco manual.</td>
+                            <td>El panel de control principal (Dashboard) deberá actualizar automáticamente los indicadores y gráficos de inventario cada vez que se registre un cambio en la información almacenada por el sistema, sin requerir una actualización manual por parte del usuario.</td>
                             <td><span class="badge badge-alta">Alta</span></td>
                         </tr>
                         <tr>
                             <td><strong>RF-003</strong></td>
-                            <td>Exportación de Datos Analíticos</td>
-                            <td>El sistema proveerá filtros por rango de fechas y módulos de negocio que permitan a los roles autorizados exportar reportes tabulares directamente a formatos abiertos estructurados (CSV y PDF).</td>
-                            <td><span class="badge badge-media">Media</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>RF-004</strong></td>
                             <td>Centro de Notificaciones Críticas</td>
-                            <td>Despacho automatizado de alertas de sistema mediante WebSockets e integraciones de correo electrónico cuando las métricas superen los umbrales de tolerancia preestablecidos.</td>
+                            <td>El sistema deberá generar y enviar notificaciones automáticas cuando se detecten situaciones que requieran atención, como niveles bajos de inventario o eventos críticos, pudiendo mostrarlas dentro de la aplicación o enviarlas por correo electrónico.
+</td>
                             <td><span class="badge badge-media">Media</span></td>
                         </tr>
                     </tbody>
@@ -136,11 +118,6 @@
                         </tr>
                         <tr>
                             <td><strong>RNF-003</strong></td>
-                            <td>Escalabilidad Concurrente</td>
-                            <td>La arquitectura base debe estar preparada para mantener de forma simultánea un volumen de hasta 5,000 conexiones por sockets activas sin evidenciar degradación en los tiempos de respuesta.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>RNF-004</strong></td>
                             <td>Disponibilidad del Servicio</td>
                             <td>La infraestructura desplegada en los entornos Cloud garantizará un acuerdo de nivel de servicio (SLA) de disponibilidad operativa anual del 99.95%.</td>
                         </tr>
@@ -162,19 +139,15 @@
             <div class="tech-grid">
                 <div class="tech-card">
                     <h4>Capa Cliente (Frontend)</h4>
-                    <p>Desarrollado sobre <strong>Flutter</strong>, permitiendo una interfaz unificada multiplataforma (Web/Mobile), gestionando estados mediante el patrón empresarial <strong>BLoC</strong>.</p>
+                    <p>Desarrollado sobre <strong>Flutter</strong>, Permitiendo una interfaz de usuario integrada para la aplicación, gestionando los estados y procesos internos de manera eficiente mediante el patrón empresarial establecido. <strong>BLoC</strong>.</p>
                 </div>
                 <div class="tech-card">
                     <h4>Capa de Servicios (Backend)</h4>
-                    <p>Construido con Node.js empleando el framework estructurado <strong>NestJS</strong> basado en TypeScript, controladores REST y pasarelas dinámicas de WebSockets.</p>
+                    <p>Desarrollado en Python mediante el framework Flask, permitiendo la gestión de la lógica de negocio, el acceso a los datos y la interacción con los diferentes módulos de la aplicación.</p>
                 </div>
                 <div class="tech-card">
                     <h4>Persistencia de Datos</h4>
-                    <p>Motor Relacional <strong>PostgreSQL 15</strong> enfocado en resguardar el modelo transaccional rígido y los históricos de auditoría de la plataforma.</p>
-                </div>
-                <div class="tech-card">
-                    <h4>Capa de Caché y Memoria</h4>
-                    <p><strong>Redis Enterprise</strong> para la administración de sesiones activas, mecanismos de caché distribuido y colas intermediates de mensajería rápida.</p>
+                    <p>Motor de base de datos relacional MariaDB, encargado de almacenar y gestionar de forma segura la información del inventario, las transacciones realizadas y los registros históricos generados por la aplicación.</p>
                 </div>
             </div>
         </section>
@@ -206,12 +179,6 @@
                             <td>Validación de Credenciales JWT</td>
                             <td>Petición POST a <code>/api/v1/auth/login</code> incluyendo usuario y clave válidos en el body JSON.</td>
                             <td>El backend debe retornar código HTTP 200 OK y la estructura cifrada del token JWT con expiración estricta de 60 minutos.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>CP-AUTH-02</strong></td>
-                            <td>Control de Accesos por Rol</td>
-                            <td>Usuario autenticado con rol "Operador" ejecuta llamada DELETE a la ruta restringida <code>/api/v1/admin/users</code>.</td>
-                            <td>El interceptor bloquea la petición inmediatamente y devuelve código HTTP 403 Forbidden sin afectar la base de datos.</td>
                         </tr>
                         <tr>
                             <td><strong>CP-SOCK-01</strong></td>
