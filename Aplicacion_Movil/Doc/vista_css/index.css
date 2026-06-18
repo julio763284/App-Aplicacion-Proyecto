@@ -1,6 +1,6 @@
 #index{
 
-  width:100vw;
+  width:100%;
 
   min-height:100vh;
 }
@@ -15,9 +15,17 @@
 
   position:relative;
 
-  overflow:hidden;
+    overflow-x: hidden;
+  overflow-y: visible;
 }
 
+.parrafo{
+  font-size: 25px ;
+}
+
+.texto{
+  font-size: 40px;
+}
 
 main{
 
