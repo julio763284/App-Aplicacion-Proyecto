@@ -6,12 +6,7 @@ font-family:system-ui;
 }
 
 body{
-background: radial-gradient(
-circle at 30% 30%,
-#0f8a83,
-#0d746e,
-#083f3c
-);
+background: rgba(10,15,23,.75);
 color:white;
 min-height:100vh;
 display:flex;
