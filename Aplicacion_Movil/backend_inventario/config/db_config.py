@@ -3,7 +3,7 @@ DB_SETTINGS = {
     'host': 'localhost', 
     'user': 'root',  
     'password': '', 
-    'database': 'db_inventario' 
+    'database': 'mitiendaweb_db' 
 }
 
 SERVER_SETTINGS = {
