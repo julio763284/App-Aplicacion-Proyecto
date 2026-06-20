@@ -92,17 +92,18 @@ def init_routes(app):
 
 
     @app.route('/producto', methods=['POST'])
-    def guardar_producto():
-        data = request.json
-        res = registrar_producto_db(
-            data.get('nombre'),
-            data.get('descripcion'),
-            data.get('precio'),
-            data.get('cantidad'),
-            data.get('imagen', '')
-        )
-
-        return jsonify(res), (201 if res["status"] == "success" else 400)   
+def guardar_producto():
+    data = request.json
+    res = registrar_producto_db(
+        data.get('nombre'),
+        data.get('descripcion'),
+        data.get('precio_compra'),
+        data.get('precio_venta'),
+        data.get('stock'),
+        data.get('stock_minimo'),
+        data.get('imagen_url', '')
+    )
+    return jsonify(res), (201 if res["status"] == "success" else 400)   
     
     @app.route('/proveedores', methods=['GET'])
     def listar_proveedores():
@@ -120,14 +121,15 @@ def init_routes(app):
             return jsonify({"status": "success", "message": "Producto eliminado"}), 200
         return jsonify({"status": "error", "message": "No se pudo eliminar"}), 400
 
-    @app.route('/producto/<int:id>', methods=['PUT', 'OPTIONS'])
-    def editar_producto(id):
-        if request.method == 'OPTIONS': 
-            return jsonify({}), 200
-        data = request.json
-        if editar_producto_db(id, data['nombre'], data['descripcion'], data['precio'], data['cantidad']):
-            return jsonify({"status": "success", "message": "Producto actualizado"}), 200
-        return jsonify({"status": "error", "message": "Error al actualizar"}), 400
+  @app.route('/producto/<int:id>', methods=['PUT', 'OPTIONS'])
+def editar_producto(id):
+    if request.method == 'OPTIONS': 
+        return jsonify({}), 200
+    data = request.json
+    if editar_producto_db(id, data['nombre'], data['descripcion'], data['precio_compra'], 
+                           data['precio_venta'], data['stock'], data['stock_minimo']):
+        return jsonify({"status": "success", "message": "Producto actualizado"}), 200
+    return jsonify({"status": "error", "message": "Error al actualizar"}), 400
     
     @app.route('/cliente/<int:id>', methods=['DELETE'])
     def eliminar_cliente(id):

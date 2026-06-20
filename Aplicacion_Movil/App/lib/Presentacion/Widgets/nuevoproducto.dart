@@ -18,9 +18,11 @@ class _NuevoproductoState extends State<Nuevoproducto> {
   final _formKey = GlobalKey<FormState>();
   final nombreController = TextEditingController();
   final descripcionController = TextEditingController();
-  final precioController = TextEditingController();
+  final precioCompraController = TextEditingController();
+  final precioVentaController = TextEditingController();
   final cantidadController = TextEditingController();
-  
+  final stockMinimoController = TextEditingController();
+
   Uint8List? _webImage; 
   final ImagePicker _picker = ImagePicker();
 
@@ -40,49 +42,53 @@ class _NuevoproductoState extends State<Nuevoproducto> {
   }
 
   Future<void> guardarProducto(BuildContext context) async {
-    if (nombreController.text.isEmpty || precioController.text.isEmpty) {
-      _notificar(context, 'Nombre y Precio son obligatorios ⚠️', Colors.orangeAccent);
-      return;
-    }
-
-    try {
-      String base64Image = "";
-      if (_webImage != null) {
-        base64Image = base64Encode(_webImage!);
-      }
-
-      final response = await http.post(
-        Uri.parse(ApiConfig.url('/producto')),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "nombre": nombreController.text,
-          "descripcion": descripcionController.text,
-          "precio": double.tryParse(precioController.text) ?? 0.0,
-          "cantidad": int.tryParse(cantidadController.text) ?? 0,
-          "imagen": base64Image,
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        _notificar(context, 'Producto guardado en Nexus ✅', Colors.greenAccent);
-        _limpiar();
-      } else {
-        _notificar(context, 'Error en el servidor: ${response.statusCode}', Colors.redAccent);
-      }
-    } catch (e) {
-      _notificar(context, 'Error de conexión 🌐', Colors.redAccent);
-    }
+  if (nombreController.text.isEmpty || precioVentaController.text.isEmpty) {
+    _notificar(context, 'Nombre y Precio de venta son obligatorios ⚠️', Colors.orangeAccent);
+    return;
   }
+
+  try {
+    String base64Image = "";
+    if (_webImage != null) {
+      base64Image = base64Encode(_webImage!);
+    }
+
+    final response = await http.post(
+      Uri.parse(ApiConfig.url('/producto')),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "nombre": nombreController.text,
+        "descripcion": descripcionController.text,
+        "precio_compra": double.tryParse(precioCompraController.text) ?? 0.0,
+        "precio_venta": double.tryParse(precioVentaController.text) ?? 0.0,
+        "stock": int.tryParse(cantidadController.text) ?? 0,
+        "stock_minimo": int.tryParse(stockMinimoController.text) ?? 0,
+        "imagen_url": base64Image,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      _notificar(context, 'Producto guardado en Nexus ✅', Colors.greenAccent);
+      _limpiar();
+    } else {
+      _notificar(context, 'Error en el servidor: ${response.statusCode}', Colors.redAccent);
+    }
+  } catch (e) {
+    _notificar(context, 'Error de conexión 🌐', Colors.redAccent);
+  }
+}
 
   void _limpiar() {
-    nombreController.clear();
-    descripcionController.clear();
-    precioController.clear();
-    cantidadController.clear();
-    setState(() {
-      _webImage = null;
-    });
-  }
+  nombreController.clear();
+  descripcionController.clear();
+  precioCompraController.clear();
+  precioVentaController.clear();
+  cantidadController.clear();
+  stockMinimoController.clear();
+  setState(() {
+    _webImage = null;
+  });
+}
 
   void _notificar(BuildContext context, String msg, Color col) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -157,9 +163,9 @@ class _NuevoproductoState extends State<Nuevoproducto> {
               _campoNexus("Descripción Breve", Icons.description_outlined, descripcionController),
               Row(
                 children: [
-                  Expanded(child: _campoNexus("Precio", Icons.attach_money, precioController, type: TextInputType.number)),
+                  Expanded(child: _campoNexus("Precio de Compra", Icons.attach_money, precioCompraController, type: TextInputType.number)),
                   const SizedBox(width: 15),
-                  Expanded(child: _campoNexus("Cantidad", Icons.numbers, cantidadController, type: TextInputType.number)),
+                  Expanded(child: _campoNexus("Precio de Venta", Icons.attach_money, precioVentaController, type: TextInputType.number)),
                 ],
               ),
               const SizedBox(height: 30),
