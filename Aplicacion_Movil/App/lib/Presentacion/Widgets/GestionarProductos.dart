@@ -8,6 +8,7 @@ import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/nuevoproducto.dart';
 import 'package:intl/intl.dart';
+
 class Gestionarproductos extends StatefulWidget {
   const Gestionarproductos({super.key});
 
@@ -20,11 +21,13 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   static const Color nexusCard = Color(0xFF0A2426);
   static const Color nexusCyan = Color(0xFF00FBFF);
   static const Color nexusBorder = Color(0xFF163D3F);
-String _formatearPrecio(dynamic precio) {
-  final valor = double.tryParse(precio.toString()) ?? 0.0;
-  final formatter = NumberFormat('#,##0', 'es_CO');
-  return formatter.format(valor).replaceAll(',', '.');
-}
+
+  String _formatearPrecio(dynamic precio) {
+    final valor = double.tryParse(precio.toString()) ?? 0.0;
+    final formatter = NumberFormat('#,##0', 'es_CO');
+    return formatter.format(valor).replaceAll(',', '.');
+  }
+
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _allProducts = [];
@@ -35,6 +38,34 @@ String _formatearPrecio(dynamic precio) {
   void initState() {
     super.initState();
     obtenerProductos();
+  }
+
+  void _confirmarEliminar(BuildContext context, dynamic producto) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: nexusCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text("¿ELIMINAR PRODUCTO?", style: TextStyle(color: Colors.white, fontSize: 14)),
+        content: Text(
+          "Esta acción eliminará '${producto['nombre']}' del inventario de forma permanente.",
+          style: const TextStyle(color: Colors.white70, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("CANCELAR", style: TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              eliminarProducto(producto['id']);
+            },
+            child: const Text("ELIMINAR", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> obtenerProductos() async {
@@ -139,7 +170,7 @@ String _formatearPrecio(dynamic precio) {
                             title: const Text("ELIMINAR DE INVENTARIO", style: TextStyle(color: Colors.white, fontSize: 13)),
                             onTap: () {
                               Navigator.pop(context);
-                              eliminarProducto(producto['id']);
+                              _confirmarEliminar(context, producto);
                             },
                           ),
                         ],
@@ -189,56 +220,92 @@ String _formatearPrecio(dynamic precio) {
 
                 return GestureDetector(
                   onLongPress: () => _mostrarOpciones(context, producto),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: nexusCard,
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: nexusBorder, width: 1.2),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              // Usamos imagen_url, que es la llave real que devuelve el backend
-                              child: _mostrarImagenNexus(producto['imagen_url']),
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: nexusCard,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: nexusBorder, width: 1.2),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  // Usamos imagen_url, que es la llave real que devuelve el backend
+                                  child: _mostrarImagenNexus(producto['imagen_url']),
+                                ),
+                              ),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    producto['nombre'].toString().toUpperCase(),
+                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    producto['descripcion']?.toString() ?? '',
+                                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "\$ ${_formatearPrecio(producto['precio_venta'])}",
+                                    style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Botón visible de eliminar, esquina superior derecha
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: GestureDetector(
+                          onTap: () => _confirmarEliminar(context, producto),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 16),
                           ),
                         ),
-                        Padding(
-  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        producto['nombre'].toString().toUpperCase(),
-        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      const SizedBox(height: 4),
-      Text(
-        producto['descripcion']?.toString() ?? '',
-        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      const SizedBox(height: 6),
-      Text(
-        "\$ ${_formatearPrecio(producto['precio_venta'])}",
-        style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.bold),
-      ),
-    ],
-  ),
-),
-                      ],
-                    ),
+                      ),
+                      // Botón visible de editar, esquina superior izquierda
+                      Positioned(
+                        top: 6,
+                        left: 6,
+                        child: GestureDetector(
+                          onTap: () => _mostrarDialogoEditar(context, producto),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit_outlined, color: nexusCyan, size: 16),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
