@@ -121,11 +121,11 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
     return PieChart(
       PieChartData(
         sections: productos.asMap().entries.map((e) {
-          final cantidad = (e.value['cantidad'] ?? 0) is num
-              ? (e.value['cantidad'] as num).toDouble()
+          final stock = (e.value['stock'] ?? 0) is num
+              ? (e.value['stock'] as num).toDouble()
               : 0.0;
           return PieChartSectionData(
-            value: cantidad,
+            value: stock,
             color: GestionInventarioView
                 .chartColors[e.key % GestionInventarioView.chartColors.length],
             radius: 50,
@@ -141,14 +141,14 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
     return BarChart(
       BarChartData(
         barGroups: productos.asMap().entries.map((e) {
-          final cantidad = (e.value['cantidad'] ?? 0) is num
-              ? (e.value['cantidad'] as num).toDouble()
+          final stock = (e.value['stock'] ?? 0) is num
+              ? (e.value['stock'] as num).toDouble()
               : 0.0;
           return BarChartGroupData(
             x: e.key,
             barRods: [
               BarChartRodData(
-                toY: cantidad,
+                toY: stock,
                 color:
                     GestionInventarioView.chartColors[e.key %
                         GestionInventarioView.chartColors.length],
@@ -179,7 +179,7 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
         Text(p['nombre'], style: const TextStyle(color: Colors.white)),
         const Spacer(),
         Text(
-          "Stock: ${p['cantidad']}",
+          "Stock: ${p['stock']}",
           style: TextStyle(color: color, fontWeight: FontWeight.bold),
         ),
       ],

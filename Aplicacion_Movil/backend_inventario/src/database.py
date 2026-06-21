@@ -485,13 +485,26 @@ def obtener_reportes_db():
     if not db: return []
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM reporte_venta ORDER BY id_reporte DESC")
+        sql = """
+            SELECT 
+                p.id AS id_reporte,
+                CONCAT('Pedido #', p.referencia) AS titulo,
+                CONCAT(
+                    'Cliente: ', u.nombre, ' | Estado: ', p.estado, 
+                    ' | ', p.ciudad_envio
+                ) AS descripcion,
+                p.total AS monto,
+                p.fecha_creacion AS fecha
+            FROM pedidos p
+            JOIN usuarios u ON p.usuario_id = u.id
+            ORDER BY p.fecha_creacion DESC
+        """
+        cursor.execute(sql)
         reportes = cursor.fetchall()
 
         for r in reportes:
-            if r.get('fecha'):
-                if hasattr(r['fecha'], 'strftime'):
-                    r['fecha'] = r['fecha'].strftime('%Y-%m-%d %H:%M:%S')
+            if r.get('fecha') and hasattr(r['fecha'], 'strftime'):
+                r['fecha'] = r['fecha'].strftime('%Y-%m-%d %H:%M:%S')
         return reportes
     except Exception as e:
         print(f"Error al listar reportes: {e}")
