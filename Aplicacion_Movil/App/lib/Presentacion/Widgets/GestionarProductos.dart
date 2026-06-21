@@ -17,10 +17,8 @@ class Gestionarproductos extends StatefulWidget {
 }
 
 class _GestionarproductosState extends State<Gestionarproductos> {
-  static const Color nexusBg = Color(0xFF031A1A);
-  static const Color nexusCard = Color(0xFF0A2426);
+  // Acento fijo de marca: se mantiene igual en ambos temas
   static const Color nexusCyan = Color(0xFF00FBFF);
-  static const Color nexusBorder = Color(0xFF163D3F);
 
   String _formatearPrecio(dynamic precio) {
     final valor = double.tryParse(precio.toString()) ?? 0.0;
@@ -41,20 +39,21 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   }
 
   void _confirmarEliminar(BuildContext context, dynamic producto) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: nexusCard,
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text("¿ELIMINAR PRODUCTO?", style: TextStyle(color: Colors.white, fontSize: 14)),
+        title: Text("¿ELIMINAR PRODUCTO?", style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14)),
         content: Text(
           "Esta acción eliminará '${producto['nombre']}' del inventario de forma permanente.",
-          style: const TextStyle(color: Colors.white70, fontSize: 13),
+          style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("CANCELAR", style: TextStyle(color: Colors.white54)),
+            child: Text("CANCELAR", style: theme.textTheme.bodyMedium),
           ),
           TextButton(
             onPressed: () {
@@ -85,11 +84,11 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     }
   }
 
-  Widget _mostrarImagenNexus(String? base64String) {
+  Widget _mostrarImagenNexus(String? base64String, Color placeholderColor) {
     if (base64String == null || base64String.isEmpty) {
       return Container(
-        color: Colors.black26,
-        child: const Icon(Icons.inventory, color: nexusBorder, size: 40),
+        color: placeholderColor.withOpacity(0.3),
+        child: Icon(Icons.inventory, color: placeholderColor, size: 40),
       );
     }
 
@@ -112,6 +111,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   }
 
   void _mostrarOpciones(BuildContext context, dynamic producto) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -125,7 +125,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Container(
                 decoration: BoxDecoration(
-                  color: nexusCard.withOpacity(0.6),
+                  color: theme.cardColor.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: nexusCyan.withOpacity(0.2),
@@ -139,8 +139,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                       padding: const EdgeInsets.all(20),
                       child: Text(
                         producto['nombre'].toString().toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: theme.textTheme.bodyLarge?.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
@@ -150,7 +149,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Divider(color: nexusCyan.withOpacity(0.15), height: 1),
+                    Divider(color: theme.dividerColor, height: 1),
                     Material(
                       color: Colors.transparent,
                       child: Column(
@@ -158,7 +157,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                           ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
                             leading: const Icon(Icons.edit_outlined, color: nexusCyan, size: 22),
-                            title: const Text("EDITAR PRODUCTO", style: TextStyle(color: Colors.white, fontSize: 13)),
+                            title: Text("EDITAR PRODUCTO", style: theme.textTheme.bodyLarge?.copyWith(fontSize: 13)),
                             onTap: () {
                               Navigator.pop(context);
                               _mostrarDialogoEditar(context, producto);
@@ -167,7 +166,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                           ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
                             leading: const Icon(Icons.delete_forever_outlined, color: Colors.redAccent, size: 22),
-                            title: const Text("ELIMINAR DE INVENTARIO", style: TextStyle(color: Colors.white, fontSize: 13)),
+                            title: const Text("ELIMINAR DE INVENTARIO", style: TextStyle(color: Colors.redAccent, fontSize: 13)),
                             onTap: () {
                               Navigator.pop(context);
                               _confirmarEliminar(context, producto);
@@ -197,8 +196,9 @@ class _GestionarproductosState extends State<Gestionarproductos> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: nexusBg,
       drawer: const CustomNexusDrawer(),
       appBar: CustomAppBar(
         conteoNotificaciones: 0,
@@ -224,11 +224,11 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: nexusCard,
+                          color: theme.cardColor,
                           borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: nexusBorder, width: 1.2),
+                          border: Border.all(color: theme.dividerColor, width: 1.2),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
+                            BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8, offset: const Offset(0, 4)),
                           ],
                         ),
                         child: Column(
@@ -239,8 +239,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                                 padding: const EdgeInsets.all(10),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  // Usamos imagen_url, que es la llave real que devuelve el backend
-                                  child: _mostrarImagenNexus(producto['imagen_url']),
+                                  child: _mostrarImagenNexus(producto['imagen_url'], theme.dividerColor),
                                 ),
                               ),
                             ),
@@ -251,14 +250,14 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                                 children: [
                                   Text(
                                     producto['nombre'].toString().toUpperCase(),
-                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                    style: theme.textTheme.bodyLarge?.copyWith(fontSize: 11, fontWeight: FontWeight.bold),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     producto['descripcion']?.toString() ?? '',
-                                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+                                    style: theme.textTheme.bodyMedium?.copyWith(fontSize: 10),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -311,7 +310,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
               },
             ),
       bottomNavigationBar: BottomAppBar(
-        color: nexusCard,
+        color: theme.cardColor,
         child: Container(
           height: 65,
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -320,7 +319,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: nexusBg,
+                  color: theme.scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: nexusCyan.withOpacity(0.5)),
                 ),
@@ -328,7 +327,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                   children: [
                     const Icon(Icons.analytics_outlined, color: nexusCyan, size: 16),
                     const SizedBox(width: 10),
-                    Text("TOTAL: ${_filteredProducts.length}", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                    Text("TOTAL: ${_filteredProducts.length}", style: theme.textTheme.bodyLarge?.copyWith(fontSize: 10, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -337,7 +336,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: nexusBg,
+        backgroundColor: theme.scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: nexusCyan, width: 2)),
         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const Nuevoproducto())).then((_) => obtenerProductos()),
         child: const Icon(Icons.add_box_outlined, color: nexusCyan),
@@ -354,6 +353,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   }
 
   void _mostrarDialogoEditar(BuildContext context, dynamic producto) {
+    final theme = Theme.of(context);
     final nombreCtrl = TextEditingController(text: producto['nombre'].toString());
     final descCtrl = TextEditingController(text: producto['descripcion']?.toString() ?? '');
     final precioCompraCtrl = TextEditingController(text: producto['precio_compra'].toString());
@@ -364,18 +364,18 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: nexusCard,
-        title: const Text("EDITAR PRODUCTO", style: TextStyle(color: Colors.white)),
+        backgroundColor: theme.cardColor,
+        title: Text("EDITAR PRODUCTO", style: theme.textTheme.bodyLarge),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nombreCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Nombre", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: descCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Descripción", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: precioCompraCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Precio Compra", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: precioVentaCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Precio Venta", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: stockCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Stock", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: stockMinimoCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Stock Mínimo", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: nombreCtrl, style: theme.textTheme.bodyLarge, decoration: const InputDecoration(labelText: "Nombre", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: descCtrl, style: theme.textTheme.bodyLarge, decoration: const InputDecoration(labelText: "Descripción", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: precioCompraCtrl, keyboardType: TextInputType.number, style: theme.textTheme.bodyLarge, decoration: const InputDecoration(labelText: "Precio Compra", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: precioVentaCtrl, keyboardType: TextInputType.number, style: theme.textTheme.bodyLarge, decoration: const InputDecoration(labelText: "Precio Venta", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: stockCtrl, keyboardType: TextInputType.number, style: theme.textTheme.bodyLarge, decoration: const InputDecoration(labelText: "Stock", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: stockMinimoCtrl, keyboardType: TextInputType.number, style: theme.textTheme.bodyLarge, decoration: const InputDecoration(labelText: "Stock Mínimo", labelStyle: TextStyle(color: nexusCyan))),
             ],
           ),
         ),
