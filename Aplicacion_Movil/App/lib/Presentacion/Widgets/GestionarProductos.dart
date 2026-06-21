@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/nuevoproducto.dart';
-
+import 'package:intl/intl.dart';
 class Gestionarproductos extends StatefulWidget {
   const Gestionarproductos({super.key});
 
@@ -20,7 +20,11 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   static const Color nexusCard = Color(0xFF0A2426);
   static const Color nexusCyan = Color(0xFF00FBFF);
   static const Color nexusBorder = Color(0xFF163D3F);
-
+String _formatearPrecio(dynamic precio) {
+  final valor = double.tryParse(precio.toString()) ?? 0.0;
+  final formatter = NumberFormat('#,##0', 'es_CO');
+  return formatter.format(valor).replaceAll(',', '.');
+}
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _allProducts = [];
@@ -135,7 +139,7 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             title: const Text("ELIMINAR DE INVENTARIO", style: TextStyle(color: Colors.white, fontSize: 13)),
                             onTap: () {
                               Navigator.pop(context);
-                              eliminarProducto(producto['id_producto']);
+                              eliminarProducto(producto['id']);
                             },
                           ),
                         ],
@@ -202,27 +206,37 @@ class _GestionarproductosState extends State<Gestionarproductos> {
                             padding: const EdgeInsets.all(10),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              // CAMBIADO: Usamos la función de decodificación Base64
-                              child: _mostrarImagenNexus(producto['imagen']),
+                              // Usamos imagen_url, que es la llave real que devuelve el backend
+                              child: _mostrarImagenNexus(producto['imagen_url']),
                             ),
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                producto['nombre'].toString().toUpperCase(),
-                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Text("\$ :   ${producto['precio']}", style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
+  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        producto['nombre'].toString().toUpperCase(),
+        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      const SizedBox(height: 4),
+      Text(
+        producto['descripcion']?.toString() ?? '',
+        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      const SizedBox(height: 6),
+      Text(
+        "\$ ${_formatearPrecio(producto['precio_venta'])}",
+        style: const TextStyle(color: nexusCyan, fontSize: 14, fontWeight: FontWeight.bold),
+      ),
+    ],
+  ),
+),
                       ],
                     ),
                   ),
@@ -275,8 +289,10 @@ class _GestionarproductosState extends State<Gestionarproductos> {
   void _mostrarDialogoEditar(BuildContext context, dynamic producto) {
     final nombreCtrl = TextEditingController(text: producto['nombre'].toString());
     final descCtrl = TextEditingController(text: producto['descripcion']?.toString() ?? '');
-    final precioCtrl = TextEditingController(text: producto['precio'].toString());
-    final cantCtrl = TextEditingController(text: producto['cantidad'].toString());
+    final precioCompraCtrl = TextEditingController(text: producto['precio_compra'].toString());
+    final precioVentaCtrl = TextEditingController(text: producto['precio_venta'].toString());
+    final stockCtrl = TextEditingController(text: producto['stock'].toString());
+    final stockMinimoCtrl = TextEditingController(text: producto['stock_minimo'].toString());
 
     showDialog(
       context: context,
@@ -289,8 +305,10 @@ class _GestionarproductosState extends State<Gestionarproductos> {
             children: [
               TextField(controller: nombreCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Nombre", labelStyle: TextStyle(color: nexusCyan))),
               TextField(controller: descCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Descripción", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: precioCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Precio", labelStyle: TextStyle(color: nexusCyan))),
-              TextField(controller: cantCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Cantidad", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: precioCompraCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Precio Compra", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: precioVentaCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Precio Venta", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: stockCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Stock", labelStyle: TextStyle(color: nexusCyan))),
+              TextField(controller: stockMinimoCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Stock Mínimo", labelStyle: TextStyle(color: nexusCyan))),
             ],
           ),
         ),
@@ -300,15 +318,17 @@ class _GestionarproductosState extends State<Gestionarproductos> {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                final url = ApiConfig.url('/producto/${producto['id_producto']}');
+                final url = ApiConfig.url('/producto/${producto['id']}');
                 final res = await http.put(
                   Uri.parse(url),
                   headers: {"Content-Type": "application/json"},
                   body: jsonEncode({
                     "nombre": nombreCtrl.text,
                     "descripcion": descCtrl.text,
-                    "precio": double.tryParse(precioCtrl.text) ?? 0.0,
-                    "cantidad": int.tryParse(cantCtrl.text) ?? 0,
+                    "precio_compra": double.tryParse(precioCompraCtrl.text) ?? 0.0,
+                    "precio_venta": double.tryParse(precioVentaCtrl.text) ?? 0.0,
+                    "stock": int.tryParse(stockCtrl.text) ?? 0,
+                    "stock_minimo": int.tryParse(stockMinimoCtrl.text) ?? 0,
                   }),
                 );
                 if (res.statusCode == 200) obtenerProductos();
