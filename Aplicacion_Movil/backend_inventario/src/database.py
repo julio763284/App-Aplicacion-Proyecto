@@ -468,7 +468,7 @@ def obtener_notificaciones_db():
     if not db: return []
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT mensaje, DATE_FORMAT(fecha, '%H:%i') as fecha, leido FROM notificaciones ORDER BY id DESC")
+        cursor.execute("SELECT mensaje, DATE_FORMAT(fecha_creacion, '%H:%i') as fecha FROM notificaciones ORDER BY id DESC")
         return cursor.fetchall()
     finally:
         cursor.close()
@@ -548,3 +548,61 @@ def eliminar_reporte_db(id_reporte):
     cursor.execute("DELETE FROM reporte_venta WHERE id_reporte = %s", (id_reporte,))
     db.commit()
     return True
+
+def verificar_stock_bajo():
+    db = obtener_conexion()
+    if not db:
+        return False
+
+    try:
+        cursor = db.cursor(dictionary=True)
+
+        # Buscar productos con stock bajo
+        sql = """
+        SELECT id, nombre, stock, stock_minimo
+        FROM productos
+        WHERE stock <= stock_minimo
+        """
+        cursor.execute(sql)
+        productos = cursor.fetchall()
+
+        for producto in productos:
+            if producto['stock'] == 0:
+                mensaje = (
+                    f"🚨 AGOTADO: {producto['nombre']} "
+                    f"| Stock actual: 0"
+                )
+        else:
+            mensaje = (
+                f"⚠️ {producto['nombre']} "
+                f"| Stock actual: {producto['stock']} "
+                f"| Stock mínimo: {producto['stock_minimo']}"
+            )
+
+            # Evitar duplicar notificaciones
+            cursor.execute("""
+                SELECT id
+                FROM notificaciones
+                WHERE mensaje = %s
+                ORDER BY id DESC
+                LIMIT 1
+            """, (mensaje,))
+
+            existe = cursor.fetchone()
+
+            if not existe:
+                cursor.execute("""
+                    INSERT INTO notificaciones (mensaje)
+                    VALUES (%s)
+                """, (mensaje,))
+
+        db.commit()
+        return True
+
+    except Exception as e:
+        print(f"Error verificando stock: {e}")
+        return False
+
+    finally:
+        cursor.close()
+        db.close()

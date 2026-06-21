@@ -32,6 +32,7 @@ from src.database import (
     actualizar_password_db,
     eliminar_imagen_usuario,
     obtener_reportes_db,
+    verificar_stock_bajo
 )
 
 
@@ -75,8 +76,10 @@ def init_routes(app):
 
     @app.route('/producto', methods=['POST'])
     def guardar_producto():
-        data = request.json
-        res = registrar_producto_db(
+        if res["status"] == "success":
+            verificar_stock_bajo()
+            data = request.json
+            res = registrar_producto_db(
             data.get('nombre'),
             data.get('descripcion'),
             data.get('precio_compra'),
@@ -85,6 +88,9 @@ def init_routes(app):
             data.get('stock_minimo'),
             data.get('imagen_url', '')
         )
+
+        if res["status"] == "success":
+            verificar_stock_bajo()
         return jsonify(res), (201 if res["status"] == "success" else 400)
 
     @app.route('/producto/<int:id>', methods=['DELETE', 'OPTIONS'])
@@ -100,19 +106,23 @@ def init_routes(app):
         if request.method == 'OPTIONS':
             return jsonify({}), 200
         data = request.json
-        if editar_producto_db(id, data['nombre'], data['descripcion'], data['precio_compra'],
-                               data['precio_venta'], data['stock'], data['stock_minimo']):
-            return jsonify({"status": "success", "message": "Producto actualizado"}), 200
-        return jsonify({"status": "error", "message": "Error al actualizar"}), 400
+        if editar_producto_db(id,
+                               data['nombre'],
+                               data['descripcion'],
+                               data['precio_compra'],
+                               data['precio_venta'],
+                               data['stock'],
+                               data['stock_minimo']
+                            ):
+                                verificar_stock_bajo()
+                                return jsonify({"status": "success", "message": "Producto actualizado"}), 200
+                                return jsonify({"status": "error", "message": "Error al actualizar"}), 400
 
     @app.route('/notificaciones', methods=['GET'])
     def listar_notificaciones():
-        try:
-            alertas = obtener_notificaciones_db()
-            return jsonify(alertas), 200
-        except Exception as e:
-            print(f"Error en ruta notificaciones: {e}")
-            return jsonify({"status": "error", "message": str(e)}), 500
+        alertas = obtener_notificaciones_db()
+        print(alertas)
+        return jsonify(alertas)
 
     @app.route('/clientes', methods=['GET'])
     def listar_clientes():
@@ -304,6 +314,20 @@ def init_routes(app):
         if registrar_reporte_db(data['titulo'], data['descripcion'], data['monto']):
             return jsonify({"status": "success"}), 201
         return jsonify({"status": "error"}), 400
+    
+    @app.route('/verificar_stock', methods=['GET'])
+    def verificar_stock():
+        if verificar_stock_bajo():
+            return jsonify({
+                "status": "success",
+                "message": "Verificación realizada"
+            }), 200
+
+        return jsonify({
+            "status": "error",
+            "message": "No se pudo verificar"
+        }), 500
+    
 
     
 

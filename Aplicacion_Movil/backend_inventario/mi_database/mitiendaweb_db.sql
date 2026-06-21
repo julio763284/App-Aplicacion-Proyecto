@@ -6,6 +6,8 @@
 -- Tiempo de generación: 21-06-2026 a las 19:49:34
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
+CREATE DATABASE mitiendaweb_db;
+USE mitiendaweb_db;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
