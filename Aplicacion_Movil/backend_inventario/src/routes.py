@@ -30,10 +30,7 @@ from src.database import (
     verificar_codigo_db,
     actualizar_password_db,
     eliminar_imagen_usuario,
-    registrar_reporte_db,
     obtener_reportes_db,
-    eliminar_reporte_db,
-    editar_reporte_db
 )
 
 def init_routes(app):
@@ -311,6 +308,7 @@ def init_routes(app):
         if eliminar_reporte_db(id):
             return jsonify({"status": "success"}), 200
         return jsonify({"status": "error"}), 400
+
 
 def enviar_email_codigo(destinatario, codigo):
     msg = MIMEMultipart()
