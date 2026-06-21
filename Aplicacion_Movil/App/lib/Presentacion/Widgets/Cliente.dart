@@ -32,6 +32,8 @@ class _ClienteState extends State<Cliente> {
           clientes = json.decode(response.body);
           cargando = false;
         });
+      } else {
+        setState(() => cargando = false);
       }
     } catch (e) {
       setState(() => cargando = false);
@@ -54,7 +56,6 @@ class _ClienteState extends State<Cliente> {
   @override
   Widget build(BuildContext context) {
     const primaryDark = Color(0xFF0D1B1E);
-    const accentTeal = Color(0xFF017A74);
 
     return Scaffold(
       backgroundColor: primaryDark,
@@ -69,6 +70,13 @@ class _ClienteState extends State<Cliente> {
             child: cargando
                 ? const Center(
                     child: CircularProgressIndicator(color: Colors.cyanAccent),
+                  )
+                : clientes.isEmpty
+                ? const Center(
+                    child: Text(
+                      "NO HAY CLIENTES REGISTRADOS",
+                      style: TextStyle(color: Colors.white60),
+                    ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.only(top: 10),
@@ -85,6 +93,14 @@ class _ClienteState extends State<Cliente> {
   }
 
   Widget _buildClienteCard(Map<String, dynamic> cliente) {
+    // CORRECCIÓN DE COLUMNAS COINCIDIENDO CON TU XAMPP (nombre -> nombre_completo, celular -> telefono)
+    final String nombre =
+        (cliente['nombre_completo'] ?? cliente['nombre'] ?? 'SIN NOMBRE')
+            .toString();
+    final String telefono =
+        (cliente['telefono'] ?? cliente['celular'] ?? 'SIN TELÉFONO')
+            .toString();
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -97,7 +113,7 @@ class _ClienteState extends State<Cliente> {
         leading: CircleAvatar(
           backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
           child: Text(
-            cliente['nombre'][0].toString().toUpperCase(),
+            nombre.isNotEmpty ? nombre[0].toUpperCase() : 'C',
             style: const TextStyle(
               color: Colors.cyanAccent,
               fontWeight: FontWeight.bold,
@@ -105,7 +121,7 @@ class _ClienteState extends State<Cliente> {
           ),
         ),
         title: Text(
-          cliente['nombre'].toString().toUpperCase(),
+          nombre.toUpperCase(),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 13,
@@ -113,19 +129,26 @@ class _ClienteState extends State<Cliente> {
           ),
         ),
         subtitle: Text(
-          cliente['celular'] ?? 'SIN TELÉFONO',
+          telefono,
           style: const TextStyle(color: Colors.white38, fontSize: 11),
         ),
-        trailing: const Icon(
-          Icons.more_vert,
-          color: Color(0xFF017A74),
-          size: 18,
+        trailing: InkWell(
+          onTap: () => _mostrarOpciones(cliente),
+          child: const Icon(
+            Icons.more_vert,
+            color: Color(0xFF017A74),
+            size: 18,
+          ),
         ),
       ),
     );
   }
 
   void _mostrarOpciones(Map<String, dynamic> cliente) {
+    final String nombre =
+        (cliente['nombre_completo'] ?? cliente['nombre'] ?? 'CLIENTE')
+            .toString();
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -146,7 +169,7 @@ class _ClienteState extends State<Cliente> {
                 ),
               ),
               child: Text(
-                cliente['nombre'].toString().toUpperCase(),
+                nombre.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
@@ -182,12 +205,18 @@ class _ClienteState extends State<Cliente> {
   }
 
   void _abrirEditor(Map<String, dynamic> cliente) {
-    final nomCtrl = TextEditingController(text: cliente['nombre']);
+    final nomCtrl = TextEditingController(
+      text: cliente['nombre_completo'] ?? cliente['nombre'],
+    );
     final dirCtrl = TextEditingController(
       text: cliente['direccion_residencia'],
     );
-    final corCtrl = TextEditingController(text: cliente['gmail_corporativo']);
-    final telCtrl = TextEditingController(text: cliente['celular']);
+    final corCtrl = TextEditingController(
+      text: cliente['gmail_corporativo'] ?? cliente['correo_electronico'],
+    );
+    final telCtrl = TextEditingController(
+      text: cliente['telefono'] ?? cliente['celular'],
+    );
 
     showDialog(
       context: context,
@@ -199,68 +228,70 @@ class _ClienteState extends State<Cliente> {
         ),
         child: Container(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "EDITAR PRODUCTO",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "EDITAR CLIENTE",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              _inputMinimal("Nombre", nomCtrl),
-              _inputMinimal("Dirección", dirCtrl),
-              _inputMinimal("Correo", corCtrl),
-              _inputMinimal("Celular", telCtrl),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "CANCELAR",
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  TextButton(
-                    onPressed: () async {
-                      final response = await http.put(
-                        Uri.parse(
-                          ApiConfig.url('/cliente/${cliente['id_cliente']}'),
+                const SizedBox(height: 10),
+                _inputMinimal("Nombre", nomCtrl),
+                _inputMinimal("Dirección", dirCtrl),
+                _inputMinimal("Correo", corCtrl),
+                _inputMinimal("Celular", telCtrl),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        "CANCELAR",
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
                         ),
-                        headers: {"Content-Type": "application/json"},
-                        body: jsonEncode({
-                          "nombre": nomCtrl.text,
-                          "direccion_residencia": dirCtrl.text,
-                          "gmail_corporativo": corCtrl.text,
-                          "celular": telCtrl.text,
-                        }),
-                      );
-                      if (response.statusCode == 200) {
-                        Navigator.pop(context);
-                        fetchClientes();
-                      }
-                    },
-                    child: const Text(
-                      "GUARDAR",
-                      style: TextStyle(
-                        color: Colors.cyanAccent,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 20),
+                    TextButton(
+                      onPressed: () async {
+                        final response = await http.put(
+                          Uri.parse(
+                            ApiConfig.url('/cliente/${cliente['id_cliente']}'),
+                          ),
+                          headers: {"Content-Type": "application/json"},
+                          body: jsonEncode({
+                            "nombre": nomCtrl.text,
+                            "direccion_residencia": dirCtrl.text,
+                            "gmail_corporativo": corCtrl.text,
+                            "celular": telCtrl.text,
+                          }),
+                        );
+                        if (response.statusCode == 200) {
+                          Navigator.pop(context);
+                          fetchClientes();
+                        }
+                      },
+                      child: const Text(
+                        "GUARDAR",
+                        style: TextStyle(
+                          color: Colors.cyanAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
