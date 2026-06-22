@@ -507,6 +507,38 @@ INSERT INTO usuarios (
     foto_perfil, 
     foto_perfil_url
 ) VALUES (
+    7, 
+    'Juan Rhenals', 
+    'juanrhenals@gmail.com', 
+    '$2b$12$MpUMgHl7b9xlxUkLe9VXy.iJzKzWeLDDa7sTMIV8uS1...',
+    'cliente', 
+    1, 
+    NOW(), 
+    NULL, 
+    NULL, 
+    '3106371087', 
+    'calle 27', 
+    'barranquilla', 
+    NULL, 
+    'NULL'
+);
+
+INSERT INTO usuarios (
+    id, 
+    nombre, 
+    correo, 
+    password_hash, 
+    rol, 
+    activo, 
+    creado_el, 
+    codigo_recuperacion, 
+    codigo_expira, 
+    telefono, 
+    direccion, 
+    ciudad, 
+    foto_perfil, 
+    foto_perfil_url
+) VALUES (
     NULL, 
     'Juan David', 
     'Juandavid2004@gmail.com', 
