@@ -93,52 +93,18 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     }
   }
 
-  Widget _mostrarImagenNexus(String? stringImagen, Color placeholderColor) {
-    if (stringImagen == null || stringImagen.isEmpty) {
+  Widget _mostrarImagenNexus(String? base64String, Color placeholderColor) {
+    if (base64String == null || base64String.isEmpty) {
       return Container(
         color: placeholderColor.withOpacity(0.3),
         child: Icon(Icons.inventory, color: placeholderColor, size: 40),
       );
     }
 
-    // NUEVO: Si es una URL de internet (como los links de Pexels en tu DB)
-    if (stringImagen.startsWith('http://') ||
-        stringImagen.startsWith('https://')) {
-      return Image.network(
-        stringImagen,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-        // Si el link se cae o no hay internet, muestra un icono amigable
-        errorBuilder: (context, error, stackTrace) => Container(
-          color: placeholderColor.withOpacity(0.1),
-          child: const Icon(
-            Icons.broken_image,
-            color: Colors.redAccent,
-            size: 35,
-          ),
-        ),
-        // Efecto de carga mientras descarga la imagen de internet
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              color: nexusCyan,
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                  : null,
-            ),
-          );
-        },
-      );
-    }
-
-    // Si no es URL, asume que es una cadena Base64 (como lo tenías originalmente)
     try {
-      String cleanBase64 = stringImagen.contains(',')
-          ? stringImagen.split(',').last
-          : stringImagen;
+      String cleanBase64 = base64String.contains(',')
+          ? base64String.split(',').last
+          : base64String;
 
       Uint8List bytes = base64Decode(cleanBase64);
 
