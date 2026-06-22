@@ -451,10 +451,18 @@ class _GestionarproductosState extends State<Gestionarproductos> {
           borderRadius: BorderRadius.circular(15),
           side: const BorderSide(color: nexusCyan, width: 2),
         ),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Nuevoproducto()),
-        ).then((_) => obtenerProductos()),
+        onPressed: () async {
+          // Esperamos a que la pantalla se cierre
+          final bool? recargar = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Nuevoproducto()),
+          );
+
+          // Si volvió con un valor true, refrescamos de una vez
+          if (recargar == true) {
+            obtenerProductos();
+          }
+        },
         child: const Icon(Icons.add_box_outlined, color: nexusCyan),
       ),
     );
