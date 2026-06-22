@@ -6,7 +6,6 @@ from email.mime.multipart import MIMEMultipart
 from flask import request, jsonify
 
 from config.db_config import MAIL_SETTINGS
-
 from src.database import (
     obtener_usuario,
     validar_usuario,
@@ -34,7 +33,6 @@ from src.database import (
     obtener_reportes_db,
 )
 
-
 def init_routes(app):
 
     @app.route('/login', methods=['POST'])
@@ -54,17 +52,29 @@ def init_routes(app):
 
     @app.route('/registro_cliente', methods=['POST'])
     def registro_cliente():
-        data = request.json
-        res = registrar_cliente(data.get('nombre'), data.get('direccion_residencia'),
-                                data.get('gmail_corporativo'), data.get('celular'), data.get('imagen', ''))
-        return jsonify(res), (201 if res["status"] == "success" else 400)
+        datos = request.get_json()
+        if not datos: 
+            return jsonify({"status": "error", "message": "No hay datos recibidos"}), 400
+        
+        nombre = datos.get('nombre')
+        direccion = datos.get('direccion_residencia')
+        correo = datos.get('gmail_corporativo')
+        celular = datos.get('celular')
+        imagen = datos.get('imagen', '')
+        
+        if not nombre or not correo:
+            return jsonify({"status": "error", "message": "Nombre y Correo son obligatorios"}), 400
+            
+        resultado = registrar_cliente(nombre, direccion, correo, celular, imagen)
+        # Retorna 201 si fue exitoso, de lo contrario 400
+        return jsonify(resultado), (201 if resultado["status"] == "success" else 400)
 
     @app.route('/registro_proveedor', methods=['GET', 'POST'])
     def registro_proveedor():
         data = request.get_json(force=True)
         print("DATA RECIBIDA:", data)
         res = registrar_proveedor(data.get('nombre'), data.get('direccion'),
-                                data.get('gmail'), data.get('telefono'))
+                                 data.get('gmail'), data.get('telefono'))
         return jsonify(res), (201 if res["status"] == "success" else 400)
 
     @app.route('/productos', methods=['GET'])
@@ -145,7 +155,6 @@ def init_routes(app):
     @app.route('/proveedor/<int:id>', methods=['DELETE', 'OPTIONS'])
     def eliminar_proveedor(id):
         if request.method == 'OPTIONS': return jsonify({}), 200
-
         if eliminar_proveedor_db(id):
             return jsonify({"status": "success", "message": "Proveedor eliminado"}), 200
         return jsonify({"status": "error", "message": "No se pudo eliminar el proveedor"}), 400
@@ -153,7 +162,6 @@ def init_routes(app):
     @app.route('/proveedor/<int:id>', methods=['PUT', 'OPTIONS'])
     def editar_proveedor(id):
         if request.method == 'OPTIONS': return jsonify({}), 200
-
         data = request.json
         if editar_proveedor_db(id, data['nombre'], data.get('direccion', ''),
                                data['gmail'], data.get('telefono', '')):
@@ -164,19 +172,15 @@ def init_routes(app):
     def ruta_enviar_codigo():
         if request.method == 'OPTIONS':
             return jsonify({"status": "ok"}), 200
-
         try:
             data = request.json
             email = data.get('email')
-
             if not email:
                 return jsonify({"status": "error", "message": "El correo es requerido"}), 400
             codigo = str(random.randint(100000, 999999))
             exito_db = guardar_codigo_recuperacion(email, codigo)
-
             if exito_db:
                 exito_email = enviar_email_codigo(email, codigo)
-
                 if exito_email:
                     print(f"✅ Código {codigo} enviado con éxito a {email}")
                     return jsonify({
@@ -193,7 +197,6 @@ def init_routes(app):
                     "status": "error",
                     "message": "El correo no está registrado en el sistema"
                 }), 404
-
         except Exception as e:
             print(f"❌ Error crítico en ruta_enviar_codigo: {e}")
             return jsonify({"status": "error", "message": "Error interno del servidor"}), 500
@@ -203,7 +206,6 @@ def init_routes(app):
         user_id = request.args.get('id')
         if not user_id:
             return jsonify({"status": "error", "message": "ID requerido"}), 400
-
         user = obtener_usuario(user_id)
         if user:
             return jsonify({
@@ -218,13 +220,10 @@ def init_routes(app):
         data = request.json
         user_id = data.get('id')
         base64_imagen = data.get('imagen')
-
         if not user_id or not base64_imagen:
             return jsonify({"status": "error", "message": "Datos incompletos"}), 400
-
         if actualizar_imagen_usuario(user_id, base64_imagen):
             return jsonify({"status": "success", "message": "Imagen actualizada"}), 200
-
         return jsonify({"status": "error", "message": "No se pudo guardar la imagen"}), 500
 
     @app.route('/verificar_y_cambiar_password', methods=['POST', 'OPTIONS'])
@@ -235,10 +234,8 @@ def init_routes(app):
         email = data.get('email')
         codigo = data.get('codigo')
         nueva_password = data.get('nuevo_password')
-
         if not email or not codigo or not nueva_password:
             return jsonify({"status": "error", "message": "Datos incompletos"}), 400
-
         if verificar_codigo_db(email, codigo):
             if actualizar_password_db(email, nueva_password):
                 return jsonify({"status": "success", "message": "Contraseña actualizada correctamente"}), 200
@@ -255,10 +252,8 @@ def init_routes(app):
         user_id = data.get('id')
         nuevo_email = data.get('nuevo_email')
         codigo = data.get('codigo')
-
         if not user_id or not nuevo_email or not codigo:
             return jsonify({"status": "error", "message": "Datos incompletos"}), 400
-
         if verificar_codigo_db(nuevo_email, codigo):
             if actualizar_email_db(user_id, nuevo_email):
                 return jsonify({"status": "success", "message": "Email actualizado correctamente"}), 200
@@ -272,10 +267,8 @@ def init_routes(app):
         data = request.json
         user_id = data.get('id')
         nombre = data.get('nombre')
-
         if not user_id or nombre is None:
             return jsonify({"status": "error", "message": "Datos incompletos"}), 400
-
         if actualizar_nombre_usuario(user_id, nombre):
             return jsonify({"status": "success", "message": "Usuario actualizado"}), 200
         else:
@@ -285,10 +278,8 @@ def init_routes(app):
     def eliminar_imagen():
         data = request.json
         user_id = data.get('id')
-
         if not user_id:
             return jsonify({"status": "error", "message": "ID requerido"}), 400
-
         if eliminar_imagen_usuario(user_id):
             return jsonify({"status": "success", "message": "Imagen eliminada con éxito"})
         else:
@@ -305,9 +296,19 @@ def init_routes(app):
             return jsonify({"status": "success"}), 201
         return jsonify({"status": "error"}), 400
 
-    
+    @app.route('/reporte/<int:id>', methods=['PUT'])
+    def editar_reporte(id):
+        data = request.json
+        if editar_reporte_db(id, data['titulo'], data['descripcion'], data['monto']):
+            return jsonify({"status": "success"}), 200
+        return jsonify({"status": "error"}), 400
 
-    
+    @app.route('/reporte/<int:id>', methods=['DELETE'])
+    def eliminar_reporte(id):
+        if eliminar_reporte_db(id):
+            return jsonify({"status": "success"}), 200
+        return jsonify({"status": "error"}), 400
+
 
 def enviar_email_codigo(destinatario, codigo):
     msg = MIMEMultipart()
