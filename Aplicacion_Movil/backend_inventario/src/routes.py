@@ -38,10 +38,29 @@ def init_routes(app):
     @app.route('/login', methods=['POST'])
     def login():
         data = request.json
-        if not data: return jsonify({"status": "error", "message": "No hay datos"}), 400
+        if not data: 
+            return jsonify({"status": "error", "message": "No hay datos"}), 400
+            
+        # 1. Validamos que el usuario y contraseña sean correctos
         user = validar_usuario(data.get('username'), data.get('password'))
+        
         if user:
-            return jsonify({"status": "success", "message": "Bienvenido", "user": user}), 200
+            # 2. Extraemos el rol del usuario (nos aseguramos de pasarlo a minúsculas para evitar fallos)
+            rol_usuario = user.get('rol', '').lower()
+            
+            if rol_usuario == 'admin':
+                return jsonify({
+                    "status": "success", 
+                    "message": "Bienvenido Administrador", 
+                    "user": user
+                }), 200
+            else:
+                # Si los datos son reales pero no es administrador, le bloqueamos el paso
+                return jsonify({
+                    "status": "error", 
+                    "message": "Acceso denegado: Solo se permiten usuarios Administradores."
+                }), 403 # Código 403: Prohibido/No autorizado
+                
         return jsonify({"status": "error", "message": "Credenciales inválidas"}), 401
 
     @app.route('/registro', methods=['POST'])

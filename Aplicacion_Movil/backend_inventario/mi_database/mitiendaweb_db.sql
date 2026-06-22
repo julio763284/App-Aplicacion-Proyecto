@@ -491,6 +491,42 @@ ALTER TABLE `soporte`
   ADD CONSTRAINT `fk_soporte_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL;
 COMMIT;
 
+INSERT INTO usuarios (
+    id, 
+    nombre, 
+    correo, 
+    password_hash, 
+    rol, 
+    activo, 
+    creado_el, 
+    codigo_recuperacion, 
+    codigo_expira, 
+    telefono, 
+    direccion, 
+    ciudad, 
+    foto_perfil, 
+    foto_perfil_url
+) VALUES (
+    NULL, 
+    'Juan David', 
+    'Juandavid2004@gmail.com', 
+    '$2b$12$eOa9f5B.hF/5iW0uJ2/bSuP4U6nJqD5vXwG9e6/5kQW...', 
+    'admin', 
+    1, 
+    NOW(), 
+    NULL, 
+    NULL, 
+    '3243890134', 
+    'calle 23', 
+    'barranquilla', 
+    NULL, 
+    NULL
+);
+
+UPDATE usuarios 
+SET password_hash = (SELECT p.pass FROM (SELECT password_hash AS pass FROM usuarios WHERE correo = 'juanrhenals@gmail.com') AS p)
+WHERE correo = 'Juandavid2004@gmail.com';
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
