@@ -84,18 +84,41 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     }
   }
 
-  Widget _mostrarImagenNexus(String? base64String, Color placeholderColor) {
-    if (base64String == null || base64String.isEmpty) {
+  // FUNCIÓN CORREGIDA: Detecta dinámicamente si es URL de Internet o Base64
+  Widget _mostrarImagenNexus(String? imagenString, Color placeholderColor) {
+    if (imagenString == null || imagenString.isEmpty) {
       return Container(
         color: placeholderColor.withOpacity(0.3),
         child: Icon(Icons.inventory, color: placeholderColor, size: 40),
       );
     }
 
+    // Caso 1: Es una URL de Internet tradicional (Pexels, etc.)
+    if (imagenString.startsWith('http://') || imagenString.startsWith('https://')) {
+      return Image.network(
+        imagenString,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.red),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              color: nexusCyan,
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
+      );
+    }
+
+    // Caso 2: Es una cadena de imagen en Base64
     try {
-      String cleanBase64 = base64String.contains(',') 
-          ? base64String.split(',').last 
-          : base64String;
+      String cleanBase64 = imagenString.contains(',') 
+          ? imagenString.split(',').last 
+          : imagenString;
 
       Uint8List bytes = base64Decode(cleanBase64);
       
