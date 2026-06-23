@@ -493,6 +493,124 @@ ALTER TABLE `soporte`
   ADD CONSTRAINT `fk_soporte_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL;
 COMMIT;
 
+INSERT INTO usuarios (
+    id, 
+    nombre, 
+    correo, 
+    password_hash, 
+    rol, 
+    activo, 
+    creado_el, 
+    codigo_recuperacion, 
+    codigo_expira, 
+    telefono, 
+    direccion, 
+    ciudad, 
+    foto_perfil, 
+    foto_perfil_url
+) VALUES (
+    7, 
+    'Juan Rhenals', 
+    'juanrhenals@gmail.com', 
+    '$2b$12$MpUMgHl7b9xlxUkLe9VXy.iJzKzWeLDDa7sTMIV8uS1...',
+    'cliente', 
+    1, 
+    NOW(), 
+    NULL, 
+    NULL, 
+    '3106371087', 
+    'calle 27', 
+    'barranquilla', 
+    NULL, 
+    'NULL'
+);
+
+INSERT INTO usuarios (
+    id, 
+    nombre, 
+    correo, 
+    password_hash, 
+    rol, 
+    activo, 
+    creado_el, 
+    codigo_recuperacion, 
+    codigo_expira, 
+    telefono, 
+    direccion, 
+    ciudad, 
+    foto_perfil, 
+    foto_perfil_url
+) VALUES (
+    NULL, 
+    'Juan David', 
+    'Juandavid2004@gmail.com', 
+    '$2b$12$eOa9f5B.hF/5iW0uJ2/bSuP4U6nJqD5vXwG9e6/5kQW...', 
+    'admin', 
+    1, 
+    NOW(), 
+    NULL, 
+    NULL, 
+    '3243890134', 
+    'calle 23', 
+    'barranquilla', 
+    NULL, 
+    NULL
+);
+
+UPDATE usuarios 
+SET password_hash = (SELECT p.pass FROM (SELECT password_hash AS pass FROM usuarios WHERE correo = 'juanrhenals@gmail.com') AS p)
+WHERE correo = 'Juandavid2004@gmail.com';
+
+-- 1. Actualizar la Mochila Wayúu (id 1) con una imagen estable
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=500' 
+WHERE id = 1;
+
+-- 2. Asegurar el Bolso Tipo Saco (id 2)
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=500' 
+WHERE id = 2;
+
+-- 3. Actualizar la Cartera Crochet (id 3)
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=500' 
+WHERE id = 3;
+
+-- 4. Actualizar el Bolso Artesanal con Flecos (id 4)
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=500' 
+WHERE id = 4;
+
+-- 5. Actualizar el Morral Zenú (id 5)
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=500' 
+WHERE id = 5;
+
+-- 6. Bolso Circular en Palma
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=500' 
+WHERE id = 6;
+
+-- 7. Cartera Tejida Pequeña
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?q=80&w=500' 
+WHERE id = 7;
+
+-- 8. Bolso Tote Playero
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1575032617751-6ddec2089882?q=80&w=500' 
+WHERE id = 8;
+
+-- 9. Cartera de Hombro Vintage
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=500' 
+WHERE id = 9;
+
+-- 10. Bolso Artesanal Grande
+UPDATE productos 
+SET imagen_url = 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=500' 
+WHERE id = 10;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

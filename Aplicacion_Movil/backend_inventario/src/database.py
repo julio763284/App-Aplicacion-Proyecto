@@ -1,6 +1,7 @@
 import bcrypt
 import mysql.connector 
 import datetime
+from werkzeug.security import check_password_hash
 from config.db_config import DB_SETTINGS
 
 
@@ -28,16 +29,26 @@ def validar_usuario(identificador, password_plana):
     try:
         cursor = db.cursor(dictionary=True, buffered=True)
 
+        # Buscamos por nombre o por correo electrónico
         sql = "SELECT id, nombre, correo, password_hash, rol, activo FROM usuarios WHERE nombre = %s OR correo = %s"
         cursor.execute(sql, (identificador, identificador))
 
         resultado = cursor.fetchone()
 
         if resultado:
-            hash_almacenado = resultado['password_hash'].encode('utf-8')
-            if bcrypt.checkpw(password_plana.encode('utf-8'), hash_almacenado):
-                resultado.pop('password_hash')
-                return resultado
+            hash_almacenado = resultado['password_hash']
+            
+            # Soportar contraseñas antiguas/diferentes (como la de Jholian que usa scrypt)
+            if hash_almacenado.startswith('scrypt:') or hash_almacenado.startswith('pbkdf2:'):
+                if check_password_hash(hash_almacenado, password_plana):
+                    resultado.pop('password_hash')
+                    return resultado
+            else:
+                # Soportar contraseñas encriptadas con Bcrypt (como la de Juan)
+                hash_bytes = hash_almacenado.encode('utf-8')
+                if bcrypt.checkpw(password_plana.encode('utf-8'), hash_bytes):
+                    resultado.pop('password_hash')
+                    return resultado
 
         return None
     except Exception as e:
@@ -210,8 +221,7 @@ def actualizar_password_db(email, nueva_password_plana):
 
 
 # ======================================================
-# CLIENTES (tabla 'cliente' -- PENDIENTE: aún no existe en mitiendaweb_db,
-# hay que crearla o decidir si se reemplaza por 'usuarios' con rol='cliente')
+# CLIENTES (Corregido: Leyendo de la tabla real 'usuarios')
 # ======================================================
 
 def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, imagen):
@@ -219,11 +229,16 @@ def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, 
     if not db: return {"status": "error", "message": "Error de conexión"}
     try:
         cursor = db.cursor()
-        sql = "INSERT INTO cliente (nombre, direccion_residencia, gmail_corporativo, celular, imagen) VALUES (%s, %s, %s, %s, %s)"
+        # Modificado para insertar en 'nombre', 'direccion', 'correo', 'telefono' y 'rol'
+        sql = """
+        INSERT INTO usuarios (nombre, direccion, correo, telefono, foto_perfil_url, rol, activo) 
+        VALUES (%s, %s, %s, %s, %s, 'cliente', 1)
+        """
         cursor.execute(sql, (nombre, direccion_residencia, gmail_corporativo, celular, imagen))
         db.commit()
         return {"status": "success", "message": "Cliente registrado"}
     except Exception as e:
+        print(f"Error al registrar cliente: {e}")
         return {"status": "error", "message": str(e)}
     finally:
         cursor.close()
@@ -234,22 +249,35 @@ def obtener_clientes_ordenados():
     try:
         conn = obtener_conexion()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM cliente ORDER BY fecha_registro DESC")
+        
+        # Corregido usando 'telefono' y 'direccion' reales de tu XAMPP
+        # IFNULL se encarga de que si el dato es NULL en la DB, no rompa la App
+        sql = """
+        SELECT id AS id_cliente, 
+               nombre AS nombre_completo, 
+               IFNULL(direccion, 'No especificada') AS direccion_residencia, 
+               correo AS gmail_corporativo, 
+               IFNULL(telefono, 'Sin teléfono') AS celular, 
+               foto_perfil_url AS imagen 
+        FROM usuarios 
+        WHERE LOWER(rol) = 'cliente'
+        """
+        cursor.execute(sql)
         clientes = cursor.fetchall()
         cursor.close()
         conn.close()
         return clientes
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"❌ ERROR REAL EN DATABASE.PY: {e}") 
         return None
-
-
+    
 def eliminar_cliente_db(id_cliente):
     db = obtener_conexion()
     if not db: return False
     try:
         cursor = db.cursor()
-        cursor.execute("DELETE FROM cliente WHERE id_cliente = %s", (id_cliente,))
+        # Eliminamos de la tabla usuarios usando la llave primaria real: id_usuario
+        cursor.execute("DELETE FROM usuarios WHERE id_usuario = %s", (id_cliente,))
         db.commit()
         return True
     except Exception as e:
@@ -265,9 +293,10 @@ def editar_cliente_db(id_cliente, nombre, direccion, gmail, celular):
     if not db: return False
     try:
         cursor = db.cursor()
-        sql = """UPDATE cliente
-                 SET nombre=%s, direccion_residencia=%s, gmail_corporativo=%s, celular=%s
-                 WHERE id_cliente=%s"""
+        # Actualizamos la tabla usuarios apuntando a las columnas de XAMPP
+        sql = """UPDATE usuarios
+                 SET nombre_completo=%s, direccion_residencia=%s, correo_electronico=%s, telefono=%s
+                 WHERE id_usuario=%s"""
         cursor.execute(sql, (nombre, direccion, gmail, celular, id_cliente))
         db.commit()
         return True
@@ -277,7 +306,6 @@ def editar_cliente_db(id_cliente, nombre, direccion, gmail, celular):
     finally:
         cursor.close()
         db.close()
-
 
 # ======================================================
 # PROVEEDORES (tabla 'proveedor' -- PENDIENTE: aún no existe en mitiendaweb_db)
