@@ -1,6 +1,7 @@
 import bcrypt
 import mysql.connector 
 import datetime
+from werkzeug.security import check_password_hash
 from config.db_config import DB_SETTINGS
 
 
@@ -28,16 +29,26 @@ def validar_usuario(identificador, password_plana):
     try:
         cursor = db.cursor(dictionary=True, buffered=True)
 
+        # Buscamos por nombre o por correo electrónico
         sql = "SELECT id, nombre, correo, password_hash, rol, activo FROM usuarios WHERE nombre = %s OR correo = %s"
         cursor.execute(sql, (identificador, identificador))
 
         resultado = cursor.fetchone()
 
         if resultado:
-            hash_almacenado = resultado['password_hash'].encode('utf-8')
-            if bcrypt.checkpw(password_plana.encode('utf-8'), hash_almacenado):
-                resultado.pop('password_hash')
-                return resultado
+            hash_almacenado = resultado['password_hash']
+            
+            # Soportar contraseñas antiguas/diferentes (como la de Jholian que usa scrypt)
+            if hash_almacenado.startswith('scrypt:') or hash_almacenado.startswith('pbkdf2:'):
+                if check_password_hash(hash_almacenado, password_plana):
+                    resultado.pop('password_hash')
+                    return resultado
+            else:
+                # Soportar contraseñas encriptadas con Bcrypt (como la de Juan)
+                hash_bytes = hash_almacenado.encode('utf-8')
+                if bcrypt.checkpw(password_plana.encode('utf-8'), hash_bytes):
+                    resultado.pop('password_hash')
+                    return resultado
 
         return None
     except Exception as e:

@@ -41,21 +41,26 @@ def init_routes(app):
         if not data: 
             return jsonify({"status": "error", "message": "No hay datos"}), 400
             
+        # Intentamos obtener el usuario buscando por 'username' o por 'correo' / 'email' por si la app móvil lo manda diferente
+        identificador = data.get('username') or data.get('correo') or data.get('email')
+        password = data.get('password')
+
         # 1. Validamos que el usuario y contraseña sean correctos
-        user = validar_usuario(data.get('username'), data.get('password'))
+        user = validar_usuario(identificador, password)
         
         if user:
-            # 2. Extraemos el rol del usuario (nos aseguramos de pasarlo a minúsculas para evitar fallos)
+            # 2. Extraemos el rol del usuario (en minúsculas para evitar fallos de mayúsculas)
             rol_usuario = user.get('rol', '').lower()
             
-            if rol_usuario == 'admin':
+            # PERMITIR TANTO A 'superadmin' COMO A 'admin' ENTRAR A LA APP
+            if rol_usuario == 'superadmin' or rol_usuario == 'admin':
                 return jsonify({
                     "status": "success", 
-                    "message": "Bienvenido Administrador", 
+                    "message": f"Bienvenido {rol_usuario.capitalize()}", 
                     "user": user
                 }), 200
             else:
-                # Si los datos son reales pero no es administrador, le bloqueamos el paso
+                # Si los datos son reales pero es un rol de cliente, le bloqueamos el paso
                 return jsonify({
                     "status": "error", 
                     "message": "Acceso denegado: Solo se permiten usuarios Administradores."
@@ -101,6 +106,7 @@ def init_routes(app):
         productos = obtener_productos()
         if productos is not None: return jsonify(productos), 200
         return jsonify({"status": "error", "message": "Error al obtener productos"}), 500
+    
 
     @app.route('/producto', methods=['POST'])
     def guardar_producto():
