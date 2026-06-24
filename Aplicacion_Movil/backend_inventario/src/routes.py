@@ -12,6 +12,7 @@ from src.database import (
     registrar_usuario,
     registrar_cliente,
     registrar_proveedor,
+    registrar_reporte_db,
     obtener_productos,
     obtener_notificaciones_db,
     obtener_clientes_ordenados,
@@ -31,7 +32,8 @@ from src.database import (
     actualizar_password_db,
     eliminar_imagen_usuario,
     obtener_reportes_db,
-    verificar_stock_bajo
+    verificar_stock_bajo,
+    obtener_chats_abiertos_db
 )
 
 def init_routes(app):
@@ -46,6 +48,7 @@ def init_routes(app):
         identificador = data.get('username') or data.get('correo') or data.get('email')
         password = data.get('password')
 
+
         # 1. Validamos que el usuario y contraseña sean correctos
         user = validar_usuario(identificador, password)
         
@@ -54,7 +57,7 @@ def init_routes(app):
             rol_usuario = user.get('rol', '').lower()
             
             # PERMITIR TANTO A 'superadmin' COMO A 'admin' ENTRAR A LA APP
-            if rol_usuario == 'superadmin' or rol_usuario == 'admin':
+            if rol_usuario == 'superadmin' or rol_usuario == 'admin' or rol_usuario == 'cliente':
                 return jsonify({
                     "status": "success", 
                     "message": f"Bienvenido {rol_usuario.capitalize()}", 
@@ -357,6 +360,11 @@ def init_routes(app):
         if eliminar_reporte_db(id):
             return jsonify({"status": "success"}), 200
         return jsonify({"status": "error"}), 400
+    
+    @app.route('/soporte/chats-abiertos', methods=['GET'])
+    def listar_chats_abiertos():
+        return jsonify(obtener_chats_abiertos_db()), 200
+    
 
 
 def enviar_email_codigo(destinatario, codigo):

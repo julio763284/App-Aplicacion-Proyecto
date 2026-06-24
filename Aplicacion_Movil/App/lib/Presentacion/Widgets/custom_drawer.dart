@@ -53,7 +53,7 @@ class CustomNexusDrawer extends StatelessWidget {
                       const SizedBox(height: 15),
                       
                       _buildSectionTitle("ANÁLISIS"),
-                      _drawerItem(context, Icons.analytics_outlined, "Reportes", const GestionarReportes()),
+                      _drawerItem(context, Icons.analytics_outlined, "Reportes", const GestionarChats()),
                       _drawerItem(context, Icons.warehouse_outlined, "Stock", const VisualizarStock()),
                       _drawerItem(context, Icons.notifications_active_outlined, "Alertas", const NotificationView()),
                       
