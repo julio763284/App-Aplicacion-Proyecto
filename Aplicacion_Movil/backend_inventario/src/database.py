@@ -240,7 +240,6 @@ def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, 
         cursor.close()
         db.close()
 
-
 def obtener_clientes_ordenados():
     try:
         conn = obtener_conexion()
@@ -253,6 +252,43 @@ def obtener_clientes_ordenados():
     except Exception as e:
         print(f"Error: {e}")
         return None
+    
+def obtener_clientes_ordenados():
+    try:
+        conn = obtener_conexion()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM cliente ORDER BY fecha_registro DESC")
+        clientes = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return clientes
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+def obtener_usuarios_clientes():
+    db = obtener_conexion()
+    if not db: return []
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT 
+                id              AS id_cliente,
+                nombre          AS nombre_completo,
+                correo          AS correo_electronico,
+                telefono        AS telefono,
+                NULL            AS direccion_residencia
+            FROM usuarios
+            WHERE rol = 'cliente'
+            ORDER BY creado_el DESC
+        """)
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error en obtener_usuarios_clientes: {e}")
+        return []
+    finally:
+        cursor.close()
+        db.close()
 
 
 def eliminar_cliente_db(id_cliente):
@@ -518,7 +554,7 @@ def obtener_notificaciones_db():
     if not db: return []
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT mensaje, DATE_FORMAT(fecha_creacion, '%H:%i') as fecha FROM notificaciones ORDER BY id DESC")
+        cursor.execute("SELECT mensaje, DATE_FORMAT(fecha_creacion, '%d/%m/%Y %H:%i') as fecha FROM notificaciones ORDER BY id DESC")
         return cursor.fetchall()
     finally:
         cursor.close()
