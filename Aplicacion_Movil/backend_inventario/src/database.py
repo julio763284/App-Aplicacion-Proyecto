@@ -597,3 +597,60 @@ def obtener_chats_abiertos_db():
     finally:
         cursor.close()
         db.close()
+# ======================================================
+# REPORTES DE VENTA
+# ======================================================
+
+def registrar_reporte_db(titulo, descripcion, monto):
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor()
+        sql = "INSERT INTO reporte_venta (titulo, descripcion, monto, fecha) VALUES (%s, %s, %s, CURRENT_TIMESTAMP)"
+        cursor.execute(sql, (titulo, descripcion, monto))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al registrar: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+
+def editar_reporte_db(id_reporte, titulo, descripcion, monto):
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor()
+        cursor.execute(
+            "UPDATE reporte_venta SET titulo=%s, descripcion=%s, monto=%s WHERE id_reporte=%s",
+            (titulo, descripcion, monto, id_reporte)
+        )
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al editar reporte: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+
+def eliminar_reporte_db(id_reporte):
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM reporte_venta WHERE id_reporte = %s", (id_reporte,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error al eliminar reporte: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
