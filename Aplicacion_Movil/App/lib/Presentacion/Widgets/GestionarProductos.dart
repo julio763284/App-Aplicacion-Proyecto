@@ -8,6 +8,7 @@ import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 import 'package:gestor/Presentacion/Widgets/nuevoproducto.dart';
 import 'package:intl/intl.dart';
+import 'package:gestor/Presentacion/core/config.dart';
 
 class Gestionarproductos extends StatefulWidget {
   const Gestionarproductos({super.key});
@@ -93,32 +94,46 @@ class _GestionarproductosState extends State<Gestionarproductos> {
     }
   }
 
-  Widget _mostrarImagenNexus(String? base64String, Color placeholderColor) {
-    if (base64String == null || base64String.isEmpty) {
-      return Container(
-        color: placeholderColor.withOpacity(0.3),
-        child: Icon(Icons.inventory, color: placeholderColor, size: 40),
-      );
-    }
-
-    try {
-      String cleanBase64 = base64String.contains(',')
-          ? base64String.split(',').last
-          : base64String;
-
-      Uint8List bytes = base64Decode(cleanBase64);
-
-      return Image.memory(
-        bytes,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        errorBuilder: (context, error, stackTrace) =>
-            const Icon(Icons.broken_image, color: Colors.red),
-      );
-    } catch (e) {
-      return const Icon(Icons.error, color: Colors.orange);
-    }
+  Widget _mostrarImagenNexus(String? imagenStr, Color placeholderColor) {
+  if (imagenStr == null || imagenStr.isEmpty) {
+    return Container(
+      color: placeholderColor.withOpacity(0.3),
+      child: Icon(Icons.inventory, color: placeholderColor, size: 40),
+    );
   }
+
+  // Si es una ruta del servidor (empieza con /static/ o http)
+  if (imagenStr.startsWith('/static/') || imagenStr.startsWith('http')) {
+  final String urlCompleta = imagenStr.startsWith('http')
+      ? imagenStr
+      : '${ApiConfig.baseUrl}/imagen_producto?ruta=$imagenStr'; // ✅ usa ApiConfig
+  return Image.network(
+    urlCompleta,
+    fit: BoxFit.cover,
+    width: double.infinity,
+    errorBuilder: (context, error, stackTrace) =>
+        const Icon(Icons.broken_image, color: Colors.red),
+  );
+}
+
+
+  // Si es base64 (productos creados desde tu app)
+  try {
+    String cleanBase64 = imagenStr.contains(',') 
+        ? imagenStr.split(',').last 
+        : imagenStr;
+    Uint8List bytes = base64Decode(cleanBase64);
+    return Image.memory(
+      bytes,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      errorBuilder: (context, error, stackTrace) => 
+          Icon(Icons.broken_image, color: Colors.red),
+    );
+  } catch (e) {
+    return Icon(Icons.error, color: Colors.orange);
+  }
+}
 
   void _mostrarOpciones(BuildContext context, dynamic producto) {
     final theme = Theme.of(context);

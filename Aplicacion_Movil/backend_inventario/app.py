@@ -20,11 +20,11 @@ def test():
 
 
 if __name__ == '__main__':
-    # FORZAMOS el puerto 5000 y el host 0.0.0.0
-    print("🚀 Servidor abriendo en puerto 5000...")
+    # FORZAMOS el puerto 5001 y el host 0.0.0.0
+    print("🚀 Servidor abriendo en puerto 5001...")
     app.run(
         host='0.0.0.0', 
-        port=5000, 
+        port=5001, 
         debug=True
     )
     
