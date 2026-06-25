@@ -16,10 +16,14 @@ from src.database import (
     obtener_productos,
     obtener_notificaciones_db,
     obtener_clientes_ordenados,
+    obtener_usuarios_clientes,
     obtener_proveedores_ordenados,
     registrar_producto_db,
     editar_producto_db,
     eliminar_producto_db,
+    registrar_reporte_db,
+    editar_reporte_db,
+    eliminar_reporte_db,
     editar_cliente_db,
     eliminar_cliente_db,
     editar_proveedor_db,
@@ -34,15 +38,12 @@ from src.database import (
     obtener_reportes_db,
     verificar_stock_bajo,        # ✅ importado
     obtener_chats_abiertos_db,   # ✅ importado
-    registrar_reporte_db,   # ✅
-    editar_reporte_db,      # ✅
-    eliminar_reporte_db,    # ✅
 )
 
 
 def init_routes(app):
 
-    # ─── AUTH ───────────────────────────────────────────────────────────────────
+   
 
     @app.route('/login', methods=['POST'])
     def login():
@@ -113,7 +114,7 @@ def init_routes(app):
 
     @app.route('/clientes', methods=['GET'])
     def listar_clientes():
-        clientes = obtener_clientes_ordenados()
+        clientes = obtener_usuarios_clientes()
         if clientes is not None:
             return jsonify(clientes), 200
         return jsonify({"status": "error", "message": "Error al obtener clientes"}), 500
@@ -346,7 +347,7 @@ def init_routes(app):
     @app.route('/reporte/<int:id>', methods=['PUT'])
     def editar_reporte(id):
         data = request.json
-        if editar_reporte_db(id, data['titulo'], data['descripcion'], data['monto']):
+        if editar_reporte_db (id, data['titulo'], data['descripcion'], data['monto']):
             return jsonify({"status": "success"}), 200
         return jsonify({"status": "error"}), 400
 
