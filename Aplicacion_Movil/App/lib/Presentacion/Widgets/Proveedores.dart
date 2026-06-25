@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
@@ -29,7 +28,7 @@ class _ProveedoresState extends State<Proveedores> {
       if (response.statusCode == 200) {
         setState(() {
           proveedores = json.decode(response.body);
-          cargando = false;
+          cargando    = false;
         });
       }
     } catch (e) {
@@ -39,9 +38,7 @@ class _ProveedoresState extends State<Proveedores> {
 
   Future<void> _eliminarProveedor(int id) async {
     try {
-      final response = await http.delete(
-        Uri.parse(ApiConfig.url('/proveedor/$id')),
-      );
+      final response = await http.delete(Uri.parse(ApiConfig.url('/proveedor/$id')));
       if (response.statusCode == 200) fetchProveedores();
     } catch (e) {
       debugPrint("Error: $e");
@@ -50,17 +47,17 @@ class _ProveedoresState extends State<Proveedores> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1B1E),
       drawer: const CustomNexusDrawer(),
       appBar: CustomAppBar(
         conteoNotificaciones: 0,
         onActualizarNotificaciones: () {},
       ),
       body: cargando
-          ? const Center(
-              child: CircularProgressIndicator(color: Colors.cyanAccent),
-            )
+          ? Center(child: CircularProgressIndicator(color: cyan))
           : Column(
               children: [
                 Expanded(
@@ -69,9 +66,7 @@ class _ProveedoresState extends State<Proveedores> {
                     padding: const EdgeInsets.only(top: 10, bottom: 20),
                     itemCount: proveedores.length,
                     itemBuilder: (context, index) {
-                      // Validación de seguridad para evitar RangeError
-                      if (index >= proveedores.length)
-                        return const SizedBox.shrink();
+                      if (index >= proveedores.length) return const SizedBox.shrink();
                       return _buildProveedorCard(proveedores[index]);
                     },
                   ),
@@ -84,67 +79,64 @@ class _ProveedoresState extends State<Proveedores> {
   }
 
   Widget _buildProveedorCard(Map<String, dynamic> proveedor) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
+    final teal  = theme.colorScheme.primary;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF162A2D),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
       ),
       child: ListTile(
         onLongPress: () => _mostrarOpciones(proveedor),
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
+          backgroundColor: teal.withOpacity(0.2),
           child: Text(
-            proveedor['nombre'] != null &&
-                    proveedor['nombre'].toString().isNotEmpty
+            proveedor['nombre'] != null && proveedor['nombre'].toString().isNotEmpty
                 ? proveedor['nombre'][0].toString().toUpperCase()
                 : '?',
-            style: const TextStyle(
-              color: Colors.cyanAccent,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: cyan, fontWeight: FontWeight.bold),
           ),
         ),
         title: Text(
           proveedor['nombre'].toString().toUpperCase(),
-          style: const TextStyle(
-            color: Colors.white,
+          style: theme.textTheme.bodyLarge?.copyWith(
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Text(
           proveedor['gmail'] ?? 'SIN CORREO',
-          style: const TextStyle(color: Colors.white38, fontSize: 11),
+          style: theme.textTheme.bodyMedium?.copyWith(fontSize: 11),
         ),
-        trailing: const Icon(
-          Icons.local_shipping_outlined,
-          color: Color(0xFF017A74),
-          size: 18,
-        ),
+        trailing: Icon(Icons.local_shipping_outlined, color: teal, size: 18),
       ),
     );
   }
 
   void _mostrarOpciones(Map<String, dynamic> proveedor) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
+    final teal  = theme.colorScheme.primary;
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1B1E),
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
-          side: const BorderSide(color: Color(0xFF017A74)),
+          side: BorderSide(color: teal),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.edit, color: Colors.cyanAccent),
-              title: const Text(
-                "EDITAR PROVEEDOR",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
+              leading: Icon(Icons.edit, color: cyan),
+              title: Text("EDITAR PROVEEDOR",
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 12)),
               onTap: () {
                 Navigator.pop(context);
                 _abrirEditor(proveedor);
@@ -152,10 +144,8 @@ class _ProveedoresState extends State<Proveedores> {
             ),
             ListTile(
               leading: const Icon(Icons.delete_sweep, color: Colors.redAccent),
-              title: const Text(
-                "ELIMINAR PROVEEDOR",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
+              title: Text("ELIMINAR PROVEEDOR",
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 12)),
               onTap: () {
                 Navigator.pop(context);
                 _eliminarProveedor(proveedor['id_proveedor']);
@@ -168,6 +158,9 @@ class _ProveedoresState extends State<Proveedores> {
   }
 
   void _abrirEditor(Map<String, dynamic> proveedor) {
+    final theme  = Theme.of(context);
+    final cyan   = theme.colorScheme.secondary;
+    final teal   = theme.colorScheme.primary;
     final nomCtrl = TextEditingController(text: proveedor['nombre']);
     final dirCtrl = TextEditingController(text: proveedor['direccion']);
     final corCtrl = TextEditingController(text: proveedor['gmail']);
@@ -176,52 +169,41 @@ class _ProveedoresState extends State<Proveedores> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1B1E),
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Color(0xFF017A74)),
+          side: BorderSide(color: teal),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "EDITAR PROVEEDOR",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              _inputMinimal("Nombre", nomCtrl),
+              Text("EDITAR PROVEEDOR",
+                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+              _inputMinimal("Nombre",    nomCtrl),
               _inputMinimal("Dirección", dirCtrl),
-              _inputMinimal("Correo", corCtrl),
-              _inputMinimal("Teléfono", telCtrl),
+              _inputMinimal("Correo",    corCtrl),
+              _inputMinimal("Teléfono",  telCtrl),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "CANCELAR",
-                      style: TextStyle(color: Colors.redAccent),
-                    ),
+                    child: const Text("CANCELAR",
+                        style: TextStyle(color: Colors.redAccent)),
                   ),
                   TextButton(
                     onPressed: () async {
                       final response = await http.put(
-                        Uri.parse(
-                          ApiConfig.url(
-                            '/proveedor/${proveedor['id_proveedor']}',
-                          ),
-                        ),
+                        Uri.parse(ApiConfig.url('/proveedor/${proveedor['id_proveedor']}')),
                         headers: {"Content-Type": "application/json"},
                         body: jsonEncode({
-                          "nombre": nomCtrl.text,
+                          "nombre":    nomCtrl.text,
                           "direccion": dirCtrl.text,
-                          "gmail": corCtrl.text,
-                          "telefono": telCtrl.text,
+                          "gmail":     corCtrl.text,
+                          "telefono":  telCtrl.text,
                         }),
                       );
                       if (response.statusCode == 200) {
@@ -229,10 +211,8 @@ class _ProveedoresState extends State<Proveedores> {
                         fetchProveedores();
                       }
                     },
-                    child: const Text(
-                      "GUARDAR",
-                      style: TextStyle(color: Colors.cyanAccent),
-                    ),
+                    child: Text("GUARDAR",
+                        style: TextStyle(color: cyan, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -244,28 +224,35 @@ class _ProveedoresState extends State<Proveedores> {
   }
 
   Widget _inputMinimal(String label, TextEditingController ctrl) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
     return TextField(
       controller: ctrl,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
+      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white24),
+        labelStyle: TextStyle(color: cyan, fontSize: 12),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: theme.dividerColor),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: cyan),
         ),
       ),
     );
   }
 
   Widget _buildFooterCounter() {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
     return Container(
       padding: const EdgeInsets.all(20),
-      color: const Color(0xFF0D1B1E),
+      color: theme.scaffoldBackgroundColor,
       alignment: Alignment.centerLeft,
       child: Text(
         "TOTAL PROVEEDORES : ${proveedores.length}",
-        style: const TextStyle(
-          color: Colors.cyanAccent,
+        style: TextStyle(
+          color: cyan,
           fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
@@ -274,13 +261,15 @@ class _ProveedoresState extends State<Proveedores> {
   }
 
   Widget _buildFab() {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
     return FloatingActionButton(
-      backgroundColor: const Color(0xFF0D1B1E),
-      child: const Icon(Icons.add, color: Colors.cyanAccent),
+      backgroundColor: theme.scaffoldBackgroundColor,
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => Nuevoproveedor()),
       ).then((_) => fetchProveedores()),
+      child: Icon(Icons.add, color: cyan),
     );
   }
 }
