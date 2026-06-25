@@ -12,6 +12,7 @@ from src.database import (
     registrar_usuario,
     registrar_cliente,
     registrar_proveedor,
+    registrar_reporte_db,
     obtener_productos,
     obtener_notificaciones_db,
     obtener_clientes_ordenados,
@@ -31,6 +32,8 @@ from src.database import (
     actualizar_password_db,
     eliminar_imagen_usuario,
     obtener_reportes_db,
+    verificar_stock_bajo,
+    obtener_chats_abiertos_db
 )
 
 def init_routes(app):
@@ -45,6 +48,7 @@ def init_routes(app):
         identificador = data.get('username') or data.get('correo') or data.get('email')
         password = data.get('password')
 
+
         # 1. Validamos que el usuario y contraseña sean correctos
         user = validar_usuario(identificador, password)
         
@@ -53,7 +57,7 @@ def init_routes(app):
             rol_usuario = user.get('rol', '').lower()
             
             # PERMITIR TANTO A 'superadmin' COMO A 'admin' ENTRAR A LA APP
-            if rol_usuario == 'superadmin' or rol_usuario == 'admin':
+            if rol_usuario == 'superadmin' or rol_usuario == 'admin' or rol_usuario == 'cliente':
                 return jsonify({
                     "status": "success", 
                     "message": f"Bienvenido {rol_usuario.capitalize()}", 
@@ -110,8 +114,10 @@ def init_routes(app):
 
     @app.route('/producto', methods=['POST'])
     def guardar_producto():
-        data = request.json
-        res = registrar_producto_db(
+        if res["status"] == "success":
+            verificar_stock_bajo()
+            data = request.json
+            res = registrar_producto_db(
             data.get('nombre'),
             data.get('descripcion'),
             data.get('precio_compra'),
@@ -120,6 +126,9 @@ def init_routes(app):
             data.get('stock_minimo'),
             data.get('imagen_url', '')
         )
+
+        if res["status"] == "success":
+            verificar_stock_bajo()
         return jsonify(res), (201 if res["status"] == "success" else 400)
 
     @app.route('/producto/<int:id>', methods=['DELETE', 'OPTIONS'])
@@ -135,19 +144,23 @@ def init_routes(app):
         if request.method == 'OPTIONS':
             return jsonify({}), 200
         data = request.json
-        if editar_producto_db(id, data['nombre'], data['descripcion'], data['precio_compra'],
-                               data['precio_venta'], data['stock'], data['stock_minimo']):
-            return jsonify({"status": "success", "message": "Producto actualizado"}), 200
-        return jsonify({"status": "error", "message": "Error al actualizar"}), 400
+        if editar_producto_db(id,
+                               data['nombre'],
+                               data['descripcion'],
+                               data['precio_compra'],
+                               data['precio_venta'],
+                               data['stock'],
+                               data['stock_minimo']
+                            ):
+                                verificar_stock_bajo()
+                                return jsonify({"status": "success", "message": "Producto actualizado"}), 200
+                                return jsonify({"status": "error", "message": "Error al actualizar"}), 400
 
     @app.route('/notificaciones', methods=['GET'])
     def listar_notificaciones():
-        try:
-            alertas = obtener_notificaciones_db()
-            return jsonify(alertas), 200
-        except Exception as e:
-            print(f"Error en ruta notificaciones: {e}")
-            return jsonify({"status": "error", "message": str(e)}), 500
+        alertas = obtener_notificaciones_db()
+        print(alertas)
+        return jsonify(alertas)
 
     @app.route('/clientes', methods=['GET'])
     def listar_clientes():
@@ -320,6 +333,20 @@ def init_routes(app):
         if registrar_reporte_db(data['titulo'], data['descripcion'], data['monto']):
             return jsonify({"status": "success"}), 201
         return jsonify({"status": "error"}), 400
+    
+    @app.route('/verificar_stock', methods=['GET'])
+    def verificar_stock():
+        if verificar_stock_bajo():
+            return jsonify({
+                "status": "success",
+                "message": "Verificación realizada"
+            }), 200
+
+        return jsonify({
+            "status": "error",
+            "message": "No se pudo verificar"
+        }), 500
+    
 
     @app.route('/reporte/<int:id>', methods=['PUT'])
     def editar_reporte(id):
@@ -333,6 +360,11 @@ def init_routes(app):
         if eliminar_reporte_db(id):
             return jsonify({"status": "success"}), 200
         return jsonify({"status": "error"}), 400
+    
+    @app.route('/soporte/chats-abiertos', methods=['GET'])
+    def listar_chats_abiertos():
+        return jsonify(obtener_chats_abiertos_db()), 200
+    
 
 
 def enviar_email_codigo(destinatario, codigo):
