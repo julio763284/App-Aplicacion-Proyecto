@@ -17,12 +17,12 @@ class Producto {
   });
 
   factory Producto.fromJson(Map<String, dynamic> json) {
-    return Producto(
-      idProducto: json['id_producto'] ?? 0,
-      nombre: json['nombre'] ?? 'Sin nombre',
-      cantidad: json['cantidad'] ?? 0,
-    );
-  }
+  return Producto(
+    idProducto: json['id'] ?? json['id_producto'] ?? 0,
+    nombre: json['nombre'] ?? 'Sin nombre',
+    cantidad: json['stock'] ?? json['cantidad'] ?? 0,
+  );
+}
 
   String get estado {
     if (cantidad >= 10) return 'Disponible';

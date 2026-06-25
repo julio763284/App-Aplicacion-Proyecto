@@ -43,7 +43,7 @@ from src.database import (
 
 def init_routes(app):
 
-   
+
 
     @app.route('/login', methods=['POST'])
     def login():
@@ -331,31 +331,6 @@ def init_routes(app):
             return jsonify({"status": "error", "message": "Error al actualizar email"}), 500
         return jsonify({"status": "error", "message": "Código incorrecto"}), 401
 
-    # ─── REPORTES ────────────────────────────────────────────────────────────────
-
-    @app.route('/reportes', methods=['GET'])
-    def listar_reportes():
-        return jsonify(obtener_reportes_db()), 200
-
-    @app.route('/reporte', methods=['POST'])
-    def crear_reporte():
-        data = request.json
-        if registrar_reporte_db(data['titulo'], data['descripcion'], data['monto']):
-            return jsonify({"status": "success"}), 201
-        return jsonify({"status": "error"}), 400
-
-    @app.route('/reporte/<int:id>', methods=['PUT'])
-    def editar_reporte(id):
-        data = request.json
-        if editar_reporte_db (id, data['titulo'], data['descripcion'], data['monto']):
-            return jsonify({"status": "success"}), 200
-        return jsonify({"status": "error"}), 400
-
-    @app.route('/reporte/<int:id>', methods=['DELETE'])
-    def eliminar_reporte(id):
-        if eliminar_reporte_db(id):
-            return jsonify({"status": "success"}), 200
-        return jsonify({"status": "error"}), 400
 
     # ─── SOPORTE ─────────────────────────────────────────────────────────────────
 
