@@ -7,6 +7,7 @@ from flask import request, jsonify, send_file
 
 from config.db_config import MAIL_SETTINGS
 from src.database import (
+
     obtener_usuario,
     validar_usuario,
     registrar_usuario,
@@ -33,6 +34,9 @@ from src.database import (
     obtener_reportes_db,
     verificar_stock_bajo,        # ✅ importado
     obtener_chats_abiertos_db,   # ✅ importado
+    registrar_reporte_db,   # ✅
+    editar_reporte_db,      # ✅
+    eliminar_reporte_db,    # ✅
 )
 
 

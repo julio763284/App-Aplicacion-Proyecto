@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:gestor/Presentacion/Pages/datos_empresa_page.dart';
+import 'package:gestor/Presentacion/Pages/escaner_barras_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
 import 'package:gestor/Presentacion/Widgets/CustomAppBar.dart';
@@ -102,13 +104,21 @@ class Configuracion extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const VistaTemaPage()),
                   ),
                 ),
-                const ItemAjusteNexus(
+                 ItemAjusteNexus(
                   icono: Icons.business_outlined,
                   texto: "Datos de Mi Empresa",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DatosEmpresaPage()),
+                  ),
                 ),
-                const ItemAjusteNexus(
+                 ItemAjusteNexus(
                   icono: Icons.qr_code_scanner_outlined,
                   texto: "Escáner de Barras",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const EscanerBarrasPage()),
+                  ),
                 ),
               ],
             ),

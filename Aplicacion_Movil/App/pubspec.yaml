@@ -31,6 +31,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  mobile_scanner: ^5.2.3
   font_awesome_flutter: ^10.7.0
   provider: ^6.1.2
   http: ^1.6.0
