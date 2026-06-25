@@ -468,7 +468,7 @@ def obtener_notificaciones_db():
     if not db: return []
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT mensaje, DATE_FORMAT(fecha, '%H:%i') as fecha, leido FROM notificaciones ORDER BY id DESC")
+        cursor.execute("SELECT mensaje, DATE_FORMAT(fecha_creacion, '%H:%i') as fecha FROM notificaciones ORDER BY id DESC")
         return cursor.fetchall()
     finally:
         cursor.close()
@@ -548,3 +548,100 @@ def eliminar_reporte_db(id_reporte):
     cursor.execute("DELETE FROM reporte_venta WHERE id_reporte = %s", (id_reporte,))
     db.commit()
     return True
+
+def verificar_stock_bajo():
+
+
+
+    db = obtener_conexion()
+    if not db:
+        return False
+
+    try:
+        cursor = db.cursor(dictionary=True)
+
+        # Buscar productos con stock bajo
+        sql = """
+        SELECT id, nombre, stock, stock_minimo
+        FROM productos
+        WHERE stock <= stock_minimo
+        """
+        cursor.execute(sql)
+        productos = cursor.fetchall()
+
+        for producto in productos:
+            if producto['stock'] == 0:
+                mensaje = (
+                    f"🚨 AGOTADO: {producto['nombre']} "
+                    f"| Stock actual: 0"
+                )
+        else:
+            mensaje = (
+                f"⚠️ {producto['nombre']} "
+                f"| Stock actual: {producto['stock']} "
+                f"| Stock mínimo: {producto['stock_minimo']}"
+            )
+
+            # Evitar duplicar notificaciones
+            cursor.execute("""
+                SELECT id
+                FROM notificaciones
+                WHERE mensaje = %s
+                ORDER BY id DESC
+                LIMIT 1
+            """, (mensaje,))
+
+            existe = cursor.fetchone()
+
+            if not existe:
+                cursor.execute("""
+                    INSERT INTO notificaciones (mensaje)
+                    VALUES (%s)
+                """, (mensaje,))
+
+        db.commit()
+        return True
+
+    except Exception as e:
+        print(f"Error verificando stock: {e}")
+        return False
+
+    finally:
+        cursor.close()
+        db.close()
+
+def obtener_chats_abiertos_db():
+    db = obtener_conexion()
+    if not db:
+        return []
+
+    try:
+        cursor = db.cursor(dictionary=True)
+
+        sql = """
+        SELECT
+            usuario_id,
+            nombre,
+            correo,
+            COUNT(*) AS total_mensajes,
+            MAX(fecha_creacion) AS ultima_fecha,
+            SUBSTRING_INDEX(
+                GROUP_CONCAT(mensaje ORDER BY fecha_creacion DESC),
+                ',', 1
+            ) AS ultimo_mensaje
+        FROM soporte
+        WHERE estado IN ('PENDIENTE', 'EN_PROCESO')
+        GROUP BY usuario_id, nombre, correo
+        ORDER BY ultima_fecha DESC
+        """
+
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+    except Exception as e:
+        print(f"Error chats: {e}")
+        return []
+
+    finally:
+        cursor.close()
+        db.close()

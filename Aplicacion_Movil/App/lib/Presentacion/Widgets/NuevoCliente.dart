@@ -26,28 +26,66 @@ class Nuevocliente extends StatelessWidget {
           "direccion_residencia": direccionController.text,
           "gmail_corporativo": correoController.text,
           "celular": telefonoController.text,
-          "imagen": ""
+          "imagen": "",
         }),
       );
 
-      if (response.statusCode == 201) {
-        _notificar(context, 'Cliente guardado correctamente ✅', Colors.greenAccent);
-        nombreController.clear();
-        direccionController.clear();
-        correoController.clear();
-        telefonoController.clear();
+      // Verificamos si el servidor respondió correctamente (200 o 201)
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final resData = jsonDecode(response.body);
+
+        // Validamos el estado que envía tu backend en Python
+        if (resData['status'] == 'success') {
+          _notificar(
+            context,
+            'Cliente guardado correctamente ✅',
+            Colors.greenAccent,
+          );
+
+          // Limpiamos los campos del formulario
+          nombreController.clear();
+          direccionController.clear();
+          correoController.clear();
+          telefonoController.clear();
+
+          // Esperamos 1.5 segundos para que alcances a ver el mensaje de éxito y cerramos la pantalla
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            Navigator.pop(context);
+          });
+        } else {
+          // Si el backend envió un error controlado (ej. correo duplicado)
+          _notificar(
+            context,
+            'Error: ${resData['message']} ❌',
+            Colors.redAccent,
+          );
+        }
       } else {
-        _notificar(context, 'Error al guardar cliente ❌', Colors.redAccent);
+        _notificar(
+          context,
+          'Error al guardar cliente (Código: ${response.statusCode}) ❌',
+          Colors.redAccent,
+        );
       }
     } catch (e) {
-      _notificar(context, 'Error de conexión con el servidor 🌐', Colors.orangeAccent);
+      _notificar(
+        context,
+        'Error de conexión con el servidor 🌐',
+        Colors.orangeAccent,
+      );
     }
   }
 
   void _notificar(BuildContext context, String msj, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(msj, style: const TextStyle(color: Color(0xFF0D1B1E), fontWeight: FontWeight.bold)),
+        content: Text(
+          msj,
+          style: const TextStyle(
+            color: Color(0xFF0D1B1E),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -67,12 +105,21 @@ class Nuevocliente extends StatelessWidget {
         backgroundColor: accentTeal.withOpacity(0.2),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "REGISTRO",
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
         ),
         actions: [
           Builder(
@@ -88,7 +135,10 @@ class Nuevocliente extends StatelessWidget {
           Positioned(
             bottom: -40,
             right: -40,
-            child: CircleAvatar(radius: 100, backgroundColor: accentTeal.withOpacity(0.03)),
+            child: CircleAvatar(
+              radius: 100,
+              backgroundColor: accentTeal.withOpacity(0.03),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -97,12 +147,37 @@ class Nuevocliente extends StatelessWidget {
               child: ListView(
                 children: [
                   const SizedBox(height: 30),
-                  const Text("Datos Personales", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                  const Text(
+                    "Datos Personales",
+                    style: TextStyle(
+                      color: Colors.greenAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                   const SizedBox(height: 25),
-                  _inputNexus("Nombre Completo", Icons.person_outline, nombreController),
-                  _inputNexus("Dirección Residencia", Icons.map_outlined, direccionController),
-                  _inputNexus("Email Corporativo", Icons.alternate_email, correoController, type: TextInputType.emailAddress),
-                  _inputNexus("Celular", Icons.phone_iphone_rounded, telefonoController, type: TextInputType.phone),
+                  _inputNexus(
+                    "Nombre Completo",
+                    Icons.person_outline,
+                    nombreController,
+                  ),
+                  _inputNexus(
+                    "Dirección Residencia",
+                    Icons.map_outlined,
+                    direccionController,
+                  ),
+                  _inputNexus(
+                    "Email Corporativo",
+                    Icons.alternate_email,
+                    correoController,
+                    type: TextInputType.emailAddress,
+                  ),
+                  _inputNexus(
+                    "Celular",
+                    Icons.phone_iphone_rounded,
+                    telefonoController,
+                    type: TextInputType.phone,
+                  ),
                   const SizedBox(height: 40),
                   _btnGuardar(context, accentTeal),
                 ],
@@ -114,7 +189,12 @@ class Nuevocliente extends StatelessWidget {
     );
   }
 
-  Widget _inputNexus(String label, IconData icon, TextEditingController ctrl, {TextInputType type = TextInputType.text}) {
+  Widget _inputNexus(
+    String label,
+    IconData icon,
+    TextEditingController ctrl, {
+    TextInputType type = TextInputType.text,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: TextFormField(
@@ -157,7 +237,11 @@ class Nuevocliente extends StatelessWidget {
         child: const Center(
           child: Text(
             "GUARDAR CLIENTE",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
       ),

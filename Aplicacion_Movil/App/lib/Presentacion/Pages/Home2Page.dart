@@ -40,7 +40,7 @@ class Homepagebody extends StatelessWidget {
                     mainAxisSpacing: 12,
                     childAspectRatio: childAspectRatio,
                     children: [
-                      nexusFrostedGlassCard(context, "Reportes", Icons.file_copy, const GestionarReportes(), isMobile),
+                      nexusFrostedGlassCard(context, "Supports", Icons.file_copy, const GestionarChats(), isMobile),
                       nexusFrostedGlassCard(context, "Stock", Icons.warehouse, const VisualizarStock(), isMobile),
                       nexusFrostedGlassCard(context, "Clientes", Icons.person, const Cliente(), isMobile),
                       nexusFrostedGlassCard(context, "Proveedores", Icons.local_shipping, const Proveedores(), isMobile),
