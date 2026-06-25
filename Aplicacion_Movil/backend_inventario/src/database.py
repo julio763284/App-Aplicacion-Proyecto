@@ -27,15 +27,28 @@ def validar_usuario(identificador, password_plana):
     if not db: return None
     try:
         cursor = db.cursor(dictionary=True, buffered=True)
-
         sql = "SELECT id, nombre, correo, password_hash, rol, activo FROM usuarios WHERE nombre = %s OR correo = %s"
         cursor.execute(sql, (identificador, identificador))
-
         resultado = cursor.fetchone()
 
         if resultado:
-            hash_almacenado = resultado['password_hash'].encode('utf-8')
-            if bcrypt.checkpw(password_plana.encode('utf-8'), hash_almacenado):
+            hash_almacenado = resultado['password_hash']
+
+            # Detectar tipo de hash y verificar correctamente
+            if hash_almacenado.startswith('scrypt:') or hash_almacenado.startswith('pbkdf2:'):
+                # Hash de Werkzeug (página web)
+                from werkzeug.security import check_password_hash
+                es_valido = check_password_hash(hash_almacenado, password_plana)
+            elif hash_almacenado.startswith('$2b$') or hash_almacenado.startswith('$2y$'):
+                # Hash de bcrypt (app Flutter)
+                es_valido = bcrypt.checkpw(
+                    password_plana.encode('utf-8'),
+                    hash_almacenado.encode('utf-8')
+                )
+            else:
+                es_valido = False
+
+            if es_valido:
                 resultado.pop('password_hash')
                 return resultado
 
@@ -195,7 +208,6 @@ def actualizar_password_db(email, nueva_password_plana):
     try:
         cursor = db.cursor()
         hash_pw = bcrypt.hashpw(nueva_password_plana.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
         sql = """UPDATE usuarios SET password_hash = %s, codigo_recuperacion = NULL, codigo_expira = NULL
                  WHERE correo = %s"""
         cursor.execute(sql, (hash_pw, email))
@@ -210,8 +222,7 @@ def actualizar_password_db(email, nueva_password_plana):
 
 
 # ======================================================
-# CLIENTES (tabla 'cliente' -- PENDIENTE: aún no existe en mitiendaweb_db,
-# hay que crearla o decidir si se reemplaza por 'usuarios' con rol='cliente')
+# CLIENTES (tabla 'cliente' -- PENDIENTE: aún no existe en mitiendaweb_db)
 # ======================================================
 
 def registrar_cliente(nombre, direccion_residencia, gmail_corporativo, celular, imagen):
@@ -287,31 +298,21 @@ def registrar_proveedor(nombre, direccion, gmail, telefono):
     db = obtener_conexion()
     if not db:
         return {"status": "error", "message": "Error de conexion"}
-
     try:
         cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT id_proveedor FROM proveedor WHERE gmail = %s", (gmail,))
         existe = cursor.fetchone()
 
         if existe:
-            return {
-                "status": "error",
-                "message": "El correo ya está registrado"
-            }
+            return {"status": "error", "message": "El correo ya está registrado"}
 
-        sql = """
-        INSERT INTO proveedor (nombre, direccion, gmail, telefono)
-        VALUES (%s, %s, %s, %s)
-        """
+        sql = "INSERT INTO proveedor (nombre, direccion, gmail, telefono) VALUES (%s, %s, %s, %s)"
         cursor.execute(sql, (nombre, direccion, gmail, telefono))
         db.commit()
-
         return {"status": "success", "message": "Proveedor registrado"}
-
     except Exception as e:
         print("ERROR:", e)
         return {"status": "error", "message": "Error interno"}
-
     finally:
         cursor.close()
         db.close()
@@ -321,7 +322,6 @@ def obtener_proveedores_ordenados():
     db = obtener_conexion()
     if not db:
         return []
-
     try:
         cursor = db.cursor(dictionary=True)
         cursor.execute("SELECT * FROM proveedor ORDER BY id_proveedor DESC")
@@ -458,9 +458,59 @@ def validar_y_notificar_stock(id_producto):
         db.close()
 
 
+def verificar_stock_bajo():
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor(dictionary=True)
+        sql = """
+            SELECT id, nombre, stock, stock_minimo
+            FROM productos
+            WHERE stock <= stock_minimo
+        """
+        cursor.execute(sql)
+        productos = cursor.fetchall()
+
+        for producto in productos:
+            if producto['stock'] == 0:
+                mensaje = (
+                    f"🚨 AGOTADO: {producto['nombre']} "
+                    f"| Stock actual: 0"
+                )
+            else:
+                mensaje = (
+                    f"⚠️ {producto['nombre']} "
+                    f"| Stock actual: {producto['stock']} "
+                    f"| Stock mínimo: {producto['stock_minimo']}"
+                )
+
+            # Evitar duplicar notificaciones
+            cursor.execute("""
+                SELECT id FROM notificaciones
+                WHERE mensaje = %s
+                ORDER BY id DESC LIMIT 1
+            """, (mensaje,))
+            existe = cursor.fetchone()
+
+            if not existe:
+                cursor.execute(
+                    "INSERT INTO notificaciones (mensaje) VALUES (%s)",
+                    (mensaje,)
+                )
+
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error verificando stock: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+
 # ======================================================
-# NOTIFICACIONES (tabla 'notificaciones' -- existe en mitiendaweb_db,
-# PENDIENTE: confirmar que las columnas coincidan: mensaje, fecha, leido)
+# NOTIFICACIONES
 # ======================================================
 
 def obtener_notificaciones_db():
@@ -476,8 +526,7 @@ def obtener_notificaciones_db():
 
 
 # ======================================================
-# REPORTES DE VENTA (tabla 'reporte_venta' -- PENDIENTE: aún no existe
-# en mitiendaweb_db, evaluar si se reemplaza con 'pedidos')
+# REPORTES (basados en pedidos reales de la tienda)
 # ======================================================
 
 def obtener_reportes_db():
@@ -514,134 +563,37 @@ def obtener_reportes_db():
         db.close()
 
 
-def registrar_reporte_db(titulo, descripcion, monto):
-    db = obtener_conexion()
-    if not db:
-        return False
-    try:
-        cursor = db.cursor()
-        sql = "INSERT INTO reporte_venta (titulo, descripcion, monto, fecha) VALUES (%s, %s, %s, CURRENT_TIMESTAMP)"
-
-        cursor.execute(sql, (titulo, descripcion, monto))
-        db.commit()
-        return True
-    except Exception as e:
-        print(f"Error al registrar: {e}")
-        return False
-    finally:
-        cursor.close()
-        db.close()
-
-
-def editar_reporte_db(id_reporte, titulo, descripcion, monto):
-    db = obtener_conexion()
-    cursor = db.cursor()
-    cursor.execute("UPDATE reporte_venta SET titulo=%s, descripcion=%s, monto=%s WHERE id_reporte=%s",
-                   (titulo, descripcion, monto, id_reporte))
-    db.commit()
-    return True
-
-
-def eliminar_reporte_db(id_reporte):
-    db = obtener_conexion()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM reporte_venta WHERE id_reporte = %s", (id_reporte,))
-    db.commit()
-    return True
-
-def verificar_stock_bajo():
-
-
-
-    db = obtener_conexion()
-    if not db:
-        return False
-
-    try:
-        cursor = db.cursor(dictionary=True)
-
-        # Buscar productos con stock bajo
-        sql = """
-        SELECT id, nombre, stock, stock_minimo
-        FROM productos
-        WHERE stock <= stock_minimo
-        """
-        cursor.execute(sql)
-        productos = cursor.fetchall()
-
-        for producto in productos:
-            if producto['stock'] == 0:
-                mensaje = (
-                    f"🚨 AGOTADO: {producto['nombre']} "
-                    f"| Stock actual: 0"
-                )
-        else:
-            mensaje = (
-                f"⚠️ {producto['nombre']} "
-                f"| Stock actual: {producto['stock']} "
-                f"| Stock mínimo: {producto['stock_minimo']}"
-            )
-
-            # Evitar duplicar notificaciones
-            cursor.execute("""
-                SELECT id
-                FROM notificaciones
-                WHERE mensaje = %s
-                ORDER BY id DESC
-                LIMIT 1
-            """, (mensaje,))
-
-            existe = cursor.fetchone()
-
-            if not existe:
-                cursor.execute("""
-                    INSERT INTO notificaciones (mensaje)
-                    VALUES (%s)
-                """, (mensaje,))
-
-        db.commit()
-        return True
-
-    except Exception as e:
-        print(f"Error verificando stock: {e}")
-        return False
-
-    finally:
-        cursor.close()
-        db.close()
+# ======================================================
+# SOPORTE / CHATS
+# ======================================================
 
 def obtener_chats_abiertos_db():
     db = obtener_conexion()
     if not db:
         return []
-
     try:
         cursor = db.cursor(dictionary=True)
-
         sql = """
-        SELECT
-            usuario_id,
-            nombre,
-            correo,
-            COUNT(*) AS total_mensajes,
-            MAX(fecha_creacion) AS ultima_fecha,
-            SUBSTRING_INDEX(
-                GROUP_CONCAT(mensaje ORDER BY fecha_creacion DESC),
-                ',', 1
-            ) AS ultimo_mensaje
-        FROM soporte
-        WHERE estado IN ('PENDIENTE', 'EN_PROCESO')
-        GROUP BY usuario_id, nombre, correo
-        ORDER BY ultima_fecha DESC
+            SELECT
+                usuario_id,
+                nombre,
+                correo,
+                COUNT(*) AS total_mensajes,
+                MAX(fecha_creacion) AS ultima_fecha,
+                SUBSTRING_INDEX(
+                    GROUP_CONCAT(mensaje ORDER BY fecha_creacion DESC),
+                    ',', 1
+                ) AS ultimo_mensaje
+            FROM soporte
+            WHERE estado IN ('PENDIENTE', 'EN_PROCESO')
+            GROUP BY usuario_id, nombre, correo
+            ORDER BY ultima_fecha DESC
         """
-
         cursor.execute(sql)
         return cursor.fetchall()
-
     except Exception as e:
         print(f"Error chats: {e}")
         return []
-
     finally:
         cursor.close()
         db.close()
