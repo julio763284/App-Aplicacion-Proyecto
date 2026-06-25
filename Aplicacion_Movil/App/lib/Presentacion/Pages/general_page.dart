@@ -11,9 +11,6 @@ class GeneralPage extends StatefulWidget {
 }
 
 class _GeneralPageState extends State<GeneralPage> {
-  static const Color primaryDark = Color(0xFF0D1B1E);
-  static const Color accentTeal = Color(0xFF017A74);
-
   bool _notificacionesActivas = true;
   bool _cargando = true;
 
@@ -34,44 +31,49 @@ class _GeneralPageState extends State<GeneralPage> {
   Future<void> _guardarPreferencia(bool valor) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notificaciones_activas', valor);
-    setState(() {
-      _notificacionesActivas = valor;
-    });
+    setState(() => _notificacionesActivas = valor);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final teal  = theme.colorScheme.primary;
+    final cyan  = theme.colorScheme.secondary;
+
     return Scaffold(
-      backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
       appBar: const CustomAppBar(
         titulo: "GENERAL",
         conteoNotificaciones: 0,
       ),
       body: _cargando
-          ? const Center(child: CircularProgressIndicator(color: Colors.greenAccent))
+          ? Center(child: CircularProgressIndicator(color: cyan))
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
                   ),
                   child: SwitchListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    activeColor: accentTeal,
-                    activeTrackColor: accentTeal.withOpacity(0.4),
-                    title: const Text(
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    activeColor: teal,
+                    activeTrackColor: teal.withOpacity(0.4),
+                    title: Text(
                       "Notificaciones push",
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     subtitle: Text(
                       _notificacionesActivas
                           ? "Recibirás alertas de stock bajo y novedades"
                           : "No recibirás notificaciones",
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
                     ),
                     value: _notificacionesActivas,
                     onChanged: _guardarPreferencia,

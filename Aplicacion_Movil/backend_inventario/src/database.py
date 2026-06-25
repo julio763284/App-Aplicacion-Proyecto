@@ -654,3 +654,80 @@ def eliminar_reporte_db(id_reporte):
     finally:
         cursor.close()
         db.close()
+
+# ======================================================
+# SOPORTE — pega estas funciones al final de database.py
+# ======================================================
+
+def obtener_mensajes_chat_db(usuario_id):
+    """Devuelve todos los mensajes del hilo de un usuario, ordenados por fecha."""
+    db = obtener_conexion()
+    if not db:
+        return []
+    try:
+        cursor = db.cursor(dictionary=True)
+        sql = """
+            SELECT id, remitente, nombre, correo, asunto, mensaje, estado,
+                   DATE_FORMAT(fecha_creacion, '%Y-%m-%d %H:%i') AS fecha_creacion
+            FROM soporte
+            WHERE usuario_id = %s
+            ORDER BY fecha_creacion ASC
+        """
+        cursor.execute(sql, (usuario_id,))
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Error obtener_mensajes_chat_db: {e}")
+        return []
+    finally:
+        cursor.close()
+        db.close()
+
+
+def enviar_mensaje_admin_db(usuario_id, nombre, correo, asunto, mensaje):
+    """Inserta un mensaje del admin en el hilo del usuario y actualiza estado a EN_PROCESO."""
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor()
+        # Insertar respuesta del admin
+        sql_insert = """
+            INSERT INTO soporte (usuario_id, remitente, nombre, correo, asunto, mensaje, estado)
+            VALUES (%s, 'admin', %s, %s, %s, %s, 'EN_PROCESO')
+        """
+        cursor.execute(sql_insert, (usuario_id, nombre, correo, asunto, mensaje))
+
+        # Marcar mensajes anteriores del cliente como EN_PROCESO
+        sql_update = """
+            UPDATE soporte
+            SET estado = 'EN_PROCESO'
+            WHERE usuario_id = %s AND remitente = 'cliente' AND estado = 'PENDIENTE'
+        """
+        cursor.execute(sql_update, (usuario_id,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error enviar_mensaje_admin_db: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
+
+
+def marcar_chat_resuelto_db(usuario_id):
+    """Marca todos los mensajes del usuario como RESUELTO."""
+    db = obtener_conexion()
+    if not db:
+        return False
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE soporte SET estado = 'RESUELTO' WHERE usuario_id = %s"
+        cursor.execute(sql, (usuario_id,))
+        db.commit()
+        return True
+    except Exception as e:
+        print(f"Error marcar_chat_resuelto_db: {e}")
+        return False
+    finally:
+        cursor.close()
+        db.close()
