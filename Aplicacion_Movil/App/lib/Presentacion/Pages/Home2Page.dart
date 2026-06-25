@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Widgets/GestionarProductos.dart';
-import 'package:gestor/Presentacion/Widgets/GestionarSoportes.dart';
+import 'package:gestor/Presentacion/Widgets/GestionarReportes.dart';
 import 'package:gestor/Presentacion/Widgets/Visualizar_Stock.dart';
 import 'package:gestor/Presentacion/Widgets/Cliente.dart';
 import 'package:gestor/Presentacion/Widgets/Proveedores.dart';

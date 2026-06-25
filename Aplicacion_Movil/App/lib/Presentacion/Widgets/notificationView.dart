@@ -1,7 +1,7 @@
-import 'dart:ui';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gestor/Presentacion/Dise%C3%B1o/appbar.dart';
+import 'dart:ui';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:gestor/Presentacion/core/config.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
@@ -15,7 +15,7 @@ class NotificationView extends StatefulWidget {
 
 class _NotificationViewState extends State<NotificationView> {
   final TextEditingController _searchController = TextEditingController();
-  List<dynamic> _allNotifications      = [];
+  List<dynamic> _allNotifications = [];
   List<dynamic> _filteredNotifications = [];
   bool _isLoading = true;
 
@@ -28,16 +28,18 @@ class _NotificationViewState extends State<NotificationView> {
   Future<void> _fetchNotifications() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
+    
     try {
-      final response =
-          await http.get(Uri.parse(ApiConfig.url('/notificaciones')));
+      final url = Uri.parse(ApiConfig.url('/notificaciones'));
+      final response = await http.get(url);
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         if (mounted) {
           setState(() {
-            _allNotifications      = data;
+            _allNotifications = data;
             _filteredNotifications = data;
-            _isLoading             = false;
+            _isLoading = false;
           });
         }
       } else {
@@ -60,21 +62,18 @@ class _NotificationViewState extends State<NotificationView> {
   void _filterNotifications(String query) {
     setState(() {
       _filteredNotifications = _allNotifications
-          .where((n) => n['mensaje']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+          .where((n) => n['mensaje'].toString().toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final teal  = theme.colorScheme.primary;
-    final cyan  = theme.colorScheme.secondary;
+    const primaryDark = Color(0xFF0D1B1E);
+    const accentTeal = Color(0xFF017A74);
 
     return Scaffold(
+      backgroundColor: primaryDark,
       drawer: const CustomNexusDrawer(),
       appBar: CustomAppBar(
         conteoNotificaciones: 0,
@@ -87,7 +86,7 @@ class _NotificationViewState extends State<NotificationView> {
             right: -50,
             child: CircleAvatar(
               radius: 100,
-              backgroundColor: teal.withOpacity(0.05),
+              backgroundColor: accentTeal.withOpacity(0.05),
             ),
           ),
           Column(
@@ -101,22 +100,20 @@ class _NotificationViewState extends State<NotificationView> {
                     child: TextField(
                       controller: _searchController,
                       onChanged: _filterNotifications,
-                      style: theme.textTheme.bodyLarge,
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: "Buscar en el historial...",
-                        hintStyle: theme.textTheme.bodyMedium,
-                        prefixIcon:
-                            Icon(Icons.search, color: Colors.greenAccent),
+                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                        prefixIcon: const Icon(Icons.search, color: Colors.greenAccent),
                         filled: true,
-                        fillColor: theme.cardColor.withOpacity(0.5),
+                        fillColor: Colors.white.withOpacity(0.05),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide(
-                              color: theme.dividerColor.withOpacity(0.3)),
+                          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide(color: teal),
+                          borderSide: const BorderSide(color: accentTeal),
                         ),
                       ),
                     ),
@@ -134,18 +131,16 @@ class _NotificationViewState extends State<NotificationView> {
                     : RefreshIndicator(
                         onRefresh: _fetchNotifications,
                         color: Colors.greenAccent,
-                        backgroundColor: theme.cardColor,
+                        backgroundColor: const Color(0xFF162A2D),
                         child: _filteredNotifications.isEmpty
                             ? _buildEmptyState()
                             : ListView.builder(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 itemCount: _filteredNotifications.length,
                                 itemBuilder: (context, index) {
                                   return _buildNotificationCard(
                                     _filteredNotifications[index]['mensaje'],
-                                    _filteredNotifications[index]['fecha'] ??
-                                        '',
+                                    _filteredNotifications[index]['fecha'] ?? '',
                                   );
                                 },
                               ),
@@ -159,36 +154,34 @@ class _NotificationViewState extends State<NotificationView> {
   }
 
   Widget _buildEmptyState() {
-    final theme = Theme.of(context);
-    return ListView(
+    return ListView( // Usamos ListView para que el RefreshIndicator funcione
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-        Icon(Icons.notifications_off_outlined,
-            size: 80, color: theme.dividerColor),
+        Icon(Icons.notifications_off_outlined, size: 80, color: Colors.white.withOpacity(0.1)),
         const SizedBox(height: 20),
         Center(
-          child: Text("Sin notificaciones",
-              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 16)),
+          child: Text(
+            "Sin notificaciones",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withOpacity(0.4),
+            ),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildNotificationCard(String text, String date) {
-    final theme      = Theme.of(context);
-    final teal       = theme.colorScheme.primary;
-    final isAgotado  = text.toUpperCase().contains("AGOTADO");
-    final iconColor  = isAgotado ? Colors.redAccent : Colors.greenAccent;
-    final bgColor    = isAgotado ? Colors.redAccent : teal;
-
+    final bool isAgotado = text.toUpperCase().contains("AGOTADO");
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: const Color(0xFF162A2D),
         borderRadius: BorderRadius.circular(18),
-        border:
-            Border.all(color: theme.dividerColor.withOpacity(0.3)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,14 +189,12 @@ class _NotificationViewState extends State<NotificationView> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: bgColor.withOpacity(0.15),
+              color: (isAgotado ? Colors.redAccent : const Color(0xFF017A74)).withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              isAgotado
-                  ? Icons.warning_amber_rounded
-                  : Icons.inventory_2_outlined,
-              color: iconColor,
+              isAgotado ? Icons.warning_amber_rounded : Icons.inventory_2_outlined,
+              color: isAgotado ? Colors.redAccent : Colors.greenAccent,
               size: 20,
             ),
           ),
@@ -214,18 +205,20 @@ class _NotificationViewState extends State<NotificationView> {
               children: [
                 Text(
                   text,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 14,
+                  style: const TextStyle(
+                    color: Colors.white, 
+                    fontSize: 14, 
                     fontWeight: FontWeight.w500,
-                    height: 1.4,
+                    height: 1.4
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   date,
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.3), 
                     fontSize: 11,
-                    letterSpacing: 0.5,
+                    letterSpacing: 0.5
                   ),
                 ),
               ],
