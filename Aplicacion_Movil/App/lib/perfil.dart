@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gestor/Presentacion/Pages/LoginHome.dart';
-import 'package:flutter/services.dart';
 
 class PerfilPage extends StatefulWidget {
   final int userId;
@@ -18,10 +17,10 @@ class PerfilPage extends StatefulWidget {
 }
 
 class _PerfilPageState extends State<PerfilPage> {
-  String nombre = "";
-  String email = "";
+  String nombre    = "";
+  String email     = "";
   String? urlImagen;
-  bool loading = true;
+  bool loading     = true;
 
   @override
   void initState() {
@@ -31,16 +30,14 @@ class _PerfilPageState extends State<PerfilPage> {
 
   Future<void> obtenerPerfil() async {
     try {
-      final String endpoint = ApiConfig.url('perfil?id=${widget.userId}');
-      final res = await http.get(Uri.parse(endpoint));
-
+      final res = await http.get(Uri.parse(ApiConfig.url('perfil?id=${widget.userId}')));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
         setState(() {
-          nombre = data['nombre'] ?? "";
-          email = data['correo'] ?? "";
+          nombre    = data['nombre'] ?? "";
+          email     = data['correo'] ?? "";
           urlImagen = data['imagen'];
-          loading = false;
+          loading   = false;
         });
       } else {
         setState(() => loading = false);
@@ -54,21 +51,17 @@ class _PerfilPageState extends State<PerfilPage> {
     final picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
-
-    File file = File(image.path);
-    List<int> bytes = await file.readAsBytes();
-    String base64Image = base64Encode(bytes);
-
+    final bytes = await File(image.path).readAsBytes();
+    final base64Image = base64Encode(bytes);
     try {
-      final String endpoint = ApiConfig.url('subir_imagen');
       final res = await http.post(
-        Uri.parse(endpoint),
+        Uri.parse(ApiConfig.url('subir_imagen')),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"id": widget.userId, "imagen": base64Image}),
       );
       if (res.statusCode == 200) obtenerPerfil();
     } catch (e) {
-      print("Error: $e");
+      debugPrint("Error: $e");
     }
   }
 
@@ -84,43 +77,32 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Future<void> _confirmLogout() async {
+    final theme = Theme.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF0D1B1E),
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.logout, color: Colors.redAccent),
-            SizedBox(width: 10),
-            Text(
-              "Cerrar sesión",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Icon(Icons.logout, color: Colors.redAccent),
+            const SizedBox(width: 10),
+            Text("Cerrar sesión",
+                style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
           ],
         ),
-        content: const Text(
-          "¿Estás seguro de que deseas cerrar sesión?",
-          style: TextStyle(color: Colors.white70),
-        ),
+        content: Text("¿Estás seguro de que deseas cerrar sesión?",
+            style: theme.textTheme.bodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              "Cancelar",
-              style: TextStyle(color: Colors.white54),
-            ),
+            child: Text("Cancelar", style: theme.textTheme.bodyMedium),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () => Navigator.pop(context, true),
             child: const Text("Sí, salir"),
@@ -133,33 +115,28 @@ class _PerfilPageState extends State<PerfilPage> {
 
   Future<void> _eliminarImagen() async {
     try {
-      final String endpoint = ApiConfig.url('eliminar_imagen');
       final res = await http.post(
-        Uri.parse(endpoint),
+        Uri.parse(ApiConfig.url('eliminar_imagen')),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"id": widget.userId}),
       );
-
       if (res.statusCode == 200) {
-        setState(() {
-          urlImagen = null;
-        });
+        setState(() => urlImagen = null);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Foto de perfil eliminada exitosamente'),
-            ),
+            const SnackBar(content: Text('Foto de perfil eliminada exitosamente')),
           );
         }
       }
     } catch (e) {
-      print("Error al eliminar imagen: $e");
+      debugPrint("Error al eliminar imagen: $e");
     }
   }
 
-  // --- VISOR DE FOTO MEJORADO CON EL DISEÑO DE LA APP ---
   void _verFotoEnGrande() {
     if (urlImagen == null || urlImagen!.isEmpty) return;
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
 
     showDialog(
       context: context,
@@ -169,16 +146,9 @@ class _PerfilPageState extends State<PerfilPage> {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF0D1B1E), Color(0xFF050A0B)], // Fondo integrado
-            ),
-          ),
+          color: theme.scaffoldBackgroundColor,
           child: Stack(
             children: [
-              // Contenedor interactivo con marco brillante
               Center(
                 child: InteractiveViewer(
                   panEnabled: true,
@@ -189,46 +159,29 @@ class _PerfilPageState extends State<PerfilPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
-                        BoxShadow(
-                          color: Colors.cyanAccent.withOpacity(0.15),
-                          blurRadius: 30,
-                          spreadRadius: 5,
-                        ),
+                        BoxShadow(color: cyan.withOpacity(0.15), blurRadius: 30, spreadRadius: 5),
                       ],
-                      border: Border.all(
-                        color: Colors.cyanAccent.withOpacity(0.3),
-                        width: 2,
-                      ),
+                      border: Border.all(color: cyan.withOpacity(0.3), width: 2),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(28),
-                      child: Image.memory(
-                        base64Decode(urlImagen!),
-                        fit: BoxFit.contain,
-                      ),
+                      child: Image.memory(base64Decode(urlImagen!), fit: BoxFit.contain),
                     ),
                   ),
                 ),
               ),
-              // Botón de cerrar estilizado
               SafeArea(
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: IconButton(
-                      icon: const Icon(
-                        Icons.close_rounded,
-                        color: Colors.cyanAccent,
-                        size: 28,
-                      ),
+                      icon: Icon(Icons.close_rounded, color: cyan, size: 28),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.05),
+                        backgroundColor: theme.cardColor.withOpacity(0.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
-                          side: BorderSide(
-                            color: Colors.cyanAccent.withOpacity(0.2),
-                          ),
+                          side: BorderSide(color: cyan.withOpacity(0.2)),
                         ),
                       ),
                       onPressed: () => Navigator.pop(context),
@@ -245,12 +198,12 @@ class _PerfilPageState extends State<PerfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
+
     if (loading) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF0D1B1E),
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.cyanAccent),
-        ),
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator(color: cyan)),
       );
     }
 
@@ -260,146 +213,97 @@ class _PerfilPageState extends State<PerfilPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "PERFIL",
-          style: TextStyle(
-            color: Colors.white,
-            letterSpacing: 2,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text("PERFIL",
+            style: theme.textTheme.bodyLarge?.copyWith(
+              letterSpacing: 2,
+              fontWeight: FontWeight.bold,
+            )),
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
-            color: const Color(0xFF1A2A2D),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            onSelected: (value) {
-              if (value == 'editar') {
-                _editarPerfil();
-              }
-            },
+            color: theme.cardColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            onSelected: (value) { if (value == 'editar') _editarPerfil(); },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'editar',
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.edit_outlined,
-                      color: Colors.cyanAccent,
-                      size: 20,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      'Actualizar perfil',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    Icon(Icons.edit_outlined, color: cyan, size: 20),
+                    const SizedBox(width: 10),
+                    Text('Actualizar perfil', style: theme.textTheme.bodyLarge),
                   ],
                 ),
               ),
             ],
-            icon: const Icon(Icons.more_vert, color: Colors.white),
+            icon: Icon(Icons.more_vert, color: theme.iconTheme.color),
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0D1B1E), Color(0xFF050A0B)],
-          ),
-        ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25,
-                  vertical: 20,
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - 40,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        _buildAvatar(),
-                        const SizedBox(height: 20),
-                        Text(
-                          nombre,
-                          style: const TextStyle(
-                            color: Colors.white,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 40),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildAvatar(),
+                      const SizedBox(height: 20),
+                      Text(nombre,
+                          style: theme.textTheme.bodyLarge?.copyWith(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
-                          ),
+                          )),
+                      const SizedBox(height: 5),
+                      Text(email, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 16)),
+                      const SizedBox(height: 40),
+                      _cardInfo(Icons.email_outlined,  "Correo electrónico", email),
+                      _cardInfo(Icons.person_outline,  "Nombre de usuario",  nombre),
+                      const Spacer(),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.logout, color: Colors.white),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent.withOpacity(0.9),
+                          minimumSize: const Size(double.infinity, 55),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          elevation: 5,
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          email,
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        _cardInfo(
-                          Icons.email_outlined,
-                          "Correo electrónico",
-                          email,
-                        ),
-                        _cardInfo(
-                          Icons.person_outline,
-                          "Nombre de usuario",
-                          nombre,
-                        ),
-                        const Spacer(),
-                        const SizedBox(height: 20),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.logout, color: Colors.white),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent.withOpacity(0.9),
-                            minimumSize: const Size(double.infinity, 55),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            elevation: 5,
-                          ),
-                          onPressed: _confirmLogout,
-                          label: const Text(
-                            "CERRAR SESIÓN",
+                        onPressed: _confirmLogout,
+                        label: const Text("CERRAR SESIÓN",
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                               letterSpacing: 1,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
+                            )),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
   Future<void> _editarPerfil() async {
+    final theme            = Theme.of(context);
+    final cyan             = theme.colorScheme.secondary;
     final nombreController = TextEditingController(text: nombre);
-    final emailController = TextEditingController(text: email);
-    final formKey = GlobalKey<FormState>();
-    final bool tieneFoto = urlImagen != null && urlImagen!.isNotEmpty;
+    final emailController  = TextEditingController(text: email);
+    final formKey          = GlobalKey<FormState>();
+    final bool tieneFoto   = urlImagen != null && urlImagen!.isNotEmpty;
 
     await showDialog<void>(
       context: context,
@@ -409,14 +313,10 @@ class _PerfilPageState extends State<PerfilPage> {
         child: Container(
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: const Color(0xFF132327),
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 15,
-                offset: const Offset(0, 10),
-              ),
+              BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 15, offset: const Offset(0, 10)),
             ],
           ),
           child: SingleChildScrollView(
@@ -425,49 +325,33 @@ class _PerfilPageState extends State<PerfilPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Actualizar Perfil',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('Actualizar Perfil',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      )),
                   const SizedBox(height: 25),
-                  // Visualizador de foto de perfil
                   Container(
                     padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: Colors.cyanAccent,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: cyan, shape: BoxShape.circle),
                     child: CircleAvatar(
                       radius: 45,
-                      backgroundColor: const Color(0xFF0D1B1E),
-                      backgroundImage: tieneFoto
-                          ? MemoryImage(base64Decode(urlImagen!))
-                          : null,
+                      backgroundColor: theme.scaffoldBackgroundColor,
+                      backgroundImage: tieneFoto ? MemoryImage(base64Decode(urlImagen!)) : null,
                       child: !tieneFoto
-                          ? const Icon(
-                              Icons.person,
-                              size: 50,
-                              color: Colors.white24,
-                            )
+                          ? Icon(Icons.person, size: 50, color: theme.dividerColor)
                           : null,
                     ),
                   ),
                   const SizedBox(height: 15),
-                  // Botones de acción para la foto
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white10,
-                          foregroundColor: Colors.cyanAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          backgroundColor: theme.dividerColor.withOpacity(0.1),
+                          foregroundColor: cyan,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 0,
                         ),
                         onPressed: () async {
@@ -495,61 +379,12 @@ class _PerfilPageState extends State<PerfilPage> {
                     ],
                   ),
                   const SizedBox(height: 30),
-                  // Campo Nombre
-                  TextFormField(
-                    controller: nombreController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Nombre',
-                      labelStyle: const TextStyle(color: Colors.white54),
-                      prefixIcon: const Icon(
-                        Icons.person_outline,
-                        color: Colors.cyanAccent,
-                      ),
-                      filled: true,
-                      fillColor: Colors.black26,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: const BorderSide(color: Colors.cyanAccent),
-                      ),
-                    ),
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'El nombre es requerido'
-                        : null,
-                  ),
+                  _themedField(nombreController, 'Nombre', Icons.person_outline, theme, cyan,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'El nombre es requerido' : null),
                   const SizedBox(height: 15),
-                  // Campo Correo
-                  TextFormField(
-                    controller: emailController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Correo electrónico',
-                      labelStyle: const TextStyle(color: Colors.white54),
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        color: Colors.cyanAccent,
-                      ),
-                      filled: true,
-                      fillColor: Colors.black26,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: const BorderSide(color: Colors.cyanAccent),
-                      ),
-                    ),
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'El correo es requerido'
-                        : null,
-                  ),
+                  _themedField(emailController, 'Correo electrónico', Icons.email_outlined, theme, cyan,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'El correo es requerido' : null),
                   const SizedBox(height: 30),
-                  // Botones de Guardar / Cancelar
                   Row(
                     children: [
                       Expanded(
@@ -557,65 +392,40 @@ class _PerfilPageState extends State<PerfilPage> {
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text(
-                            'Cancelar',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 16,
-                            ),
-                          ),
+                          child: Text('Cancelar', style: theme.textTheme.bodyMedium?.copyWith(fontSize: 16)),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.cyanAccent,
+                            backgroundColor: cyan,
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 5,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           onPressed: () async {
                             if (!formKey.currentState!.validate()) return;
-
                             final nuevoNombre = nombreController.text.trim();
-                            final nuevoEmail = emailController.text.trim();
-
-                            // Si cambió el nombre
+                            final nuevoEmail  = emailController.text.trim();
                             if (nuevoNombre != nombre) {
-                              final ok = await _actualizarNombreApi(
-                                widget.userId,
-                                nuevoNombre,
-                              );
-                              if (!ok) {
+                              final ok = await _actualizarNombreApi(widget.userId, nuevoNombre);
+                              if (!ok && mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Error al actualizar nombre'),
-                                  ),
+                                  const SnackBar(content: Text('Error al actualizar nombre')),
                                 );
                               }
                             }
-
-                            // Si cambió el email -> iniciar flujo de verificación
                             if (nuevoEmail != email) {
-                              final enviado = await _enviarCodigoApi(
-                                nuevoEmail,
-                              );
+                              final enviado = await _enviarCodigoApi(nuevoEmail);
                               if (enviado) {
                                 Navigator.of(context).pop();
                                 await _pedirCodigoYVerificar(nuevoEmail);
-                              } else {
+                              } else if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('No se pudo enviar código'),
-                                  ),
+                                  const SnackBar(content: Text('No se pudo enviar código')),
                                 );
                               }
                             } else {
@@ -623,13 +433,8 @@ class _PerfilPageState extends State<PerfilPage> {
                               obtenerPerfil();
                             }
                           },
-                          child: const Text(
-                            'Guardar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
+                          child: const Text('Guardar',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
                       ),
                     ],
@@ -643,87 +448,110 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
+  Widget _themedField(
+    TextEditingController ctrl,
+    String label,
+    IconData icon,
+    ThemeData theme,
+    Color cyan, {
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: ctrl,
+      style: theme.textTheme.bodyLarge,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: theme.textTheme.bodyMedium,
+        prefixIcon: Icon(icon, color: cyan),
+        filled: true,
+        fillColor: theme.scaffoldBackgroundColor.withOpacity(0.5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: cyan),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
+      ),
+    );
+  }
+
   Future<bool> _actualizarNombreApi(int id, String nuevoNombre) async {
     try {
-      final url = Uri.parse(ApiConfig.url('actualizar_usuario'));
       final res = await http.post(
-        url,
+        Uri.parse(ApiConfig.url('actualizar_usuario')),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"id": id, "nombre": nuevoNombre}),
       );
-      if (res.statusCode == 200) return true;
+      return res.statusCode == 200;
     } catch (e) {
-      print('Error actualizarNombre: $e');
+      return false;
     }
-    return false;
   }
 
   Future<bool> _enviarCodigoApi(String emailDestino) async {
     try {
-      final url = Uri.parse(ApiConfig.url('enviar_codigo'));
       final res = await http.post(
-        url,
+        Uri.parse(ApiConfig.url('enviar_codigo')),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": emailDestino}),
       );
       final data = jsonDecode(res.body);
       return res.statusCode == 200 && data['status'] == 'success';
     } catch (e) {
-      print('Error enviarCodigo: $e');
       return false;
     }
   }
 
   Future<void> _pedirCodigoYVerificar(String nuevoEmail) async {
+    final theme           = Theme.of(context);
+    final cyan            = theme.colorScheme.secondary;
     final codigoController = TextEditingController();
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF132327),
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.mark_email_read_outlined, color: Colors.cyanAccent),
-            SizedBox(width: 10),
-            Text(
-              'Confirmar correo',
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
+            Icon(Icons.mark_email_read_outlined, color: cyan),
+            const SizedBox(width: 10),
+            Text('Confirmar correo', style: theme.textTheme.bodyLarge?.copyWith(fontSize: 18)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Se ha enviado un código al nuevo correo. Ingresa el código para confirmar.',
-              style: TextStyle(color: Colors.white70),
+              style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             TextField(
               controller: codigoController,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                letterSpacing: 5,
-              ),
+              style: theme.textTheme.bodyLarge?.copyWith(fontSize: 20, letterSpacing: 5),
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: '000000',
-                hintStyle: const TextStyle(
-                  color: Colors.white24,
-                  letterSpacing: 5,
-                ),
+                hintStyle: theme.textTheme.bodyMedium?.copyWith(letterSpacing: 5),
                 filled: true,
-                fillColor: Colors.black26,
+                fillColor: theme.scaffoldBackgroundColor.withOpacity(0.5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                   borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: Colors.cyanAccent),
+                  borderSide: BorderSide(color: cyan),
                 ),
               ),
             ),
@@ -732,38 +560,27 @@ class _PerfilPageState extends State<PerfilPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.white54),
-            ),
+            child: Text('Cancelar', style: theme.textTheme.bodyMedium),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.cyanAccent,
+              backgroundColor: cyan,
               foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () async {
               final codigo = codigoController.text.trim();
               if (codigo.isEmpty) return;
-              final ok = await _verificarYCambiarEmailApi(
-                widget.userId,
-                nuevoEmail,
-                codigo,
-              );
+              final ok = await _verificarYCambiarEmailApi(widget.userId, nuevoEmail, codigo);
               Navigator.pop(context, ok);
             },
-            child: const Text(
-              'Confirmar',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            child: const Text('Confirmar', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
 
+    if (!mounted) return;
     if (confirmed == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Correo actualizado exitosamente')),
@@ -771,38 +588,29 @@ class _PerfilPageState extends State<PerfilPage> {
       obtenerPerfil();
     } else if (confirmed == false) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Código incorrecto o verificación cancelada'),
-        ),
+        const SnackBar(content: Text('Código incorrecto o verificación cancelada')),
       );
     }
   }
 
-  Future<bool> _verificarYCambiarEmailApi(
-    int id,
-    String nuevoEmail,
-    String codigo,
-  ) async {
+  Future<bool> _verificarYCambiarEmailApi(int id, String nuevoEmail, String codigo) async {
     try {
-      final url = Uri.parse(ApiConfig.url('verificar_y_cambiar_email'));
       final res = await http.post(
-        url,
+        Uri.parse(ApiConfig.url('verificar_y_cambiar_email')),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "id": id,
-          "nuevo_email": nuevoEmail,
-          "codigo": codigo,
-        }),
+        body: jsonEncode({"id": id, "nuevo_email": nuevoEmail, "codigo": codigo}),
       );
       final data = jsonDecode(res.body);
       return res.statusCode == 200 && data['status'] == 'success';
     } catch (e) {
-      print('Error verificarYCambiarEmail: $e');
       return false;
     }
   }
 
   Widget _buildAvatar() {
+    final theme    = Theme.of(context);
+    final cyan     = theme.colorScheme.secondary;
+    final teal     = theme.colorScheme.primary;
     final tieneFoto = urlImagen != null && urlImagen!.isNotEmpty;
 
     return GestureDetector(
@@ -814,27 +622,21 @@ class _PerfilPageState extends State<PerfilPage> {
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Colors.cyanAccent, Color(0xFF017A74)],
+              gradient: LinearGradient(
+                colors: [cyan, teal],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.cyanAccent.withOpacity(0.3),
-                  blurRadius: 15,
-                  spreadRadius: 2,
-                ),
+                BoxShadow(color: cyan.withOpacity(0.3), blurRadius: 15, spreadRadius: 2),
               ],
             ),
             child: CircleAvatar(
               radius: 65,
-              backgroundColor: const Color(0xFF0D1B1E),
-              backgroundImage: tieneFoto
-                  ? MemoryImage(base64Decode(urlImagen!))
-                  : null,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              backgroundImage: tieneFoto ? MemoryImage(base64Decode(urlImagen!)) : null,
               child: !tieneFoto
-                  ? const Icon(Icons.person, size: 70, color: Colors.white24)
+                  ? Icon(Icons.person, size: 70, color: theme.dividerColor)
                   : null,
             ),
           ),
@@ -842,15 +644,11 @@ class _PerfilPageState extends State<PerfilPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.cyanAccent,
+                color: cyan,
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF0D1B1E), width: 3),
+                border: Border.all(color: theme.scaffoldBackgroundColor, width: 3),
               ),
-              child: const Icon(
-                Icons.camera_alt,
-                size: 20,
-                color: Colors.black,
-              ),
+              child: const Icon(Icons.camera_alt, size: 20, color: Colors.black),
             ),
         ],
       ),
@@ -858,19 +656,18 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Widget _cardInfo(IconData icon, String title, String value) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: theme.cardColor.withOpacity(0.5),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
         ],
       ),
       child: Row(
@@ -878,33 +675,19 @@ class _PerfilPageState extends State<PerfilPage> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.cyanAccent.withOpacity(0.1),
+              color: cyan.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.cyanAccent, size: 28),
+            child: Icon(icon, color: cyan, size: 28),
           ),
           const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white54,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(title, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 5),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                Text(value, style: theme.textTheme.bodyLarge?.copyWith(fontSize: 17, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
