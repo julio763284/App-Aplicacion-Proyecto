@@ -23,19 +23,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cyan = theme.colorScheme.secondary;
+
     return AppBar(
-      backgroundColor: const Color(0xFF017A74).withOpacity(0.2),
+      backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
       elevation: 0,
       leading: Builder(
         builder: (context) => IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+          icon: Icon(Icons.menu, color: theme.iconTheme.color, size: 28),
           onPressed: () => Scaffold.of(context).openDrawer(),
         ),
       ),
       title: Text(
         titulo,
-        style: const TextStyle(
-          color: Colors.white,
+        style: theme.textTheme.bodyLarge?.copyWith(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
@@ -47,9 +49,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(
+                Icon(
                   Icons.notifications_none,
-                  color: Colors.white70,
+                  color: theme.iconTheme.color?.withOpacity(0.7),
                   size: 28,
                 ),
                 if (conteoNotificaciones > 0)
@@ -82,21 +84,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationView(),
-                ),
+                MaterialPageRoute(builder: (context) => const NotificationView()),
               );
-              if (alActualizarNotificaciones != null)
-                alActualizarNotificaciones!();
+              alActualizarNotificaciones?.call();
             },
           ),
         if (mostrarPerfil)
           IconButton(
-            icon: const Icon(
-              Icons.person_pin,
-              color: Colors.greenAccent,
-              size: 28,
-            ),
+            icon: Icon(Icons.person_pin, color: cyan, size: 28),
             onPressed: () async {
               final prefs = await SharedPreferences.getInstance();
               final String? userData = prefs.getString('user_data');
@@ -104,11 +99,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               if (userData != null) {
                 try {
                   final Map<String, dynamic> u = jsonDecode(userData);
-                  userId =
-                      int.tryParse(
+                  userId = int.tryParse(
                         (u['id_usuario'] ?? u['id'] ?? u['userId']).toString(),
-                      ) ??
-                      0;
+                      ) ?? 0;
                 } catch (_) {
                   userId = 0;
                 }
@@ -116,9 +109,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => userId == 0
-                      ? const LoginPage()
-                      : PerfilPage(userId: userId),
+                  builder: (context) =>
+                      userId == 0 ? const LoginPage() : PerfilPage(userId: userId),
                 ),
               );
             },

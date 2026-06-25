@@ -6,10 +6,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:gestor/Presentacion/Widgets/CustomAppBar.dart';
 import 'package:gestor/Presentacion/Widgets/custom_drawer.dart';
 
-
 class GestionInventarioView extends StatefulWidget {
   const GestionInventarioView({super.key});
-  static const Color primaryDark = Color(0xFF0D1B1E);
+
   static const List<Color> chartColors = [
     Color(0xFF00FFC2),
     Color(0xFFFFD700),
@@ -40,8 +39,10 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cyan  = theme.colorScheme.secondary;
+
     return Scaffold(
-      backgroundColor: GestionInventarioView.primaryDark,
       drawer: const CustomNexusDrawer(),
       appBar: const CustomAppBar(
         titulo: "PANEL DE CONTROL",
@@ -51,7 +52,7 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
         future: _futureProductos,
         builder: (context, snapshot) {
           if (!snapshot.hasData)
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(color: cyan));
           final productos = snapshot.data!;
 
           return ListView(
@@ -64,16 +65,15 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
                   child: Row(
                     children: [
                       _buildCard("DISTRIBUCIÓN", _buildDonut(productos)),
-                      _buildCard("STOCK", _buildBar(productos)),
+                      _buildCard("STOCK",        _buildBar(productos)),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "LISTA DE PRODUCTOS",
-                style: TextStyle(
-                  color: Colors.white,
+                style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -82,8 +82,8 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
               ...productos.asMap().entries.map(
                 (e) => _buildLeyendaCard(
                   e.value,
-                  GestionInventarioView.chartColors[e.key %
-                      GestionInventarioView.chartColors.length],
+                  GestionInventarioView.chartColors[
+                      e.key % GestionInventarioView.chartColors.length],
                 ),
               ),
             ],
@@ -93,28 +93,29 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
     );
   }
 
-  Widget _buildCard(String title, Widget child) => Container(
-    width: 300,
-    margin: const EdgeInsets.only(right: 15),
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.05),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Column(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Expanded(child: child),
-      ],
-    ),
-  );
+  Widget _buildCard(String title, Widget child) {
+    final theme = Theme.of(context);
+    return Container(
+      width: 300,
+      margin: const EdgeInsets.only(right: 15),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Text(title,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              )),
+          const SizedBox(height: 20),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
 
   Widget _buildDonut(List productos) {
     if (productos.isEmpty) return const SizedBox();
@@ -126,8 +127,8 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
               : 0.0;
           return PieChartSectionData(
             value: stock,
-            color: GestionInventarioView
-                .chartColors[e.key % GestionInventarioView.chartColors.length],
+            color: GestionInventarioView.chartColors[
+                e.key % GestionInventarioView.chartColors.length],
             radius: 50,
             title: "",
           );
@@ -149,9 +150,8 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
             barRods: [
               BarChartRodData(
                 toY: stock,
-                color:
-                    GestionInventarioView.chartColors[e.key %
-                        GestionInventarioView.chartColors.length],
+                color: GestionInventarioView.chartColors[
+                    e.key % GestionInventarioView.chartColors.length],
                 width: 15,
               ),
             ],
@@ -161,28 +161,32 @@ class _GestionInventarioViewState extends State<GestionInventarioView> {
     );
   }
 
-  Widget _buildLeyendaCard(Map p, Color color) => Container(
-    margin: const EdgeInsets.symmetric(vertical: 5),
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.05),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Row(
-      children: [
-        Container(
-          width: 15,
-          height: 15,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 15),
-        Text(p['nombre'], style: const TextStyle(color: Colors.white)),
-        const Spacer(),
-        Text(
-          "Stock: ${p['stock']}",
-          style: TextStyle(color: color, fontWeight: FontWeight.bold),
-        ),
-      ],
-    ),
-  );
+  Widget _buildLeyendaCard(Map p, Color color) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 15,
+            height: 15,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 15),
+          Text(p['nombre'], style: theme.textTheme.bodyLarge),
+          const Spacer(),
+          Text(
+            "Stock: ${p['stock']}",
+            style: TextStyle(color: color, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
 }
