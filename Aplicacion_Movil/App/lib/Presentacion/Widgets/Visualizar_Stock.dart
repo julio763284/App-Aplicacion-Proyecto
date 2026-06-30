@@ -18,9 +18,9 @@ class Producto {
 
   factory Producto.fromJson(Map<String, dynamic> json) {
   return Producto(
-    idProducto: json['id'] ?? 0,              // ← era 'id_producto'
+    idProducto: json['id'] ?? json['id_producto'] ?? 0,
     nombre: json['nombre'] ?? 'Sin nombre',
-    cantidad: int.tryParse(json['stock'].toString()) ?? 0,  // ← era 'cantidad'
+    cantidad: json['stock'] ?? json['cantidad'] ?? 0,
   );
 }
 

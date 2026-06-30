@@ -45,7 +45,7 @@ from src.database import (
 
 def init_routes(app):
 
-    # ─── AUTH ───────────────────────────────────────────────────────────────────
+   
 
     @app.route('/login', methods=['POST'])
     def login():
@@ -345,7 +345,7 @@ def init_routes(app):
     @app.route('/reporte/<int:id>', methods=['PUT'])
     def editar_reporte(id):
         data = request.json
-        if editar_reporte_db(id, data['titulo'], data['descripcion'], data['monto']):
+        if editar_reporte_db (id, data['titulo'], data['descripcion'], data['monto']):
             return jsonify({"status": "success"}), 200
         return jsonify({"status": "error"}), 400
 
